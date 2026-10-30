@@ -1,3 +1,5 @@
+import { isOverseas } from "@/constant/integration";
+import { workbenchVideoInput } from "@/services/workbench/video";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent as ReactChangeEvent, DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -214,7 +216,11 @@ function InfiniteCanvasPage() {
     const config = useConfigStore((state) => state.config);
     const effectiveConfig = useEffectiveConfig();
     const isAiConfigReady = useConfigStore((state) => state.isAiConfigReady);
-    const openConfigDialog = useConfigStore((state) => state.openConfigDialog);
+    const standaloneConfigDialog = useConfigStore((state) => state.openConfigDialog);
+    const openConfigDialog = useCallback((shouldPromptContinue = false) => {
+        if (isOverseas) { void message.info("Only platform video models are available. Text, image and audio AI are not enabled in Workbench."); return; }
+        standaloneConfigDialog(shouldPromptContinue);
+    }, [message, standaloneConfigDialog]);
     const addAsset = useAssetStore((state) => state.addAsset);
     const cleanupAssetImages = useAssetStore((state) => state.cleanupImages);
     const hydrated = useCanvasStore((state) => state.hydrated);
@@ -318,14 +324,34 @@ function InfiniteCanvasPage() {
 
     const completeVideoNodeTask = useCallback(
         async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], prompt: string, images: Parameters<typeof createVideoGenerationTask>[2], signal: AbortSignal, extra: CanvasNodeData["metadata"] = {}, videos: ReferenceVideo[] = [], audios: ReferenceAudio[] = []) => {
-            const task = await createVideoGenerationTask(config, prompt, images, { signal, videos, audios });
+            let requestKey: string | undefined;
+            if (isOverseas) {
+                const estimate = workbenchVideoInput(config);
+                const confirmed = await new Promise<boolean>((resolve) => modal.confirm({
+                    title: "Generate video",
+                    content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). Eligible daily free quota is applied by Workbench. Stopping the wait does not cancel billing.`,
+                    okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false),
+                }));
+                if (!confirmed || signal.aborted) {
+                    const originId = generationRequestsRef.current.get(nodeId)?.originNodeId;
+                    setNodes((prev) => prev.map((item) => item.id === nodeId || item.id === originId ? { ...item, metadata: { ...item.metadata, status: item.metadata?.content ? NODE_STATUS_SUCCESS : NODE_STATUS_IDLE } } : item));
+                    throw new DOMException("Aborted", "AbortError");
+                }
+                const target = nodesRef.current.find((item) => item.id === nodeId);
+                requestKey = (!target?.metadata?.content && target?.metadata?.workbenchRequestKey) || crypto.randomUUID();
+                const next = nodesRef.current.map((item) => item.id === nodeId ? { ...item, metadata: { ...item.metadata, workbenchRequestKey: requestKey } } : item);
+                nodesRef.current = next;
+                setNodes(next);
+                updateProject(projectId, { nodes: next, connections: connectionsRef.current });
+            }
+            const task = await createVideoGenerationTask(config, prompt, images, { signal, videos, audios, projectId, nodeId, requestKey });
             if (task.provider !== "plugin") {
-                setNodes((prev) => prev.map((item) => (item.id === nodeId ? { ...item, metadata: { ...item.metadata, videoTaskId: task.id, videoTaskProvider: task.provider === "gemini" ? "gemini" : "openai", model: config.model } } : item)));
+                setNodes((prev) => prev.map((item) => (item.id === nodeId ? { ...item, metadata: { ...item.metadata, videoTaskId: task.id, videoTaskProvider: task.provider === "workbench" ? "workbench" : task.provider === "gemini" ? "gemini" : "openai", workbenchProjectId: task.projectId, model: config.model } } : item)));
             }
             const video = await storeGeneratedVideo(await waitForVideoGenerationTask(config, task, { signal }));
             setNodes((prev) => prev.map((item) => (item.id === nodeId ? applyGeneratedVideo(item, video, { prompt, model: config.model, ...extra }) : item)));
         },
-        [],
+        [modal, projectId, updateProject],
     );
 
     const pollVideoNodeTask = useCallback(
@@ -336,7 +362,7 @@ function InfiniteCanvasPage() {
             let controller: AbortController | undefined;
             try {
                 const generationConfig = buildGenerationConfig(effectiveConfig, node, "video");
-                if (!isAiConfigReady(generationConfig, generationConfig.model)) {
+                if (!isOverseas && !isAiConfigReady(generationConfig, generationConfig.model)) {
                     if (silent) {
                         setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_ERROR, errorDetails: t("workbench.configFirst") } } : item)));
                         return;
@@ -347,7 +373,7 @@ function InfiniteCanvasPage() {
                 setRunningNodeId(node.id);
                 setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_LOADING, errorDetails: undefined } } : item)));
                 controller = startGenerationRequest(node.id, node.id, node.id);
-                const video = await storeGeneratedVideo(await waitForVideoGenerationTask(generationConfig, { id: taskId, provider: node.metadata?.videoTaskProvider === "gemini" ? "gemini" : "openai", model: generationConfig.model }, { signal: controller.signal }));
+                const video = await storeGeneratedVideo(await waitForVideoGenerationTask(generationConfig, { id: taskId, provider: node.metadata?.videoTaskProvider === "workbench" ? "workbench" : node.metadata?.videoTaskProvider === "gemini" ? "gemini" : "openai", projectId: node.metadata?.workbenchProjectId, model: generationConfig.model }, { signal: controller.signal }));
                 setNodes((prev) =>
                     prev.map((item) =>
                         item.id === node.id
@@ -377,7 +403,7 @@ function InfiniteCanvasPage() {
                                       ...item.metadata,
                                       status: item.metadata?.content ? NODE_STATUS_SUCCESS : NODE_STATUS_ERROR,
                                       errorDetails: item.metadata?.content ? undefined : errorDetails,
-                                      ...(isVideoTaskFailed(error) ? { videoTaskId: undefined } : {}),
+                                      ...(isVideoTaskFailed(error) ? { videoTaskId: undefined, workbenchRequestKey: undefined } : {}),
                                   },
                               }
                             : item,
@@ -483,7 +509,7 @@ function InfiniteCanvasPage() {
     }, [projectLoaded]);
 
     useEffect(() => {
-        if (!projectLoaded || !["new", "recent", "choose"].includes(searchParams.get("mode") || "")) return;
+        if (isOverseas || !projectLoaded || !["new", "recent", "choose"].includes(searchParams.get("mode") || "")) return;
         if (!searchParams.has("agentUrl") && !localAgentEnabled && !fragmentBootstrap) openAgentPanel();
     }, [fragmentBootstrap, localAgentEnabled, openAgentPanel, projectLoaded, searchParams]);
 
@@ -2551,6 +2577,7 @@ function InfiniteCanvasPage() {
                         height: reuseVideoNode ? sourceNode.height : spec.height,
                         metadata: {
                             prompt: effectivePrompt,
+                            workbenchRequestKey: reuseVideoNode && !sourceNode?.metadata?.content ? sourceNode?.metadata?.workbenchRequestKey : undefined,
                             status: NODE_STATUS_LOADING,
                             model: generationConfig.model,
                             size: generationConfig.size,
@@ -2748,7 +2775,7 @@ function InfiniteCanvasPage() {
                                           ...node.metadata,
                                           status: NODE_STATUS_ERROR,
                                           errorDetails,
-                                          ...(isVideoTaskFailed(error) && node.type === CanvasNodeType.Video ? { videoTaskId: undefined } : {}),
+                                          ...(isVideoTaskFailed(error) && node.type === CanvasNodeType.Video ? { videoTaskId: undefined, workbenchRequestKey: undefined } : {}),
                                       },
                                   }
                             : node,
@@ -2905,7 +2932,7 @@ function InfiniteCanvasPage() {
                                       status: item.metadata?.content ? NODE_STATUS_SUCCESS : NODE_STATUS_ERROR,
                                       errorDetails: item.metadata?.content ? undefined : errorDetails,
                                       images: item.metadata?.images?.map((image) => (image.id === imageId ? { ...image, status: NODE_STATUS_ERROR, errorDetails } : image)),
-                                      ...(isVideoTaskFailed(error) && item.type === CanvasNodeType.Video ? { videoTaskId: undefined } : {}),
+                                      ...(isVideoTaskFailed(error) && item.type === CanvasNodeType.Video ? { videoTaskId: undefined, workbenchRequestKey: undefined } : {}),
                                   },
                               }
                             : item,
@@ -3167,7 +3194,7 @@ function InfiniteCanvasPage() {
                     onCancelTitleEditing={() => setTitleEditing(false)}
                     canUndo={historyState.canUndo}
                     canRedo={historyState.canRedo}
-                    onHome={() => navigate("/")}
+                    onHome={() => isOverseas ? window.location.assign("/") : navigate("/")}
                     onProjects={() => navigate("/canvas")}
                     onCreateProject={createAndOpenProject}
                     onDeleteProject={deleteCurrentProject}

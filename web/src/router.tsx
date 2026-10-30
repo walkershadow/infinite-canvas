@@ -1,3 +1,5 @@
+import { isOverseas } from "@/constant/integration";
+import WorkbenchLayout from "@/layouts/workbench-layout";
 import { createBrowserRouter, Outlet } from "react-router-dom";
 
 import { AnalyticsTracker } from "@/components/layout/analytics-tracker";
@@ -12,7 +14,13 @@ import NotFound from "@/pages/not-found";
 import PromptsPage from "@/pages/prompts";
 import VideoPage from "@/pages/video";
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(isOverseas ? [
+    { element: <WorkbenchLayout><Outlet /></WorkbenchLayout>, children: [
+        { path: "/canvas", element: <CanvasPage /> },
+        { path: "/canvas/:id", element: <CanvasProjectPage /> },
+    ] },
+    { path: "*", element: <NotFound /> },
+] : [
     {
         element: (
             <UserLayout>

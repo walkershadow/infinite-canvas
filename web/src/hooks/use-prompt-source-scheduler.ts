@@ -1,3 +1,4 @@
+import { isOverseas } from "@/constant/integration";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -12,7 +13,7 @@ export function usePromptSourceScheduler() {
     const intervalMinutes = usePromptSourceStore((state) => state.schedule.intervalMinutes);
 
     useEffect(() => {
-        if (!intervalMinutes) return;
+        if (isOverseas || !intervalMinutes) return;
         let running = false;
         const tick = async () => {
             if (running) return;

@@ -1,8 +1,10 @@
+import { isOverseas } from "@/constant/integration";
+import { accountDatabaseName } from "@/services/api/workbench";
 import localforage from "localforage";
 import type { StateStorage } from "zustand/middleware";
 
 localforage.config({
-    name: "infinite-canvas",
+    name: isOverseas ? accountDatabaseName() : "infinite-canvas",
     storeName: "app_state",
 });
 
@@ -11,7 +13,8 @@ export const localForageStorage: StateStorage = {
         if (typeof window === "undefined") return null;
         try {
             return (await localforage.getItem<string>(name)) || null;
-        } catch {
+        } catch (error) {
+            if (isOverseas) throw error;
             return window.localStorage.getItem(name);
         }
     },
@@ -19,7 +22,8 @@ export const localForageStorage: StateStorage = {
         if (typeof window === "undefined") return;
         try {
             await localforage.setItem(name, value);
-        } catch {
+        } catch (error) {
+            if (isOverseas) throw error;
             window.localStorage.setItem(name, value);
         }
     },
@@ -27,7 +31,8 @@ export const localForageStorage: StateStorage = {
         if (typeof window === "undefined") return;
         try {
             await localforage.removeItem(name);
-        } catch {
+        } catch (error) {
+            if (isOverseas) throw error;
             window.localStorage.removeItem(name);
         }
     },

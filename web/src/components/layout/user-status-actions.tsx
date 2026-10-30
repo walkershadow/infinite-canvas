@@ -1,3 +1,4 @@
+import { isOverseas } from "@/constant/integration";
 import type { CSSProperties } from "react";
 import { Tooltip } from "antd";
 import { BookOpen, Keyboard, Puzzle, Settings2 } from "lucide-react";
@@ -37,7 +38,7 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
 
     return (
         <div className="inline-flex shrink-0 items-center gap-1">
-            {onOpenPlugins ? (
+            {onOpenPlugins && !isOverseas ? (
                 <button type="button" className={naturalIconClass} style={iconStyle} onClick={onOpenPlugins} aria-label={t("topNav.plugins")} title={t("topNav.plugins")}>
                     <Puzzle className="size-4" />
                 </button>
@@ -45,7 +46,7 @@ export function UserStatusActions({ showConfig = true, variant = "default", onOp
             <a href={DOCS_URL} target="_blank" rel="noopener noreferrer" className={naturalIconClass} style={iconStyle} aria-label={t("topNav.docs")} title={t("topNav.docs")}>
                 <BookOpen className="size-4" />
             </a>
-            {showConfig ? (
+            {showConfig && !isOverseas ? (
                 <button type="button" className={naturalIconClass} style={iconStyle} onClick={() => openConfigDialog(false)} aria-label={t("navigation.config")} title={t("navigation.config")}>
                     <Settings2 className="size-4" />
                 </button>

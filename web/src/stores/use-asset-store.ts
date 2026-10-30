@@ -1,3 +1,4 @@
+import { isOverseas } from "@/constant/integration";
 import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 
@@ -95,6 +96,7 @@ export const useAssetStore = create<AssetStore>()(
                 }),
             replaceAssets: (assets) => set({ assets }),
             cleanupImages: (extra) => {
+                if (isOverseas) return; // Keep local blobs available to unsaved recovery snapshots.
                 window.setTimeout(async () => {
                     const { useCanvasStore } = await import("@/stores/canvas/use-canvas-store");
                     await cleanupUnusedImages({ assets: get().assets, projects: useCanvasStore.getState().projects, extra });

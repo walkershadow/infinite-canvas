@@ -1,23 +1,23 @@
-import React from "react";
-import { createRoot } from "react-dom/client";
-import "antd/dist/reset.css";
-import "streamdown/styles.css";
-import "./styles/globals.css";
-import { RouterProvider } from "react-router-dom";
+import { isOverseas } from "@/constant/integration";
+import { bootstrapWorkbench } from "@/services/api/workbench";
 
-import { AppProviders } from "@/components/layout/app-providers";
-import "@/i18n";
-import { initAnalytics } from "@/lib/analytics";
-import { router } from "@/router";
-
-initAnalytics();
-
-document.body.style.fontFamily = '"SF Pro Display","SF Pro Text","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif';
-
-createRoot(document.getElementById("root")!).render(
-    <React.StrictMode>
-        <AppProviders>
-            <RouterProvider router={router} />
-        </AppProviders>
-    </React.StrictMode>,
-);
+async function start() {
+    if (isOverseas) {
+        document.documentElement.lang = "en-US";
+        document.title = "Canvas · Workbench";
+        await bootstrapWorkbench();
+    }
+    await import("./app");
+}
+void start().catch((error: unknown) => {
+    const root = document.getElementById("root")!;
+    const description = document.createElement("p");
+    description.textContent = error instanceof Error ? error.message : "Canvas could not start.";
+    const retry = document.createElement("button");
+    retry.textContent = "Retry";
+    retry.onclick = () => window.location.reload();
+    const home = document.createElement("a");
+    home.href = "/";
+    home.textContent = "Return to Workbench";
+    root.replaceChildren(description, retry, home);
+});

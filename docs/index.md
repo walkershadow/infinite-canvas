@@ -19,6 +19,8 @@
 - [Canvas Data Structure](/docs/development/canvas-data-structure)
 - [How the Local Codex Connection Works](/docs/development/local-codex-canvas)
 
+- [Overseas Workbench Integration](/docs/development/overseas-workbench)
+
 ## Business
 
 - [Open-source License](/docs/business/license)

@@ -1,0 +1,118 @@
+---
+title: Overseas Workbench Integration
+description: 海外原生画布的模式、接口、存储和本地联调运维说明
+---
+
+# 海外 Workbench 原生画布
+
+本模式复用原生画布的节点、连线、分组、撤销重做、复制粘贴、素材选择、导入导出、小地图、快捷键和明暗主题。只有账号、持久化和生成边界切换到 Workbench。默认独立模式不变：画布与素材主要保存在浏览器，API Key 在本地，由前端直连 OpenAI 兼容接口。海外模式则必须通过 Workbench 的 cookie 鉴权和服务端计费，不要求用户填写 API Key。
+
+当前代码仅本地开发，未部署到海外生产、独立生产画布或国内站。
+
+## 模式与启动
+
+| 配置 | 含义 |
+| --- | --- |
+| `VITE_APP_MODE=overseas` | 构建时启用海外模式，默认未设置即独立模式 |
+| `WORKBENCH_DEV_ORIGIN` | Vite 开发代理的 Workbench 地址，默认 `http://localhost:3100`，只供开发服务器使用 |
+| `VITE_BASE` | 仅独立模式可用；海外模式固定 `/canvas/` |
+| `NATIVE_CANVAS_DEV_ORIGIN` | 配置于 Workbench，不属于本仓库；开发时反向代理 `/canvas/` 到 Vite |
+
+可参考 `web/overseas.env.example`，不要覆盖现有配置。在 `web/` 安装项目依赖后运行：
+
+```sh
+VITE_APP_MODE=overseas bun run dev --host 127.0.0.1 --port 3200 --strictPort
+```
+
+使用 Workbench 的本地登录会话，从 `http://localhost:3100/canvas/` 联调。Vite 也可从 `http://localhost:3200/canvas/` 打开；两端须一致使用 localhost，不能混用 127.0.0.1 导致 cookie 不匹配。不要复制生产 cookie、把 API Key 放进环境变量或绕过登录。代理改变 Host 时，后端 Origin 校验仍需明确认可本地联调源；推荐通过 Workbench 同域入口访问。
+
+```sh
+# 在 web/ 中，分别输出到独立目录，避免覆盖独立站产物
+VITE_APP_MODE=overseas bun run build --outDir /private/tmp/canvas-overseas-build
+bun run build --outDir /private/tmp/canvas-standalone-build
+# 从仓库根目录执行，无真实付费请求
+VITE_APP_MODE=overseas bun test web/tests/workbench-integration.test.ts
+```
+
+构建配置不从用户 URL、浏览器 localStorage 或项目内容选择模式。不要把同一构建产物运行时切换为另一模式。资源 URL 使用 `/canvas/` 前缀，原生 router 直接定义 `/canvas` 和 `/canvas/:id`，不叠加 basename。
+
+## 架构与责任
+
+入口先请求 `/api/canvas/bootstrap`，获得 user、视频模型目录、quota、currency、pointsPerUsd 和能力开关，成功后才动态加载应用。所有业务数据库名称此时已经绑定账号；未登录不加载旧账号本地画布。
+
+`services/api/workbench.ts` 负责同域 cookie 请求，其他服务请求仍放在 `services/api/`。`services/workbench/projects.ts` 负责把原生 Zustand 项目映射到云 envelope，`stores/use-workbench-store.ts` 保存 UI 订阅状态。原生编辑历史保留在页面内部，不把撤销操作映射为撤销扣费。
+
+浏览器只显示估价。模型、允许时长/画幅、价格、余额和最终扣费以服务器为准。图像、文本、音频 AI 的服务入口直接拒绝，调用脚本和外部画布插件无法加载执行；已有此类插件节点保留原数据，但无插件运行能力。Canvas Agent 不自动连接，海外模式当前不开放；未来需要独立鉴权和工具权限方案。
+
+## API 契约
+
+统一前缀 `/api/canvas`。除首次 bootstrap 和媒体读取外携带 `X-Canvas-Account`；它不是登录凭证，服务器必须与 cookie 用户比对。写请求检查 Origin/CSRF，接口按账号验证资源归属，返回 private/no-store。错误为 `{error:string}`，常见 401 登录失效、404 不存在或非本人资源、409 版本冲突、429 配额不足。
+
+| 路径 | 请求与响应 |
+| --- | --- |
+| GET `/bootstrap` | `{user,models,quota,capabilities,currency,pointsPerUsd}` |
+| GET `/projects` | `{projects:[{id,revision,document,title,createdAt,updatedAt}]}` |
+| POST `/projects` | `{document}`，按账号和 document.id 幂等，返回 envelope |
+| GET `/projects/:id` | envelope |
+| PUT `/projects/:id` | `{revision,document}`，返回新 revision envelope |
+| DELETE `/projects/:id` | `{revision}`，软删除项目，不删除计费任务历史 |
+| POST `/projects/:id/generate` | `{revision,requestKey,nodeId,input:{prompt,model,duration,ratio,images,videos,audios}}` → `{task,revision}` |
+| GET `/projects/:id/tasks` | `{tasks:[TaskDTO]}`，含 nodeId、requestKey、createdAt、status、videoUrl、error |
+| GET `/assets` | `{assets:[{id,name,mime,bytes,url,createdAt}]}` |
+| POST `/assets` | multipart `file` → 直接 Asset 对象 |
+| GET `/assets/:id/content` | 同域、验证归属的媒体字节，支持 Range |
+| GET `/import-legacy` | `{projects:[{id,title,updatedAt}]}` |
+| POST `/import-legacy` | `{projectId}` → 新原生 envelope；不改变旧项目、不扣费 |
+
+完整类型在 `web/src/types/workbench.ts`。旧 `/api/projects` 不变。不要复用旧简版项目的数据模型写回原生文档。
+
+媒体限制沿用 Workbench 已有约束：图片 10 MB、视频 100 MB、音频 20 MB；不在本次前端新增限制、重试次数或超时。拒绝上传时保留本地文件并展示保存失败。视频轮询沿用原生 120 次、每次间隔 2500ms 的逻辑，超时/中止只停止浏览器等待，不取消服务端任务或自动退款；使用任务状态恢复，不自动换请求键重新计费。
+
+## 存储与版本
+
+云端 envelope 的 `id/revision` 与 `document.id` 分开管理。原生 document 增加 `schemaVersion:1`，仍包含 title、时间戳、nodes、connections、chatSessions、activeChatId、backgroundMode、showImageInfo 和 viewport。节点位置/尺寸、分组、未知 metadata 不被删减。无法理解的 schemaVersion 拒绝初始化；未来升级先备份、明确变更协议，不静默丢字段。
+
+数据库名称为 `infinite-canvas:workbench:<userId>`，包含 app_state、image_files、image_previews、media_files 等原生 store。图片/视频缓存和素材列表均隔离账号，海外模式不回落到不分账号的 localStorage。语言使用独立的小配置 key；主题沿用原主题偏好。
+
+保存前把有 storageKey 的本地媒体上传，云文档中的临时 content/url/dataUrl 替换成账号素材 URL，storageKey 改成 `image:workbench:<id>` 等。其他设备可从同域媒体接口恢复二进制供缩略图和 ZIP 导出使用。没有关联文件的 blob URL 会阻止保存，而不是写入失效云文档。生成结果保留 `/api/tasks/:id/video`，任务视频再次作为参考时转为当前账号素材。
+
+恢复记录独立使用 `workbench:canvas-recovery:v1`；首次启动发现未保存记录时备份为 `workbench:canvas-recovery:previous:v1`。加载始终以云端为准，旧副本不自动覆盖云端。用户可导出恢复 JSON，或明确恢复为新项目。当前编辑在写云端前写本地缓存，全部同步成功后删除当前恢复记录；失败不删除。历史副本在用户 dismiss 后才移除。恢复 JSON 是排障/恢复文件，不是原生 ZIP 导入包；正常跨设备导出应使用项目的 ZIP 导出功能。
+
+保存串行执行，后续更新在队列中取最新状态，无新增自动重试或并发限制。409 后暂停云端写入，用户可导出本地编辑，再刷新云端版本；不会强制覆盖另一标签页的内容。POST 响应丢失可通过 document.id 幂等恢复。生成请求键先写入节点 metadata 后保存，再提交计费请求。刷新从服务器任务关联恢复，不依赖浏览器收到创建响应。
+
+## 本地验收
+
+1. 独立模式原有项目/配置保持可用，海外模式默认英文且不出现 API Key 配置或 Agent 自动连接。
+2. 未登录无法初始化；A/B 账号分别加载自己的缓存和项目。A 页面仍开着而 cookie 切成 B 时，旧页面写入必须被服务器拒绝。
+3. 新建、重命名、删除、ZIP 导入导出、节点/连线/分组/缩放/复制粘贴/撤销重做和两种主题。刷新后从云端保持布局。
+4. 图片/视频/音频上传、裁剪等纯编辑在无 AI 权限时仍可用。换浏览器打开云项目可读媒体；非本人素材无法引用。
+5. 平台模型目录、允许时长、画幅、估价和余额；取消确认不请求生成。模拟生成测试不得请求真实供应商。
+6. 重复提交相同 key、断网后重试、创建成功但响应丢失、轮询超时、刷新恢复、失败退款后余额刷新。同节点多次生成按时间使用最新任务，不被旧任务覆盖。
+7. 双标签页版本冲突、断网保存失败、恢复导出/恢复为新项目；未知或损坏缓存拒绝覆盖原数据。
+8. 旧 Workbench 画布导入只新建原生副本，源项目、任务和账本不变。
+
+已实现的适配测试不替代上述真实 cookie/数据库/媒体服务联调。生产构建通过不代表已验证 Docker 静态资源路径。
+
+## 未来部署与回滚（仅方案，未执行）
+
+先备份 Workbench 数据库和媒体索引，记录前后端 commit、schema 版本、构建环境及产物校验值。部署海外产物到同域 `/canvas/`，由 Workbench 后端处理 `/api/canvas/*`，媒体接口验证归属；深层 `/canvas/:id` 回落到该子应用 index，不能回落到旧画布。确认静态缓存不会混入 API 响应，代理允许 Range 和 cookie。不要覆盖独立站根资源或国内配置。
+
+发布前在隔离环境完成上述验收，再单独获取部署批准。回滚优先恢复上一套海外静态产物及匹配后端代码；保留已写项目、任务和账本，不通过删除新表、撤销支付、清理媒体或强制降级文档实现回滚。未知 schema 由旧客户端拒绝读取；备份恢复需人工评估新增数据，不能直接覆盖。
+
+## 排障与上游维护
+
+- 白屏/404：检查资源 base、反向代理、深链回落和 Vite HMR websocket；不要额外叠加 router basename。
+- Please sign in：检查同域 cookie、localhost/127.0.0.1 混用、后端会话；不向前端注入供应商 key。
+- 401/403：确认 cookie 用户与 X-Canvas-Account 一致、Origin 被后端允许；导出未保存数据后重新登录并刷新。
+- 409：导出恢复副本、刷新云版本，必要时恢复为新项目，不修改 revision 绕过冲突。
+- 媒体失败：检查 MIME/现有限制、云存储配置、资源归属及 Range；本地恢复文件勿清理。
+- 生成失败：使用项目 envelope ID、nodeId、requestKey、taskId 关联排查；日志不记录 cookie/API Key/用户媒体正文。停止轮询不代表任务取消或退款。
+- 上游更新在独立分支合入并审查，重点检查 API 公共入口、插件加载、Agent 启动、存储初始化、节点 metadata 和路由是否新增绕过路径；运行适配测试和独立模式验证后才更新 dev。上游存储格式、导出版本、云 schema 版本和 Agent 协议独立管理。
+
+## 已知限制
+
+海外模式当前每次生成一段视频，保留原生编辑而未新增批量计费入口。批量生成若后续开放，需要总估价确认和每项稳定 key。Canvas Agent、外部脚本/插件及未接入计费的 AI 功能不可用。
+
+云素材目录显示已上传图片/视频；文本收藏、标签等仍属账号本地数据，原生素材选择器尚无音频收藏类型（音频节点上传仍支持）。为保全恢复副本，海外模式暂停本地媒体自动清理；尚无独立的账号缓存清理界面。当前媒体上传响应丢失可能产生孤立云素材，清理策略应由后端后续制定，不静默删除用户资源。
+
+最初类型检查发现上游已有的 `model-script-editor.tsx` Ant Design styles.content 类型错误；另一路并行工作修复后，当前工作区类型检查通过，该修复独立于本次集成提交。完整真实后端验收与未来生产部署仍待确认。

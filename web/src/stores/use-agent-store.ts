@@ -1,3 +1,4 @@
+import { isOverseas } from "@/constant/integration";
 import { create } from "zustand";
 import i18n from "@/i18n";
 
@@ -145,6 +146,7 @@ export const useAgentStore = create<AgentStore>((set, get) => ({
     togglePanel: () => (get().panelOpen ? get().closePanel() : get().openPanel()),
     setCanvasContext: (canvasContext) => set({ canvasContext }),
     connectAgent: (options) => {
+        if (isOverseas) return;
         const silent = options?.silent ?? false;
         const endpoint = get().url.trim().replace(/\/$/, "");
         const token = get().token.trim();
