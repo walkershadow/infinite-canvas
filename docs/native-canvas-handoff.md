@@ -1,6 +1,6 @@
 # 海外原生画布前端交接
 
-本轮恢复完整原版能力，并接入个人提示词和云收藏。开发在 `dev`，仅本地提交，不推送、不部署；不触发真实付费生成，保留独立版和国内版行为及历史数据。
+本轮恢复完整原版能力，并接入个人提示词和云收藏。开发在 `dev`；此前仅本地提交，最新部署状态见下方记录；不触发真实付费生成，保留独立版和国内版行为及历史数据。
 
 - 完整页面、导航、配置、插件及 Agent 入口恢复。平台与自配请求按渠道分流，平台视频使用账号余额，自配供应商直接结算。
 - bootstrap 保留用户自配渠道、密钥和所选模型。平台渠道不能编辑密钥，账号配置与本地业务存储隔离。
@@ -31,4 +31,15 @@ ali-image 内置请求现支持 URL 响应和协议数量校验，禁止 edits�
 - 主会话报告 jp1 四模型真实验收通过，图片与 WAV 经七牛保存、鉴权读取成功，余额未扣减；此为主会话接口验收证据，本轮浏览器没有再次生成。
 - 本轮已检查 todo/pending-test，用户端发布后刷新恢复、真实页面出图/语音播放、跨设备关联边界仍列待验收；Video Studio 音视频参考上传仍属待办。
 
-最终截图：`docs/acceptance/native-canvas/original-navigation.jpg`、`platform-ai-tasks.jpg`、`platform-image-settings.jpg`（均位于同目录）。本地验证构建：`/private/tmp/canvas-ai-overseas`、`/private/tmp/canvas-ai-standalone`。前端不部署，主会话从 dev 最终提交构建并发布 jp1。
+最终截图：`docs/acceptance/native-canvas/original-navigation.jpg`、`platform-ai-tasks.jpg`、`platform-image-settings.jpg`（均位于同目录）。本地验证构建：`/private/tmp/canvas-ai-overseas`、`/private/tmp/canvas-ai-standalone`。该前端提交由主会话在 jp1 构建发布，见下方记录。
+
+## 海外部署记录
+
+以下结果来自负责发布的主会话交接，本会话未重复部署或发起真实生成。
+
+- 已部署前端：`f28416f`，由 jp1 构建，入口为 https://seedance-cheap.xprismai.com/canvas/ 。
+- 后端发布提交：`69bb4d5`；后端文档提交：`f809dba`。
+- 主会话已验证四个 Ali 模型真实请求、图片和 WAV 七牛转存及鉴权读取、双边使用量为零且余额不变、旧数据一致性。
+- 国内版、独立画布和 new-api 容器未重启。
+- 最终线上交互由用户验收；刷新/断网恢复、原节点结果回填、页面出图与音频播放仍保留在 pending-test，不据接口通过提前转入正式功能说明。
+- 本次仅补记部署结果并推送 dev 到项目既有 GitHub 远端；不新增功能。todo 已核对，无已完成待办需要移除。
