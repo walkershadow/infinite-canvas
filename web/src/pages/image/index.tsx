@@ -1,3 +1,5 @@
+import { acknowledgeAiTask, isWorkbenchTaskPending, WorkbenchTaskPendingError } from "@/services/api/workbench-ai-tasks";
+import { isWorkbenchModel } from "@/stores/use-config-store";
 import { isOverseas } from "@/constant/integration";
 import { accountDatabaseName } from "@/services/api/workbench";
 import { ArrowLeft, ArrowRight, BookOpen, CheckSquare, ClipboardPaste, Download, FolderPlus, History, ImagePlus, LoaderCircle, PenLine, Plus, SlidersHorizontal, Sparkles, Trash2, Upload } from "lucide-react";
@@ -37,7 +39,7 @@ type GeneratedImage = {
 
 type GenerationResult = {
     id: string;
-    status: "pending" | "success" | "failed";
+    status: "pending" | "success" | "failed" | "paused";
     image?: GeneratedImage;
     error?: string;
 };
@@ -74,10 +76,18 @@ export default function ImagePage() {
     const { t } = useTranslation();
     useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const platformControllers = useRef(new Map<number, AbortController>());
+    useEffect(() => () => platformControllers.current.forEach((controller) => controller.abort()), []);
     const dragDepthRef = useRef(0);
     const config = useConfigStore((state) => state.config);
-    const effectiveConfig = useEffectiveConfig();
-    const updateConfig = useConfigStore((state) => state.updateConfig);
+    const baseConfig = useEffectiveConfig();
+    const platformImage = isWorkbenchModel(baseConfig, baseConfig.imageModel || baseConfig.model);
+    const effectiveConfig = platformImage ? { ...baseConfig, size: baseConfig.platformImageSize || "1024x1024" } : baseConfig;
+    const updateStoredConfig = useConfigStore((state) => state.updateConfig);
+    const updateConfig: UpdateAiConfig = (key, value) => {
+        if (platformImage && key === "size") updateStoredConfig("platformImageSize", String(value));
+        else updateStoredConfig(key, value);
+    };
     const isAiConfigReady = useConfigStore((state) => state.isAiConfigReady);
     const openConfigDialog = useConfigStore((state) => state.openConfigDialog);
     const addAsset = useAssetStore((state) => state.addAsset);
@@ -184,13 +194,14 @@ export default function ImagePage() {
         const result = await Promise.allSettled(tasks);
         const successImages = result.filter((item): item is PromiseFulfilledResult<GeneratedImage> => item.status === "fulfilled").map((item) => item.value);
         const successCount = successImages.length;
-        const failCount = generationCount - successCount;
+        const pendingCount = result.filter((item) => item.status === "rejected" && isWorkbenchTaskPending(item.reason)).length;
+        const failCount = generationCount - successCount - pendingCount;
         const failed = result.find((item): item is PromiseRejectedResult => item.status === "rejected");
         const error = failed?.reason instanceof Error ? failed.reason.message : failCount ? t("workbench.generationFailed") : undefined;
-        if (agentTaskId) updateAgentTask(agentTaskId, { status: successCount ? "succeeded" : "failed", successCount, failCount, error: successCount ? undefined : error });
+        if (agentTaskId) updateAgentTask(agentTaskId, { status: pendingCount ? "running" : successCount ? "succeeded" : "failed", successCount, failCount, error: successCount ? undefined : error });
 
         try {
-            saveLog(
+            if (successCount || failCount) saveLog(
                 buildLog({
                     prompt: text,
                     model,
@@ -203,7 +214,8 @@ export default function ImagePage() {
                     images: successImages,
                 }),
             );
-            successCount ? message.success(t("imageWorkbench.generated")) : message.error(failed?.reason instanceof Error ? failed.reason.message : t("workbench.generationFailed"));
+            if (pendingCount) message.info("Platform tasks are preserved. Open Points → AI tasks to resume.");
+            else successCount ? message.success(t("imageWorkbench.generated")) : message.error(failed?.reason instanceof Error ? failed.reason.message : t("workbench.generationFailed"));
         } finally {
             setRunning(false);
         }
@@ -322,17 +334,25 @@ export default function ImagePage() {
 
     const runGenerationSlot = async (index: number, snapshot: { text: string; config: AiConfig; references: ReferenceImage[] }) => {
         const itemStartedAt = performance.now();
+        const controller = isWorkbenchModel(snapshot.config, snapshot.config.model) ? new AbortController() : undefined;
+        if (controller) platformControllers.current.set(index, controller);
         try {
-            const result = snapshot.references.length ? await requestEdit(snapshot.config, snapshot.text, snapshot.references) : await requestGeneration(snapshot.config, snapshot.text);
+            const options = { owner: { slot: index }, signal: controller?.signal };
+            const result = snapshot.references.length ? await requestEdit(snapshot.config, snapshot.text, snapshot.references, options) : await requestGeneration(snapshot.config, snapshot.text, options);
             const image = result[0];
             if (!image) throw new Error(t("imageWorkbench.missingResult"));
             const stored = await uploadImage(image.dataUrl);
             const nextImage: GeneratedImage = { id: image.id, dataUrl: stored.url, ...(stored.storageKey ? { storageKey: stored.storageKey } : {}), durationMs: performance.now() - itemStartedAt, width: stored.width, height: stored.height, bytes: stored.bytes, mimeType: stored.mimeType };
+            controller?.signal.throwIfAborted();
             setResults((value) => updateResultAt(value, index, { status: "success", image: nextImage }));
+            if (isWorkbenchModel(snapshot.config, snapshot.config.model)) await acknowledgeAiTask({ slot: index });
             return nextImage;
         } catch (error) {
-            setResults((value) => updateResultAt(value, index, { status: "failed", error: error instanceof Error ? error.message : t("workbench.generationFailed") }));
-            throw error;
+            const reason = controller?.signal.aborted ? new WorkbenchTaskPendingError("Waiting stopped. The platform task is preserved in Points → AI tasks.") : error;
+            setResults((value) => updateResultAt(value, index, { status: isWorkbenchTaskPending(reason) ? "paused" : "failed", error: reason instanceof Error ? reason.message : t("workbench.generationFailed") }));
+            throw reason;
+        } finally {
+            if (platformControllers.current.get(index) === controller) platformControllers.current.delete(index);
         }
     };
 
@@ -504,6 +524,8 @@ export default function ImagePage() {
                                 {results.map((result, index) =>
                                     result.status === "success" && result.image ? (
                                         <ResultImageCard key={result.id} image={result.image} index={index} onEdit={addResultToReferences} onDownload={downloadImage} onSaveAsset={saveResultToAssets} />
+                                    ) : result.status === "paused" ? (
+                                        <div key={result.id} className="space-y-3 rounded-lg border border-border p-5 text-sm"><p>Task preserved</p><p>{result.error}</p><Button type="text" onClick={() => retryResult(index)}>Check status</Button></div>
                                     ) : result.status === "failed" ? (
                                         <FailedImageCard key={result.id} error={result.error || t("workbench.generationFailed")} onRetry={() => retryResult(index)} />
                                     ) : (
@@ -567,7 +589,7 @@ function GenerationSettings({ config, model, updateConfig, openConfigDialog }: {
                 <ModelPicker config={config} value={model} onChange={(value) => updateConfig("imageModel", value)} capability="image" fullWidth onMissingConfig={() => openConfigDialog(false)} />
             </label>
             <div className="col-span-2">
-                <ImageSettingsPanel config={config} onConfigChange={(key, value) => updateConfig(key, value)} theme={theme} showTitle={false} className="space-y-4" maxCount={10} />
+                <ImageSettingsPanel config={{ ...config, model }} onConfigChange={(key, value) => updateConfig(key, value)} theme={theme} showTitle={false} className="space-y-4" maxCount={10} />
             </div>
         </>
     );

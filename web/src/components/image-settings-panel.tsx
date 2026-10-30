@@ -1,3 +1,4 @@
+import { isWorkbenchModel } from "@/stores/use-config-store";
 import { type ReactNode, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
 import { useTranslation } from "react-i18next";
@@ -63,6 +64,7 @@ export function ImageSettingsPanel({ config, onConfigChange, theme, showTitle = 
                 }}
             >
                 {showTitle ? <div className="text-lg font-semibold">{t("settingsPanels.image.title")}</div> : null}
+                {isWorkbenchModel(config, config.model) && <p className="text-xs leading-relaxed" style={{ color: theme.node.muted }}>Platform images: text only, default 1024×1024, dimensions 512–2048px. Transparent backgrounds are not supported. Quality is controlled by the provider; the quality selector has no effect on this platform model.</p>}
                 <div className="space-y-2.5">
                     <SettingTitle color={theme.node.muted}>{t("settingsPanels.image.quality")}</SettingTitle>
                     <div className="grid grid-cols-3 gap-2.5">

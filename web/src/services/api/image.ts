@@ -1,3 +1,4 @@
+import type { PlatformRequestOptions } from "./workbench-ai-tasks";
 import { platformImages, platformText } from "./workbench-ai";
 import { isWorkbenchModel } from "@/stores/use-config-store";
 import axios from "axios";
@@ -97,7 +98,7 @@ type GeminiPayload = {
     promptFeedback?: { blockReason?: string };
 };
 type GeminiStreamState = { buffer: string; text: string; toolCalls: ResponseToolCall[]; error?: string };
-type RequestOptions = { signal?: AbortSignal };
+type RequestOptions = PlatformRequestOptions;
 
 const IMAGE_QUALITY_VALUES = ["low", "medium", "high", "xhigh", "max"];
 const DEFAULT_IMAGE_SHORT_SIDE = 1024;
@@ -694,7 +695,7 @@ function parseGeminiImagePayload(payload: GeminiPayload) {
 }
 
 export async function requestGeneration(config: AiConfig, prompt: string, options?: RequestOptions) {
-    if (isWorkbenchModel(config, config.model || config.imageModel)) return platformImages(config, prompt, [], options?.signal);
+    if (isWorkbenchModel(config, config.model || config.imageModel)) return platformImages(config, prompt, [], options);
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     if (requestConfig.model === "ali-image" && n > 6) throw new Error(apiText("aliImageCount"));
@@ -756,7 +757,7 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
 }
 
 export async function requestEdit(config: AiConfig, prompt: string, references: ReferenceImage[], options?: RequestOptions) {
-    if (isWorkbenchModel(config, config.model || config.imageModel)) return platformImages(config, prompt, references, options?.signal);
+    if (isWorkbenchModel(config, config.model || config.imageModel)) return platformImages(config, prompt, references, options);
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
     if (requestConfig.model === "ali-image") throw new Error(apiText("aliImageTextOnly"));
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
@@ -825,7 +826,7 @@ export async function requestEdit(config: AiConfig, prompt: string, references: 
 }
 
 export async function requestImageQuestion(config: AiConfig, messages: AiTextMessage[], onDelta: (text: string) => void, options?: RequestOptions) {
-    if (isWorkbenchModel(config, config.model || config.textModel)) return platformText(config, messages, onDelta, options?.signal);
+    if (isWorkbenchModel(config, config.model || config.textModel)) return platformText(config, messages, onDelta, options);
     const requestConfig = resolveModelRequestConfig(config, config.model || config.textModel);
     const script = resolveModelScript(config, config.model || config.textModel);
     if (script) {

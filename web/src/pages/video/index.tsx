@@ -212,7 +212,7 @@ export default function VideoPage() {
             let requestKey: string | undefined;
             if (isWorkbenchModel(snapshot.config, snapshot.config.model || snapshot.config.videoModel)) {
                 const estimate = workbenchVideoInput(snapshot.config);
-                const confirmed = await new Promise<boolean>((resolve) => modal.confirm({ title: "Generate video", content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). Workbench applies eligible free quota.`, okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false) }));
+                const confirmed = await new Promise<boolean>((resolve) => modal.confirm({ title: "Generate video", content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). ${estimate.model.freeQuota ? "Workbench applies eligible free quota." : "This model does not use daily free quota."}`, okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false) }));
                 if (!confirmed) { setRunning(false); setResults([]); return; }
                 const signature = JSON.stringify({ prompt: snapshot.text, model, duration: estimate.duration, ratio: estimate.ratio, references: snapshot.references.map((item) => item.storageKey || item.id) });
                 const previous = await requestStore.getItem<{ signature: string; requestKey: string }>("workbench-pending-request");

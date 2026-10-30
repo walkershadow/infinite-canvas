@@ -1,3 +1,4 @@
+import type { PlatformRequestOptions } from "./workbench-ai-tasks";
 import { platformAudio } from "./workbench-ai";
 import { isWorkbenchModel } from "@/stores/use-config-store";
 import axios from "axios";
@@ -8,7 +9,7 @@ import { uploadMediaFile, type UploadedFile } from "@/services/file-storage";
 import { buildApiUrl, resolveModelRequestConfig, resolveModelScript, withLocalProxy, type AiConfig } from "@/stores/use-config-store";
 import { runModelPlugin } from "./model-plugin";
 
-type RequestOptions = { signal?: AbortSignal };
+type RequestOptions = PlatformRequestOptions;
 const apiText = (key: string, options?: Record<string, unknown>) => i18n.t(`apiErrors.${key}`, options);
 
 function aiApiUrl(config: AiConfig, path: string) {
@@ -23,7 +24,7 @@ function aiHeaders(config: AiConfig) {
 }
 
 export async function requestAudioGeneration(config: AiConfig, prompt: string, options?: RequestOptions): Promise<Blob> {
-    if (isWorkbenchModel(config, config.model || config.audioModel)) return platformAudio(config, prompt, options?.signal);
+    if (isWorkbenchModel(config, config.model || config.audioModel)) return platformAudio(config, prompt, options);
     const requestConfig = resolveModelRequestConfig(config, config.model || config.audioModel);
     const model = requestConfig.model.trim();
     const format = normalizeAudioFormatValue(config.audioFormat);

@@ -39,7 +39,7 @@ export function AppTopNav() {
                 <header className="sticky top-0 z-20 h-14 shrink-0 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
                     <div className="mx-auto flex h-full max-w-7xl items-stretch justify-between gap-5 px-6">
                         <div className="flex min-w-0 items-center">
-                            <Link to={isOverseas ? `${window.location.origin}/` : "/"} reloadDocument={isOverseas} aria-label={isOverseas ? "Return to Workbench" : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
+                            <Link to={isOverseas ? `${window.location.origin}/workbench` : "/"} reloadDocument={isOverseas} aria-label={isOverseas ? "Return to Workbench" : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
                                 <span
                                     className="size-5 shrink-0 bg-current"
                                     style={{
@@ -47,7 +47,7 @@ export function AppTopNav() {
                                         WebkitMask: `url(${import.meta.env.BASE_URL}logo.svg) center / contain no-repeat`,
                                     }}
                                 />
-                                <span className="text-base font-medium">{t("meta.title")}</span>
+                                <span className="text-base font-medium">{isOverseas ? "Workbench" : t("meta.title")}</span>
                             </Link>
 
                             <button

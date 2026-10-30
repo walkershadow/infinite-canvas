@@ -5,9 +5,9 @@ description: 完整原版页面、渠道分流、云持久化与本地联调运�
 
 # 海外 Workbench 原生画布
 
-海外模式复用原版完整界面与交互：首页、画布、图片、视频、提示词、素材、配置、插件和 Agent。平台视频通过 Workbench 的账号余额计费；用户自配渠道由前端直连供应商并由供应商结算。默认独立模式不变，画布及素材主要保存在浏览器本地，API Key 同样保存在浏览器本地。
+海外模式复用原版完整界面与交互：首页、画布、图片、视频、提示词、素材、配置、插件和 Agent。平台模型通过 Workbench 的账号与余额体系调用；用户自配渠道由前端直连供应商并由供应商结算。默认独立模式不变，画布及素材主要保存在浏览器本地，API Key 同样保存在浏览器本地。
 
-当前仅本地开发，未部署到海外生产、独立生产画布或国内站。
+本轮前端仅在 dev 开发与提交；海外发布由主会话执行，独立版和国内站不在本轮发布范围。
 
 ## 启动与路由
 
@@ -19,7 +19,7 @@ VITE_APP_MODE=overseas bun run dev --host 127.0.0.1 --port 3200 --strictPort
 
 `WORKBENCH_DEV_ORIGIN` 默认 `http://localhost:3100`。Workbench 端配置 `NATIVE_CANVAS_DEV_ORIGIN=http://localhost:3200` 后，从 `http://localhost:3100/canvas/` 使用本地登录会话联调。不要混用 localhost 与 127.0.0.1，避免 cookie 不匹配。不要复制生产 cookie 或覆盖已有环境配置；示例在 `web/overseas.env.example`。
 
-海外资源 base 和路由 basename 均为 `/canvas/`（路由配置不含结尾斜杠）。原内部路径不变，因此项目列表为 `/canvas/canvas`，项目为 `/canvas/canvas/:id`；图片、视频、提示词、素材和配置分别为 `/canvas/image`、`/canvas/video`、`/canvas/prompts`、`/canvas/assets`、`/canvas/config`。旧 `/canvas/:id` 项目别名保留。Workbench 根页通过整页链接返回。
+海外资源 base 和路由 basename 均为 `/canvas/`（路由配置不含结尾斜杠）。原内部路径不变，因此项目列表为 `/canvas/canvas`，项目为 `/canvas/canvas/:id`；图片、视频、提示词、素材和配置分别为 `/canvas/image`、`/canvas/video`、`/canvas/prompts`、`/canvas/assets`、`/canvas/config`。旧 `/canvas/:id` 项目别名保留。海外入口 /canvas/ 默认打开项目列表。原导航品牌显示 Workbench，通过整页链接返回 /workbench；积分位于原 GitHub 图标位置，打开云恢复、导入和 AI tasks。独立版导航不变。
 
 模式由构建环境决定，不通过 URL 参数或项目内容切换。默认未设置 `VITE_APP_MODE` 即独立模式。
 
@@ -29,7 +29,7 @@ VITE_APP_MODE=overseas bun run dev --host 127.0.0.1 --port 3200 --strictPort
 
 平台渠道 `workbench` 由 bootstrap 管理，不要求填写 API Key，也不可编辑或删除。新用户默认平台视频模型；初始化不覆盖已有自配渠道及选择。用户自配 endpoint、模型、密钥与脚本继续原请求流程，费用不计入 Workbench 余额。密钥与偏好只保存在账号隔离的本地配置，不进入云项目、个人提示词或收藏文档。
 
-原插件和 Agent 入口及手动连接可用；这些是用户自行配置的功能，并非平台托管服务。平台没有确认图片、文本、音频模型与价格，当前须使用自配渠道。预留的平台 AI 适配需完善计费、幂等、响应语义并通过验收后才能启用。
+原插件和 Agent 入口及手动连接可用；这些是用户自行配置的功能，并非平台托管服务。平台已接入 ali-llm、ali-image、ali-audio、ali-video，由服务端持有上游凭据。前三项使用持久化异步任务，视频沿用视频任务接口；具体限制与已确认零价见接入契约。零价不等于免余额校验，真实零余额仍可能返回 429。
 
 ## 云数据与媒体
 
@@ -40,6 +40,12 @@ VITE_APP_MODE=overseas bun run dev --host 127.0.0.1 --port 3200 --strictPort
 有 storageKey 的本地原文件在云文档保存时上传平台，云文档中替换成同域持久媒体 URL。无法下载而只留下外部链接的媒体不保证持久性；平台任务播放 URL 也不等于已复制云素材。界面明确显示文档保存状态及媒体说明。供应商 CORS、链接过期、跨设备读取和大文件均需实际验收。
 
 账号级 localforage 数据库包含恢复副本、媒体、收藏、插件及生成历史；偏好与 Agent 连接参数也使用账号前缀。独立版数据库与键名保留，海外模式不读取或迁移独立版历史。个人提示词和收藏跨设备依赖云端，偏好与生成历史仍属于本地数据。
+
+## 平台 AI 任务
+
+图片、文本、音频提交前把 requestKey、输入与本地目标位置写入账号隔离的 localforage；响应丢失时复用相同输入和键，不新增生成。2.5 秒查询一次，没有浏览器总等待期限；关闭页面不取消服务端任务。画布恢复只写回原节点/结果槽位，不猜测跨设备目标；Image Studio 刷新后的结果可在 Points → AI tasks 找回。服务端列表最近 100 条，本地记录不按数量裁剪。
+
+unknown 只允许查询与管理员核实，不自动重新提交；真实 failed 才作为失败。上游请求服务端 240 秒后未知，转存失败重试原结果（60 秒间隔，24 小时后 unknown），绝不重新生成。自配渠道保留原行为。
 
 ## 故障处理
 

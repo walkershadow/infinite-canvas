@@ -11,7 +11,7 @@
 
 接口与真实缺口见 [接入契约](native-canvas-next-interfaces.md)，启动、运维和存储说明见 [开发文档](content/docs/development/overseas-workbench.mdx)，本地测试与截图记录见 [验收记录](native-canvas-acceptance.md)。
 
-平台当前没有确认图片/文本/音频模型及价格，相关平台适配只是未启用草案；可用原自配渠道完成这些操作。插件和 Agent 是用户自配能力，没有完成平台托管接入。文档保存成功不等于外部媒体已备份。
+平台图片/文本/音频现已按确认契约接入，详见下方最新交接。插件和 Agent 是用户自配能力，没有完成平台托管接入。文档保存成功不等于外部媒体已备份。
 
 ## 本轮视频与导航修正交接
 
@@ -22,3 +22,13 @@
 ali-image 内置请求现支持 URL 响应和协议数量校验，禁止 edits。主会话的真实 API 成功与本会话 mock 测试是两类证据，不能等同浏览器端完整链路通过。无需再调用真实视频测试。Video Studio 仍仅支持上传参考图片（7 张），音视频参考上传入口列入 todo，原画布音视频功能保留。
 
 截图与检查结果见 native-canvas-acceptance.md 的本轮修正验收段。构建产物位于 /private/tmp/canvas-feedback-overseas 与 /private/tmp/canvas-feedback-standalone，仅用于本地验证。
+
+## 平台四模型与原导航最终交接
+
+- 原导航恢复提交为 `7b224d9`，后续提交包含 Workbench 品牌与 `/workbench` 链接、原 GitHub 位置积分入口。独立模式保留原品牌、首页和 GitHub。
+- 平台图片/文本/音频支持持久化请求键、异步查询、响应丢失重放原请求、unknown 管理员核实、画布原节点/槽位恢复及积分菜单任务中心。Image Studio 刷新后可从任务中心读取完成结果。ali-video 继续原任务接口，720/1080 比例映射已处理，不计免费日额度。
+- 平台图片默认 1024×1024，音频默认 WAV/alloy/1；均不改写自配渠道偏好。具体限制、零价与仍需余额条件见接入契约。
+- 主会话报告 jp1 四模型真实验收通过，图片与 WAV 经七牛保存、鉴权读取成功，余额未扣减；此为主会话接口验收证据，本轮浏览器没有再次生成。
+- 本轮已检查 todo/pending-test，用户端发布后刷新恢复、真实页面出图/语音播放、跨设备关联边界仍列待验收；Video Studio 音视频参考上传仍属待办。
+
+最终截图：`docs/acceptance/native-canvas/original-navigation.jpg`、`platform-ai-tasks.jpg`、`platform-image-settings.jpg`（均位于同目录）。本地验证构建：`/private/tmp/canvas-ai-overseas`、`/private/tmp/canvas-ai-standalone`。前端不部署，主会话从 dev 最终提交构建并发布 jp1。

@@ -44,7 +44,7 @@
 
 ## 尚未验证与真实缺口
 
-- 平台仅提供当前视频目录（本次账户界面显示 16 项，数量以实际 bootstrap 为准）。平台图片/文本/音频模型与价格未确认；对应平台适配是未启用草案，不能视为完成。用户自配渠道保留原能力。
+- 此前仅视频目录的限制已被下方平台四模型接入更新取代；目录仍以实际 bootstrap 为准。用户自配渠道保留原能力。
 - 没有执行供应商收费生成、真实余额扣减/退款、失败任务恢复或平台批量扣费；平台视频估价/请求键适配通过 mock，前一阶段曾做估价取消夹具，但不是本次真实生成验收。
 - 没有验证真实自配图片/视频下载上传、CORS 失败、链接过期、大文件和跨设备媒体。代码对本地 storageKey 原文件执行云上传；没有本地原文件的外部 URL 只保留链接，平台 task URL 也是播放地址，不能据文档已保存推断已备份媒体。页面明确显示该边界。
 - 没有实测多账号切换、网络中断、多端并发 409、损坏 IndexedDB、旧项目导入、全量节点连线/分组/快捷键回归。恢复和冲突的自动化结果不替代这些真实场景。
@@ -82,4 +82,14 @@
 
 ## 原导航恢复验收
 
-按最新要求恢复原版 max-w-7xl、gap-5、px-6 与导航 gap-7；删除额外 Workbench/云按钮。海外品牌链接为 Workbench 根路径，积分替代原 GitHub 位置，保留云恢复和旧画布导入。实际打开 /canvas/ 已跳转 /canvas/canvas；浏览器确认海外导航无 GitHub 链接且积分弹层正常。独立版仍使用原首页与 GitHub。截图：[原导航及积分弹层](acceptance/native-canvas/original-navigation.jpg)。
+按最新要求恢复原版 max-w-7xl、gap-5、px-6 与导航 gap-7；删除额外 Workbench/云按钮。海外品牌显示 Workbench 并链接 /workbench，积分替代原 GitHub 位置，保留云恢复和旧画布导入。实际打开 /canvas/ 已跳转 /canvas/canvas；浏览器确认海外导航无 GitHub 链接且积分弹层正常。独立版仍使用原首页与 GitHub。截图：[原导航及积分弹层](acceptance/native-canvas/original-navigation.jpg)。
+
+## 平台异步 AI 最终补验
+
+- 本地真实页面检查 Workbench 导航链接 `/workbench`、原 GitHub 位置积分菜单、AI tasks 空列表与约束说明；ali-image 正确显示名称和 1024×1024 默认尺寸。没有点击生成，没有修改用户凭据；检查后已恢复原 gpt-image-2 自配选择。
+- mock 覆盖提交前持久化、响应丢失后同键重放、连续 301 次 pending 后完成、查询中断、unknown 与真实 failed、文本最终回调、同域图片/WAV 读取、禁止不支持参数及价格变化、画布节点和结果槽位隔离。未伪造真实账号任务记录。
+- TypeScript、全量 bun test（16 个外层测试、16 个隔离集成测试）及海外/独立构建通过。构建仍有既有大 chunk、混合静态/动态导入、运行时 config.js 提示。
+- 主会话报告 jp1 上 ali-llm、ali-image、ali-audio、ali-video 真实验收通过：图片 1187558 字节、WAV 111404 字节经七牛保存与鉴权读取成功；零价调用未扣余额，测试用户已清理。本轮不重复生成，也不将接口验收等同发布后完整浏览器恢复验收。
+- 发布后仍需人工验证页面断网/刷新后的任务恢复、图片显示、语音播放、原节点持久化及跨设备任务读取。跨设备没有本地 owner 时仅展示服务端结果，不自动猜测节点。
+
+截图：[导航与积分](acceptance/native-canvas/original-navigation.jpg)、[平台任务中心](acceptance/native-canvas/platform-ai-tasks.jpg)、[平台图片设置](acceptance/native-canvas/platform-image-settings.jpg)。

@@ -17,7 +17,7 @@ export type WorkbenchModel = {
 export type WorkbenchBootstrap = {
     user: { id: string; name?: string; image?: string };
     models: WorkbenchModel[];
-    aiModels?: { id: string; name: string; capability: "image" | "text" | "audio" }[];
+    aiModels?: { id: string; name: string; capability: "image" | "text" | "audio"; price: number; constraints?: Record<string, unknown> }[];
     quota: { points: number; daily: { remaining: number } };
     capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean };
     currency: string;

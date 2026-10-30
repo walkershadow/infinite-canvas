@@ -10,7 +10,7 @@ const localForageStorage = {
 };
 mock.module("@/lib/localforage-storage", () => ({ localForageStorage }));
 mock.module("@/i18n", () => ({ default: { t: (key: string) => key } }));
-mock.module("@/services/image-storage", () => ({ getImageBlob: async () => new Blob(["fixture"], { type: "image/png" }), imageToDataUrl: async () => "data:image/png;base64,AA==" }));
+mock.module("@/services/image-storage", () => ({ ensureImagePreview: async () => {}, resolveImageUrl: async (_key: string, url: string) => url, uploadImage: async (url: string) => ({ url }), getImageBlob: async () => new Blob(["fixture"], { type: "image/png" }), imageToDataUrl: async () => "data:image/png;base64,AA==" }));
 mock.module("@/services/file-storage", () => ({ getMediaBlob: async () => null, resolveMediaUrl: async (_key: string, url: string) => url, uploadMediaFile: async (url: string) => ({ url, storageKey: "video:fixture", mimeType: "video/mp4", bytes: 1 }) }));
 
 const { create } = await import("zustand");
@@ -27,6 +27,12 @@ let videoChecks = 0;
 let videoPending = 0;
 let videoQueryError = false;
 let videoFailed = false;
+const aiTasks = new Map<string, any>();
+let aiPostLost = false;
+let aiQueryError = false;
+let aiStatus = "completed";
+let aiChecks = 0;
+let aiPending = 0;
 const libraryItems = new Map<string, any>();
 const promptItems = new Map<string, any>();
 const requests: { path: string; method: string; body: any; account: string | null }[] = [];
@@ -36,6 +42,26 @@ globalThis.fetch = mock(async (url: string | URL | Request, init?: RequestInit) 
     const path = String(url);
     const body = typeof init?.body === "string" ? JSON.parse(init.body) : init?.body;
     requests.push({ path, method: init?.method || "GET", body, account: new Headers(init?.headers).get("X-Canvas-Account") });
+    if (path === "/api/canvas/assets/audio/content") return new Response(new Blob(["fixture"], { type: "audio/wav" }));
+    if (path.startsWith("/api/canvas/ai/")) {
+        if (init?.method === "POST") {
+            const existing = aiTasks.get(body.requestKey);
+            if (existing && JSON.stringify(existing.input) !== JSON.stringify(body)) return Response.json({ error: "Payload conflict" }, { status: 409 });
+            const kind = path.split("/").at(-1);
+            const task = existing || { id: "ai-" + aiTasks.size, requestKey: body.requestKey, model: body.model, kind, status: "queued", error: null, result: null, createdAt: "a", updatedAt: "a", input: body };
+            aiTasks.set(body.requestKey, task);
+            expect(cache.get("workbench:ai-tasks:v1")).toContain(body.requestKey);
+            if (aiPostLost) { aiPostLost = false; throw new Error("Response lost after acceptance"); }
+            return Response.json({ task });
+        }
+        if (path.endsWith("/tasks")) return Response.json({ tasks: [...aiTasks.values()] });
+        if (aiQueryError) return Response.json({ error: "Offline" }, { status: 503 });
+        const task = [...aiTasks.values()].find((item) => path.endsWith("/" + item.id));
+        aiChecks++;
+        task.status = aiChecks <= aiPending ? "running" : aiStatus;
+        task.result = task.status === "completed" ? task.kind === "images" ? { images: [{ id: "image-result", url: "/api/canvas/assets/image/content" }] } : task.kind === "text" ? { text: "Recovered text" } : { url: "/api/canvas/assets/audio/content", mimeType: "audio/wav" } : null;
+        return Response.json({ task });
+    }
     if (path.endsWith("/bootstrap")) return Response.json({ user: { id: account }, models: [{ id: "platform-video", name: "Platform video", price: 1, billingUnit: "request", durations: [5], defaultDuration: 5, ratios: [{ value: "16:9", label: "16:9", size: "1280x720" }] }], currency: "USD", pointsPerUsd: 100, quota: { points: 12 }, capabilities: { video: true } });
     if (path.includes("/library") || path.includes("/prompts")) {
         const library = path.includes("/library");
@@ -303,4 +329,99 @@ test("ali-image uses URL output and rejects unsupported count and editing before
         await requestGeneration({ ...config, model: configModule.encodeChannelModel(channel.id, "other-image") }, "Fixture");
         expect(calls[2].response_format).toBe("b64_json");
     } finally { axios.defaults.adapter = original; }
+});
+
+test("AI tasks persist before submission and recover lost responses with the same key", async () => {
+    const { runAiTask, resumeAiTask, queryAiTask, acknowledgeAiTask, isWorkbenchTaskPending } = await import("@/services/api/workbench-ai-tasks");
+    const { useAiTasksStore } = await import("@/stores/use-workbench-ai-store");
+    const originalTimer = globalThis.setTimeout;
+    globalThis.setTimeout = ((callback: () => void) => { queueMicrotask(callback); return 0; }) as any;
+    const owner = { projectId: "native-1", nodeId: "text-fixture" };
+    try {
+        aiPostLost = true;
+        const input = { model: "ali-llm", messages: [{ role: "user", content: "Fixture" }] };
+        let lost: unknown;
+        try { await runAiTask("text", input, { owner }); } catch (error) { lost = error; }
+        expect(isWorkbenchTaskPending(lost)).toBe(true);
+        expect(aiTasks.size).toBe(1);
+        const saved = JSON.parse(cache.get("workbench:ai-tasks:v1")!)[0];
+        expect(saved.owner).toEqual(owner);
+        expect(saved.body).toEqual(input);
+        aiPending = 301; aiChecks = 0;
+        expect(await runAiTask("text", input, { owner })).toEqual({ text: "Recovered text" });
+        expect(aiChecks).toBe(302);
+        expect(aiTasks.size).toBe(1);
+        const posts = requests.filter((r) => r.path === "/api/canvas/ai/text");
+        expect(new Set(posts.map((r) => r.body.requestKey)).size).toBe(1);
+        const completed = useAiTasksStore.getState().records[0];
+        expect(await resumeAiTask(structuredClone(completed))).toEqual({ text: "Recovered text" });
+        expect(aiTasks.size).toBe(1);
+        await expect(runAiTask("text", { ...input, messages: [] }, { owner })).rejects.toThrow("unresolved");
+        await acknowledgeAiTask(owner);
+        aiPending = 0; aiStatus = "unknown";
+        let unknown: unknown;
+        try { await runAiTask("audio", { model: "ali-audio", prompt: "Fixture" }, { owner: { nodeId: "audio" } }); } catch (error) { unknown = error; }
+        expect(isWorkbenchTaskPending(unknown)).toBe(true);
+        const record = useAiTasksStore.getState().records.at(-1)!;
+        const count = aiTasks.size;
+        await expect(resumeAiTask(record)).rejects.toThrow("administrator review");
+        expect(aiTasks.size).toBe(count);
+        aiStatus = "completed";
+        expect((await queryAiTask(record)).status).toBe("completed");
+        aiQueryError = true;
+        await expect(queryAiTask(record)).rejects.toThrow("Offline");
+        expect(useAiTasksStore.getState().records.at(-1)?.task?.status).toBe("completed");
+        aiQueryError = false; aiStatus = "failed";
+        let failed: unknown;
+        try { await runAiTask("images", { model: "ali-image", prompt: "Rejected" }, { owner: { slot: 99 } }); } catch (error) { failed = error; }
+        expect(isWorkbenchTaskPending(failed)).toBe(false);
+        expect(useAiTasksStore.getState().records.at(-1)?.task?.status).toBe("failed");
+        expect(JSON.stringify(useAiTasksStore.getState().records)).not.toContain("apiKey");
+    } finally { globalThis.setTimeout = originalTimer; aiStatus = "completed"; aiPending = 0; aiQueryError = false; }
+});
+
+test("platform adapters return asynchronous text, image and speech results without provider credentials", async () => {
+    const { platformImages, platformText, platformAudio } = await import("@/services/api/workbench-ai");
+    const { buildGenerationConfig } = await import("@/lib/canvas/canvas-generation-helpers");
+    const session = api.workbenchSession();
+    session.aiModels = [{ id: "ali-image", name: "Image", capability: "image", price: 0 }, { id: "ali-llm", name: "Text", capability: "text", price: 0 }, { id: "ali-audio", name: "Speech", capability: "audio", price: 0 }];
+    Object.assign(session.capabilities, { image: true, text: true, audio: true });
+    const channel = { id: "workbench", name: "Workbench", baseUrl: "/api/canvas", apiKey: "", apiFormat: "openai" as const, models: session.aiModels.map((model) => ({ name: model.id, capability: model.capability })) };
+    const config = { ...configModule.defaultConfig, channels: [channel], model: "workbench::ali-image", imageModel: "workbench::ali-image", textModel: "workbench::ali-llm", audioModel: "workbench::ali-audio", size: "1024x1024", count: "1", audioFormat: "wav", apiKey: "" };
+    const originalTimer = globalThis.setTimeout;
+    globalThis.setTimeout = ((callback: () => void) => { queueMicrotask(callback); return 0; }) as any;
+    try {
+        expect((await platformImages(config, "Fixture", [], { owner: { slot: 100 } }))[0].dataUrl).toBe("/api/canvas/assets/image/content");
+        let delta = "";
+        expect(await platformText({ ...config, model: config.textModel }, [{ role: "user", content: "Fixture" }], (text) => delta = text, { owner: { nodeId: "adapter-text" } })).toBe("Recovered text");
+        expect(delta).toBe("Recovered text");
+        expect((await platformAudio({ ...config, model: config.audioModel }, "Fixture", { owner: { nodeId: "adapter-audio" } })).type).toBe("audio/wav");
+        const before = aiTasks.size;
+        await expect(platformImages({ ...config, count: "7" }, "Fixture", [])).rejects.toThrow("1–6");
+        await expect(platformImages({ ...config, background: "transparent" }, "Fixture", [])).rejects.toThrow("transparent");
+        await expect(platformImages(config, "Fixture", [{} as any])).rejects.toThrow("text-to-image");
+        await expect(platformText({ ...config, model: config.textModel }, [{ role: "user", content: [{ type: "image_url", image_url: { url: "data:image/png;base64,AA==" } }] }], () => {})).rejects.toThrow("text messages");
+        await expect(platformAudio({ ...config, model: config.audioModel, audioFormat: "mp3" }, "Fixture")).rejects.toThrow("WAV");
+        await expect(platformAudio({ ...config, model: config.audioModel }, "a".repeat(501))).rejects.toThrow("500");
+        session.aiModels[0].price = 1;
+        await expect(platformImages(config, "Fixture", [])).rejects.toThrow("pricing changed");
+        expect(aiTasks.size).toBe(before);
+        expect(buildGenerationConfig({ ...config, audioFormat: "mp3", size: "720x720" }, undefined, "audio").audioFormat).toBe("wav");
+        expect(buildGenerationConfig({ ...config, size: "720x720" }, undefined, "image").size).toBe("1024x1024");
+        expect(configModule.defaultConfig.audioFormat).toBe("mp3");
+    } finally { globalThis.setTimeout = originalTimer; session.aiModels[0].price = 0; }
+});
+
+test("recovered AI results only fill their owned node and slot", async () => {
+    const { applyRecoveredAiResult } = await import("@/pages/canvas/hooks/use-workbench-ai-recovery");
+    const node: any = { id: "root", type: "image", metadata: { content: "chosen", primaryImageId: "chosen-id", images: [{ id: "chosen-id", content: "chosen", status: "success" }, { id: "waiting-id", status: "idle" }] } };
+    const record: any = { kind: "images", owner: { projectId: "native-1", nodeId: "root", itemId: "waiting-id" } };
+    const result = applyRecoveredAiResult(node, record, { content: "recovered", status: "success" }, {});
+    expect(result.metadata?.content).toBe("chosen");
+    expect(result.metadata?.primaryImageId).toBe("chosen-id");
+    expect(result.metadata?.images?.[1].content).toBe("recovered");
+    expect(applyRecoveredAiResult({ ...node, id: "other" }, record, { content: "recovered" }, {}).metadata).toBe(node.metadata);
+    expect(applyRecoveredAiResult(node, { ...record, owner: { ...record.owner, itemId: "removed" } }, { content: "recovered" }, {})).toBe(node);
+    const text: any = { id: "text", type: "text", metadata: { content: "", primaryTextId: "slot", texts: [{ id: "slot", content: "", status: "idle" }] } };
+    expect(applyRecoveredAiResult(text, { ...record, kind: "text", owner: { nodeId: "text", itemId: "slot" } }, { content: "answer", status: "success" }, { text: "answer" }).metadata?.texts?.[0].content).toBe("answer");
 });

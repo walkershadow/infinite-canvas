@@ -37,6 +37,7 @@ export type AiConfig = {
     videoModel: string;
     textModel: string;
     audioModel: string;
+    platformImageSize?: string;
     audioVoice: string;
     audioFormat: string;
     audioSpeed: string;
@@ -106,6 +107,7 @@ export const defaultConfig: AiConfig = {
     videoModel: "default::grok-imagine-video",
     textModel: "default::gpt-5.5",
     audioModel: "default::gpt-4o-mini-tts",
+    platformImageSize: "1024x1024",
     audioVoice: "alloy",
     audioFormat: "mp3",
     audioSpeed: "1",
@@ -414,7 +416,7 @@ export function modelOptionName(value: string) {
 }
 
 export function modelOptionLabel(config: AiConfig, value: string) {
-    if (isWorkbenchModel(config, value)) return [...workbenchSession().models, ...(workbenchSession().aiModels || [])].find((item) => item.id === modelOptionName(value))?.name || value;
+    if (isWorkbenchModel(config, value)) return [...workbenchSession().models, ...(workbenchSession().aiModels || [])].find((item) => item.id === modelOptionName(value))?.name || modelOptionName(value);
     const decoded = decodeChannelModel(value);
     if (!decoded) return value;
     const channel = config.channels.find((item) => item.id === decoded.channelId);

@@ -1,3 +1,6 @@
+import { useAiTasksStore } from "@/stores/use-workbench-ai-store";
+import { WorkbenchAiTasks } from "./workbench-ai-tasks";
+import { workbenchSession } from "@/services/api/workbench";
 import { useState } from "react";
 import { Button, Empty, Modal, Popover, Spin, theme } from "antd";
 import { FolderOpen, Import, RefreshCw } from "lucide-react";
@@ -13,6 +16,7 @@ import type { CloudProject } from "@/types/workbench";
 
 export function WorkbenchActions() {
     const { ready, saving, error, recovery, balance, libraryError, libraryRecovery, librarySaving } = useWorkbenchStore();
+    const aiError = useAiTasksStore((state) => state.error);
     const { token } = theme.useToken();
     const [open, setOpen] = useState(false);
     const [notice, setNotice] = useState("");
@@ -21,7 +25,7 @@ export function WorkbenchActions() {
     const [importing, setImporting] = useState<string>();
     const [legacy, setLegacy] = useState<{ id: string; title: string }[]>([]);
     const busy = saving || librarySaving;
-    const attention = Boolean(error || libraryError || recovery || libraryRecovery || notice);
+    const attention = Boolean(error || libraryError || recovery || libraryRecovery || notice || aiError);
     const status = attention ? "Cloud storage needs attention" : busy ? "Saving documents…" : ready ? "Documents saved" : "Loading cloud documents…";
     const report = (error: unknown) => { setNotice(error instanceof Error ? error.message : String(error)); setOpen(true); };
     const download = (content: string, filename: string) => saveAs(new Blob([content], { type: "application/json" }), filename);
@@ -46,6 +50,7 @@ export function WorkbenchActions() {
     const details = <div className="w-80 max-w-[calc(100vw-48px)] space-y-3 whitespace-normal text-sm">
         <div className="flex items-center justify-between gap-3"><span className="font-medium">{status}</span><span className="shrink-0 tabular-nums">{balance} points</span></div>
         <p className="text-xs leading-relaxed" style={{ color: token.colorTextSecondary }}>Local media files are uploaded with your documents. External links and task playback URLs are not guaranteed media backups.</p>
+        {aiError && <p role="alert" className="break-words text-xs">{aiError}</p>}
         {notice && !importOpen && <div role="alert" className="break-words"><p>{notice}</p><Button type="text" size="small" onClick={() => setNotice("")}>Dismiss</Button></div>}
         {error && <section className="space-y-1" role="alert"><p className="break-words">{error}</p><div className="flex flex-wrap gap-1">
             <Button type="text" size="small" onClick={() => void retryCloudSave().catch(report)}>Retry save</Button>
@@ -67,6 +72,7 @@ export function WorkbenchActions() {
             <Button type="text" size="small" onClick={() => void resolveLibraryRecovery(false).catch(report)}>Discard recovery</Button>
         </div></section>}
         <div className="flex flex-wrap items-center gap-1 pt-1">
+            {Boolean(workbenchSession().aiModels?.length) && <WorkbenchAiTasks />}
             <Link to="/canvas" onClick={() => setOpen(false)} className="inline-flex items-center gap-1.5 rounded px-2 py-1.5 hover:bg-black/5 dark:hover:bg-white/10"><FolderOpen className="size-3.5" />Projects</Link>
             <Button type="text" size="small" icon={<Import className="size-3.5" />} onClick={() => void loadLegacy()}>Import existing canvas</Button>
         </div>

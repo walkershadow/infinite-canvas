@@ -1,3 +1,4 @@
+import { isWorkbenchModel } from "@/stores/use-config-store";
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -28,6 +29,7 @@ export function AudioSettingsPanel({ config, onConfigChange, theme, showTitle = 
         <ImageSettingsTheme theme={theme}>
             <div className={className} style={{ color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
                 {showTitle ? <div className="text-lg font-semibold">{t("settingsPanels.audio.title")}</div> : null}
+                {isWorkbenchModel(config, config.model) && <p className="text-xs leading-relaxed" style={{ color: theme.node.muted }}>Platform speech: up to 500 characters, alloy/default voice, WAV, speed 1, no extra instructions.</p>}
                 <SettingGroup title={t("settingsPanels.audio.voice")} color={theme.node.muted}>
                     <div className="grid grid-cols-3 gap-2.5">
                         {audioVoiceOptions.map((item) => (
