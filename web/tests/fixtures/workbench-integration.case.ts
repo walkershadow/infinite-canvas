@@ -10,7 +10,7 @@ const localForageStorage = {
 };
 mock.module("@/lib/localforage-storage", () => ({ localForageStorage }));
 mock.module("@/i18n", () => ({ default: { t: (key: string) => key } }));
-mock.module("@/services/image-storage", () => ({ ensureImagePreview: async () => {}, resolveImageUrl: async (_key: string, url: string) => url, uploadImage: async (url: string) => ({ url }), getImageBlob: async () => new Blob(["fixture"], { type: "image/png" }), imageToDataUrl: async () => "data:image/png;base64,AA==" }));
+mock.module("@/services/image-storage", () => ({ ensureImagePreview: async () => {}, resolveImageUrl: async (_key: string, url: string) => url, uploadImage: async (url: string | Blob) => typeof url === "string" ? { url } : { url: "blob:generated-cover", storageKey: "image:generated-cover" }, getImageBlob: async () => new Blob(["fixture"], { type: "image/png" }), imageToDataUrl: async () => "data:image/png;base64,AA==" }));
 mock.module("@/services/file-storage", () => ({ getMediaBlob: async () => null, resolveMediaUrl: async (_key: string, url: string) => url, uploadMediaFile: async (url: string) => ({ url, storageKey: "video:fixture", mimeType: "video/mp4", bytes: 1 }) }));
 
 const { create } = await import("zustand");
@@ -424,4 +424,66 @@ test("recovered AI results only fill their owned node and slot", async () => {
     expect(applyRecoveredAiResult(node, { ...record, owner: { ...record.owner, itemId: "removed" } }, { content: "recovered" }, {})).toBe(node);
     const text: any = { id: "text", type: "text", metadata: { content: "", primaryTextId: "slot", texts: [{ id: "slot", content: "", status: "idle" }] } };
     expect(applyRecoveredAiResult(text, { ...record, kind: "text", owner: { nodeId: "text", itemId: "slot" } }, { content: "answer", status: "success" }, { text: "answer" }).metadata?.texts?.[0].content).toBe("answer");
+});
+
+
+test("reference selection rejects empty/mixed groups and platform media without changing custom providers", async () => {
+    const { referenceKindsForNode, isCompatibleReference } = await import("@/lib/canvas/canvas-reference-selection");
+    const { useConfigStore } = await import("@/stores/use-config-store");
+    const defaultConfig = { ...useConfigStore.getState().config, channels: [{ id: "workbench", name: "Workbench", baseUrl: "", apiKey: "", apiFormat: "openai" as const, models: [...(api.workbenchSession().aiModels || []).map((item) => ({ name: item.id, capability: item.capability })), { name: "ali-video", capability: "video" as const }] }] };
+    const node = (id: string, type: string, metadata = {}) => ({ id, type, title: id, position: { x: 0, y: 0 }, width: 100, height: 100, metadata }) as any;
+    const image = node("image", "image", { content: "image.png", groupId: "group" });
+    const text = node("text", "text", { content: "context", groupId: "group" });
+    const group = node("group", "group");
+    const nodes = [image, text, group];
+    expect(referenceKindsForNode(node("target", "image", { model: "workbench::ali-image" }), defaultConfig)).toEqual(["text"]);
+    expect(referenceKindsForNode(node("target", "text", { model: "workbench::ali-llm" }), defaultConfig)).toEqual(["text"]);
+    expect(referenceKindsForNode(node("target", "image", { model: "default::gpt-image-2" }), defaultConfig)).toEqual(["text", "image"]);
+    expect(referenceKindsForNode(node("target", "video", { model: "workbench::ali-video" }), defaultConfig)).toEqual(["text"]);
+    expect(isCompatibleReference(node("empty", "image"), nodes, ["image"])).toBe(false);
+    expect(isCompatibleReference(image, nodes, ["text"])).toBe(false);
+    expect(isCompatibleReference(text, nodes, ["text"])).toBe(true);
+    expect(isCompatibleReference(group, nodes, ["text"])).toBe(false);
+    expect(isCompatibleReference(group, nodes, ["text", "image"])).toBe(true);
+});
+
+test("video cover is persisted as a separate durable image while the original video is preserved", async () => {
+    const { durableDocument } = await import("@/services/workbench/projects");
+    const original = { id: "saved-video", kind: "video", coverUrl: "", data: { url: "/api/tasks/original/video", width: 1280, height: 720 }, videoCover: { storageKey: "image:video-cover", url: "blob:cover" } };
+    const document = await durableDocument(original);
+    expect(document.data).toEqual(original.data);
+    expect(document.videoCover.url).toStartWith("/api/canvas/assets/");
+    expect(document.videoCover.storageKey).not.toBe("image:video-cover");
+    expect(original.videoCover.url).toBe("blob:cover");
+});
+
+
+test("cover generation deduplicates requests and never overwrites a newer cover or deleted asset", async () => {
+    let release!: () => void;
+    let calls = 0;
+    mock.module("@/lib/canvas/canvas-video-frame", () => ({ captureVideoFrame: async () => { calls++; await new Promise<void>((resolve) => release = resolve); return new Blob(["frame"], { type: "image/png" }); } }));
+    mock.module("@/lib/image-thumbnail", () => ({ createImageThumbnail: async () => undefined }));
+    const { ensureAssetVideoCover } = await import("@/services/asset-video-cover");
+    const original = { id: "legacy", kind: "video", coverUrl: "", data: { url: "/video", width: 640 }, note: "keep" };
+    assetStore.setState({ assets: [original], updateAsset: (id: string, patch: any) => assetStore.setState({ assets: assetStore.getState().assets.map((a: any) => a.id === id ? { ...a, ...patch } : a) }) });
+    const first = ensureAssetVideoCover("legacy");
+    expect(ensureAssetVideoCover("legacy")).toBe(first);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    release(); await first;
+    expect(calls).toBe(1);
+    expect(assetStore.getState().assets[0].data).toEqual(original.data);
+    expect(assetStore.getState().assets[0].videoCover.storageKey).toBe("image:generated-cover");
+    await ensureAssetVideoCover("legacy"); expect(calls).toBe(1);
+    assetStore.setState({ assets: [original] });
+    const custom = ensureAssetVideoCover("legacy");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assetStore.setState({ assets: [{ ...original, coverUrl: "/custom-cover" }] });
+    release(); await custom;
+    expect(assetStore.getState().assets[0].coverUrl).toBe("/custom-cover");
+    expect(assetStore.getState().assets[0].videoCover).toBeUndefined();
+    assetStore.setState({ assets: [original] });
+    const deleted = ensureAssetVideoCover("legacy");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    assetStore.setState({ assets: [] }); release(); await deleted;
+    expect(assetStore.getState().assets).toEqual([]);
 });

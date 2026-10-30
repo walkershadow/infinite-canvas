@@ -18,6 +18,7 @@ type AssetBase<T extends AssetKind> = {
     kind: T;
     title: string;
     coverUrl: string;
+    videoCover?: { url: string; storageKey?: string };
     tags: string[];
     source?: string;
     note?: string;
@@ -39,7 +40,7 @@ type AssetStore = {
 // 卡片用缩略图渲染，自定义封面（远程地址或单独上传的封面）保持原样。
 export function assetCoverUrl(asset: Asset) {
     const own = asset.kind === "image" ? asset.data.dataUrl : "";
-    const cover = asset.coverUrl || own;
+    const cover = asset.coverUrl || asset.videoCover?.url || own;
     return asset.kind === "image" && cover === own ? previewUrlFor(asset.data.storageKey) || cover : cover;
 }
 
@@ -52,7 +53,7 @@ const assetStorage: PersistStorage<AssetStore> = {
         const parsed = JSON.parse(value) as StorageValue<AssetStore>;
         parsed.state.assets = await Promise.all(
             parsed.state.assets.map(async (asset) => {
-                if (asset.kind === "video" && asset.data.storageKey) return { ...asset, data: { ...asset.data, url: await resolveMediaUrl(asset.data.storageKey, asset.data.url) } };
+                if (asset.kind === "video") return { ...asset, ...(asset.videoCover ? { videoCover: { ...asset.videoCover, url: await resolveImageUrl(asset.videoCover.storageKey, asset.videoCover.url) } } : {}), data: { ...asset.data, url: await resolveMediaUrl(asset.data.storageKey, asset.data.url) } };
                 if (asset.kind !== "image") return asset;
                 if (asset.data.storageKey) {
                     void ensureImagePreview(asset.data.storageKey);

@@ -1,3 +1,4 @@
+import { isCompatibleReference, referenceKindsForNode } from "@/lib/canvas/canvas-reference-selection";
 import { isWorkbenchTaskPending } from "@/services/api/workbench-ai-tasks";
 import { useWorkbenchAiRecovery } from "./hooks/use-workbench-ai-recovery";
 import { isOverseas } from "@/constant/integration";
@@ -19,7 +20,7 @@ import { nanoid } from "nanoid";
 import { getDataUrlByteSize, readImageMeta } from "@/lib/image-utils";
 import { imageReferenceLabel } from "@/lib/image-reference-prompt";
 import { canvasThemes, type CanvasBackgroundMode } from "@/lib/canvas-theme";
-import { useAssetStore } from "@/stores/use-asset-store";
+import { useAssetStore, type AssetKind } from "@/stores/use-asset-store";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { cropDataUrl, splitDataUrl, upscaleDataUrl } from "@/lib/canvas/canvas-image-data";
 import { fitNodeSize, nodeSizeFromRatio } from "@/lib/canvas/canvas-node-size";
@@ -50,7 +51,7 @@ import { useAgentStore } from "@/stores/use-agent-store";
 import { useCanvasStore } from "@/stores/canvas/use-canvas-store";
 import { useAgentBridge } from "@/pages/canvas/hooks/use-agent-bridge";
 import { usePluginHost } from "@/pages/canvas/hooks/use-plugin-host";
-import { buildNodeMentionReferences, getGroupResourceNodes, isCanvasReferenceNode, type CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
+import { buildNodeMentionReferences, getGroupResourceNodes, type CanvasResourceReference } from "@/lib/canvas/canvas-resource-references";
 import { exportCanvasProjects } from "@/lib/canvas/canvas-export";
 import { applyNodeConfigPatch, audioMetadata, buildAudioGenerationMetadata, buildImageGenerationMetadata, createCanvasNode, imageMetadata, videoMetadata } from "@/lib/canvas/canvas-node-factory";
 import { applyGroupSelection, applyUngroupSelection, canGroupSelectedNodes, canUngroupSelectedNodes, collectGroupMemberNodes, findContainingGroupId, findGroupDropTarget, focusViewportForNode, getConnectionTargetAnchor, getGroupWrapRect, normalizeConnection, snapNodesIntoGroup } from "@/lib/canvas/canvas-node-geometry";
@@ -823,6 +824,9 @@ function InfiniteCanvasPage() {
         return map;
     }, [connections, nodeById]);
     const referenceConnectedNodeIds = useMemo(() => new Set([referencePickerNodeId, ...(referencePickerNodeId ? connectedNodesByNodeId.get(referencePickerNodeId)?.flatMap((node) => node.type === CanvasNodeType.Group ? [node.id, ...getGroupResourceNodes(node.id, nodes).map((child) => child.id)] : [node.id]) || [] : [])].filter((id): id is string => Boolean(id))), [connectedNodesByNodeId, nodes, referencePickerNodeId]);
+    const referenceTarget = nodes.find((node) => node.id === referencePickerNodeId);
+    const referenceKinds = useMemo(() => referenceTarget ? referenceKindsForNode(referenceTarget, effectiveConfig) : [], [referenceTarget, effectiveConfig]);
+    const availableReferenceIds = useMemo(() => new Set(nodes.filter((node) => !referenceConnectedNodeIds.has(node.id) && isCompatibleReference(node, nodes, referenceKinds)).map((node) => node.id)), [nodes, referenceConnectedNodeIds, referenceKinds]);
     const { applyAgentOps } = useAgentBridge({
         projectId,
         title: currentProject?.title,
@@ -975,12 +979,12 @@ function InfiniteCanvasPage() {
     const selectNodeReference = useCallback((fromNodeId: string) => {
         if (!referencePickerNodeId || referenceConnectedNodeIds.has(fromNodeId)) return;
         const source = nodesRef.current.find((node) => node.id === fromNodeId);
-        if (!source || !isCanvasReferenceNode(source, nodesRef.current)) return;
+        if (!source || !isCompatibleReference(source, nodesRef.current, referenceKinds)) return;
         setConnections((prev) => [...prev, { id: nanoid(), fromNodeId, toNodeId: referencePickerNodeId }]);
-    }, [referenceConnectedNodeIds, referencePickerNodeId]);
+    }, [referenceConnectedNodeIds, referencePickerNodeId, referenceKinds]);
 
     useEffect(() => {
-        if (!referencePickerNodeId) return;
+        if (!referencePickerNodeId || assetPickerOpen) return;
         const exit = (event: KeyboardEvent) => {
             if (event.key !== "Escape") return;
             event.preventDefault();
@@ -989,7 +993,7 @@ function InfiniteCanvasPage() {
         };
         window.addEventListener("keydown", exit, true);
         return () => window.removeEventListener("keydown", exit, true);
-    }, [exitNodeReferenceSelection, referencePickerNodeId]);
+    }, [assetPickerOpen, exitNodeReferenceSelection, referencePickerNodeId]);
 
     const deselectCanvas = useCallback(() => {
         cancelPendingConnectionCreate();
@@ -3076,6 +3080,24 @@ function InfiniteCanvasPage() {
         [insertAssistantImage, insertAssistantText, screenToCanvas, size.height, size.width],
     );
 
+    const insertAssetReference = async (payload: InsertAssetPayload) => {
+        const target = nodesRef.current.find((node) => node.id === referencePickerNodeId);
+        if (!target || !referenceKindsForNode(target, effectiveConfig).includes(payload.kind)) return;
+        setAssetPickerOpen(false);
+        try {
+            const type = payload.kind === "text" ? CanvasNodeType.Text : payload.kind === "image" ? CanvasNodeType.Image : CanvasNodeType.Video;
+            const metadata = payload.kind === "image" ? imageMetadata(await uploadImage(payload.dataUrl)) : payload.kind === "video" ? { content: payload.url, storageKey: payload.storageKey, naturalWidth: payload.width, naturalHeight: payload.height, status: NODE_STATUS_SUCCESS } : { content: payload.content, status: NODE_STATUS_SUCCESS };
+            if (!nodesRef.current.some((node) => node.id === target.id)) return;
+            const node = createCanvasNode(type, target.position, metadata);
+            node.title = payload.title;
+            if (metadata.naturalWidth && metadata.naturalHeight) Object.assign(node, fitNodeSize(metadata.naturalWidth, metadata.naturalHeight));
+            node.position = { x: target.position.x - node.width - 40, y: target.position.y };
+            setNodes((previous) => [...previous, node]);
+            setConnections((previous) => [...previous, { id: nanoid(), fromNodeId: node.id, toNodeId: target.id }]);
+            message.success(t("canvas.references.added"));
+        } catch (error) { message.error(error instanceof Error ? error.message : String(error)); }
+    };
+
     // Memoize every callback and render function passed to CanvasNode.
     // CanvasNode uses React.memo, but new prop references would invalidate it on every render and rerender every node
     // during click, hover, or viewport changes, which is especially expensive for Markdown. These useCallback values
@@ -3270,7 +3292,7 @@ function InfiniteCanvasPage() {
                             isFocusRelated={activeNodeId === node.id}
                             isConnectionTarget={connectionTargetNodeId === node.id}
                             isConnecting={Boolean(connectingParams)}
-                            referenceSelectionState={!referencePickerNodeId ? undefined : node.id === referencePickerNodeId ? "target" : referenceConnectedNodeIds.has(node.id) || !isCanvasReferenceNode(node, nodes) ? "disabled" : "available"}
+                            referenceSelectionState={!referencePickerNodeId ? undefined : node.id === referencePickerNodeId ? "target" : !availableReferenceIds.has(node.id) ? "disabled" : "available"}
                             showPanel={!isNodeResizing && dialogNodeId === node.id && !selectionBox && !getNodeDefinition(node.type)?.hidePanel}
                             groupChildCount={groupChildCountById.get(node.id) || 0}
                             isGroupDropTarget={dropTargetGroupId === node.id}
@@ -3331,7 +3353,15 @@ function InfiniteCanvasPage() {
                     ) : null}
                 </InfiniteCanvas>
 
-                {referencePickerNodeId ? <button type="button" className="absolute left-1/2 top-4 z-[90] -translate-x-1/2 rounded-full border px-4 py-2 text-sm font-medium shadow-lg backdrop-blur" style={{ background: theme.toolbar.panel, borderColor: theme.toolbar.border }} onClick={exitNodeReferenceSelection}>{t("canvas.references.selectingHint")}</button> : null}
+                {referencePickerNodeId ? <div className="absolute left-1/2 top-4 z-[90] w-[min(36rem,calc(100%-2rem))] -translate-x-1/2 space-y-2 p-3 text-sm" style={{ background: theme.toolbar.panel, color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
+                    <p>{t(availableReferenceIds.size ? "canvas.references.selectingHint" : "canvas.references.noCandidates")}</p>
+                    {referenceKinds.length === 1 && <p className="text-xs" style={{ color: theme.node.muted }}>{t("canvas.references.textOnly")}</p>}
+                    <div className="flex flex-wrap items-center gap-2">
+                        <span className="mr-auto text-xs" style={{ color: theme.node.muted }}>{t("canvas.references.connectedCount", { count: connectedNodesByNodeId.get(referencePickerNodeId)?.length || 0 })}</span>
+                        <Button type="text" size="small" onClick={() => setAssetPickerOpen(true)}>{t("canvas.references.fromAssets")}</Button>
+                        <Button type="text" size="small" onClick={exitNodeReferenceSelection}>{t("canvas.references.done")}</Button>
+                    </div>
+                </div> : null}
 
                 <div
                     className="pointer-events-none absolute inset-0 z-[80] flex items-center justify-center transition-opacity duration-200 ease-out"
@@ -3504,7 +3534,7 @@ function InfiniteCanvasPage() {
                     <p className="text-sm opacity-60">{t("canvas.projectPage.clearDescription")}</p>
                 </Modal>
 
-                <AssetPickerModal open={assetPickerOpen} onInsert={handleAssetInsert} onClose={() => setAssetPickerOpen(false)} />
+                <AssetPickerModal open={assetPickerOpen} allowedKinds={referencePickerNodeId ? referenceKinds.filter((kind): kind is AssetKind => kind !== "audio") : undefined} description={referencePickerNodeId ? t("canvas.references.assetHint") : undefined} onInsert={referencePickerNodeId ? (payload) => void insertAssetReference(payload) : handleAssetInsert} onClose={() => setAssetPickerOpen(false)} />
             </section>
         </main>
     );

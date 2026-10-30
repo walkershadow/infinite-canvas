@@ -5,22 +5,26 @@ import { useTranslation } from "react-i18next";
 
 import { cn } from "@/lib/utils";
 import { getImagePreviewRevision, subscribeImagePreviews } from "@/services/image-storage";
-import { assetCoverUrl, useAssetStore, type Asset } from "@/stores/use-asset-store";
+import { useAssetCover } from "@/hooks/use-asset-cover";
+import { useAssetStore, type Asset, type AssetKind } from "@/stores/use-asset-store";
 
 export type InsertAssetPayload = { kind: "text"; content: string; title: string } | { kind: "image"; dataUrl: string; title: string; storageKey?: string } | { kind: "video"; url: string; title: string; storageKey?: string; width?: number; height?: number };
 
 type Props = {
     open: boolean;
     defaultTab?: string;
+    allowedKinds?: AssetKind[];
+    description?: string;
     onInsert: (payload: InsertAssetPayload) => void;
     onClose: () => void;
 };
 
-export function AssetPickerModal({ open, onInsert, onClose }: Props) {
+export function AssetPickerModal({ open, onInsert, onClose, allowedKinds, description }: Props) {
     const { t } = useTranslation();
     return (
         <Modal title={t("canvas.assetPicker.title")} open={open} onCancel={onClose} footer={null} width={860} destroyOnHidden styles={{ body: { padding: "0 24px 24px", minHeight: 480 } }}>
-            <MyAssetsTab onInsert={onInsert} />
+            {description && <p className="mb-4 text-sm text-muted-foreground">{description}</p>}
+            <MyAssetsTab onInsert={onInsert} allowedKinds={allowedKinds} />
         </Modal>
     );
 }
@@ -29,10 +33,13 @@ const PAGE_SIZE = 8;
 
 const kindOptions = ["all", "text", "image", "video"];
 
-function PickerCard({ title, kind, cover, onClick }: { title: string; kind: string; cover: string; onClick: () => void }) {
+function PickerCard({ asset, onClick }: { asset: Asset; onClick: () => void }) {
+    const { title, kind } = asset;
+    const { ref, cover, failed } = useAssetCover(asset);
     const { t } = useTranslation();
     return (
         <button
+            ref={ref}
             type="button"
             className="group relative cursor-pointer overflow-hidden rounded-lg border border-stone-200 bg-white text-left transition hover:border-stone-400 hover:shadow-md dark:border-stone-700 dark:bg-stone-900 dark:hover:border-stone-500"
             onClick={onClick}
@@ -40,7 +47,7 @@ function PickerCard({ title, kind, cover, onClick }: { title: string; kind: stri
             {cover ? (
                 <img src={cover} alt={title} className="aspect-[4/3] w-full object-cover" />
             ) : (
-                <div className="flex aspect-[4/3] items-center justify-center bg-stone-100 p-3 text-center text-xs leading-5 text-stone-500 dark:bg-stone-800 dark:text-stone-400">{title}</div>
+                <div className="flex aspect-[4/3] items-center justify-center bg-stone-100 p-3 text-center text-xs leading-5 text-stone-500 dark:bg-stone-800 dark:text-stone-400">{kind === "video" ? t(failed ? "assets.coverUnavailable" : "assets.coverLoading") : title}</div>
             )}
             <div className="p-2.5">
                 <div className="flex items-center justify-between gap-2">
@@ -53,7 +60,7 @@ function PickerCard({ title, kind, cover, onClick }: { title: string; kind: stri
     );
 }
 
-function MyAssetsTab({ onInsert }: { onInsert: (payload: InsertAssetPayload) => void }) {
+function MyAssetsTab({ onInsert, allowedKinds }: { onInsert: (payload: InsertAssetPayload) => void; allowedKinds?: AssetKind[] }) {
     const { t } = useTranslation();
     useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
     const assets = useAssetStore((state) => state.assets);
@@ -64,10 +71,10 @@ function MyAssetsTab({ onInsert }: { onInsert: (payload: InsertAssetPayload) => 
     const filtered = useMemo(() => {
         const query = keyword.trim().toLowerCase();
         return assets
-            .filter((a) => a.kind === "text" || a.kind === "image" || a.kind === "video")
+            .filter((a) => allowedKinds ? allowedKinds.includes(a.kind) : a.kind === "text" || a.kind === "image" || a.kind === "video")
             .filter((a) => kindFilter === "all" || a.kind === kindFilter)
             .filter((a) => !query || [a.title, ...(a.tags || [])].join(" ").toLowerCase().includes(query));
-    }, [assets, keyword, kindFilter]);
+    }, [assets, keyword, kindFilter, allowedKinds]);
 
     const visible = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
@@ -100,7 +107,7 @@ function MyAssetsTab({ onInsert }: { onInsert: (payload: InsertAssetPayload) => 
                     }}
                 />
                 <div className="flex gap-1.5">
-                    {kindOptions.map((option) => (
+                    {kindOptions.filter((option) => option === "all" || !allowedKinds || allowedKinds.includes(option as AssetKind)).map((option) => (
                         <Tag.CheckableTag
                             key={option}
                             checked={kindFilter === option}
@@ -117,9 +124,9 @@ function MyAssetsTab({ onInsert }: { onInsert: (payload: InsertAssetPayload) => 
             </div>
 
             {visible.length ? (
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 md:grid-cols-4">
                     {visible.map((asset) => (
-                        <PickerCard key={asset.id} title={asset.title} kind={asset.kind} cover={assetCoverUrl(asset)} onClick={() => handleInsert(asset)} />
+                        <PickerCard key={asset.id} asset={asset} onClick={() => handleInsert(asset)} />
                     ))}
                 </div>
             ) : (

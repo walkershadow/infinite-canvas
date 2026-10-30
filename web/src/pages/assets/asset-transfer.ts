@@ -2,7 +2,7 @@ import { saveAs } from "file-saver";
 
 import { createZip, readZip } from "@/lib/zip";
 import { getMediaBlob, setMediaBlob } from "@/services/file-storage";
-import { getImageBlob, setImageBlob } from "@/services/image-storage";
+import { getImageBlob, resolveImageUrl, setImageBlob } from "@/services/image-storage";
 import type { Asset } from "@/stores/use-asset-store";
 
 type AssetExportFile = {
@@ -26,6 +26,14 @@ export async function exportAssets(assets: Asset[], filename: string) {
 
     await Promise.all(
         assets.map(async (asset) => {
+            if (asset.videoCover?.storageKey) {
+                const blob = await getImageBlob(asset.videoCover.storageKey);
+                if (blob) {
+                    const path = `files/${safeFileName(asset.videoCover.storageKey)}.${fileExtension(blob.type, "image")}`;
+                    files.push({ storageKey: asset.videoCover.storageKey, path, mimeType: blob.type, bytes: blob.size });
+                    zipFiles.push({ name: path, data: blob });
+                }
+            }
             if (asset.kind !== "image" && asset.kind !== "video") return;
             const storageKey = asset.data.storageKey;
             if (!storageKey) return;
@@ -55,7 +63,7 @@ export async function readAssetPackage(file: File) {
             await (item.storageKey.startsWith("image:") ? setImageBlob(item.storageKey, typedBlob) : setMediaBlob(item.storageKey, typedBlob));
         }),
     );
-    return data.assets;
+    return Promise.all(data.assets.map(async (asset) => asset.videoCover ? { ...asset, videoCover: { ...asset.videoCover, url: await resolveImageUrl(asset.videoCover.storageKey, asset.videoCover.url) } } : asset));
 }
 
 function safeFileName(value: string) {

@@ -1,3 +1,4 @@
+import { ensureAssetVideoCover } from "@/services/asset-video-cover";
 import { canResumePlatformVideo, pollVideoTaskWindow } from "./poll-video-task";
 import { workbenchVideoInput } from "@/services/workbench/video";
 import { isOverseas } from "@/constant/integration";
@@ -281,7 +282,7 @@ export default function VideoPage() {
     };
 
     const saveResultToAssets = (video: GeneratedVideo) => {
-        addAsset({
+        const id = addAsset({
             kind: "video",
             title: t("videoWorkbench.resultTitle"),
             coverUrl: "",
@@ -290,6 +291,7 @@ export default function VideoPage() {
             data: { url: video.url, storageKey: video.storageKey, width: video.width, height: video.height, bytes: video.bytes, mimeType: video.mimeType },
             metadata: { source: "video-page", prompt },
         });
+        void ensureAssetVideoCover(id).catch(() => message.info(t("assets.coverUnavailable")));
         message.success(t("common.addedToAssets"));
     };
 
