@@ -1,3 +1,4 @@
+import { isOverseas } from "@/constant/integration";
 import { App, Button, Form, Input, Modal, Progress, Radio, Select, Switch, Tabs } from "antd";
 import type { TFunction } from "i18next";
 import { Cloud, Download, Pencil, Plus, RefreshCw, Trash2, Upload, Wifi } from "lucide-react";
@@ -77,7 +78,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
     };
 
     const finishConfig = () => {
-        const ready = config.channels.some((channel) => channel.baseUrl.trim() && channel.apiKey.trim() && channel.models.length);
+        const ready = isOverseas || config.channels.some((channel) => channel.baseUrl.trim() && channel.apiKey.trim() && channel.models.length);
         setConfigDialogOpen(false);
         if (!ready) return;
         message.success(t(shouldPromptContinue ? "config.savedContinue" : "config.saved"));
@@ -168,7 +169,7 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
     return (
         <>
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200 pb-3 dark:border-stone-800">
-                <div className="text-xs text-stone-500">{t("config.fileSecurity")}</div>
+                <div className="text-xs text-stone-500">{isOverseas ? "Workbench models use your account balance. Custom providers bill you directly, outside Workbench. Custom keys and preferences stay on this device, scoped to your account." : t("config.fileSecurity")}</div>
                 <div className="flex gap-2">
                     <Button icon={<Upload className="size-4" />} onClick={() => configInputRef.current?.click()}>
                         {t("config.import")}
@@ -204,10 +205,10 @@ export function AppConfigPanel({ showDoneButton = false, initialTab = "channels"
                                                 </div>
                                             </div>
                                             <div className="flex shrink-0 gap-2">
-                                                <Button size="small" icon={<Pencil className="size-3.5" />} onClick={() => setEditingChannelId(channel.id)}>
+                                                <Button size="small" icon={<Pencil className="size-3.5" />} disabled={isOverseas && channel.id === "workbench"} onClick={() => setEditingChannelId(channel.id)}>
                                                     {t("common.edit")}
                                                 </Button>
-                                                <Button size="small" danger icon={<Trash2 className="size-3.5" />} onClick={() => deleteChannel(channel.id)} />
+                                                <Button size="small" danger disabled={isOverseas && channel.id === "workbench"} icon={<Trash2 className="size-3.5" />} onClick={() => deleteChannel(channel.id)} />
                                             </div>
                                         </div>
                                     ))}

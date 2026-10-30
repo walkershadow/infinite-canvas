@@ -1,3 +1,6 @@
+import { workbenchVideoInput } from "@/services/workbench/video";
+import { isOverseas } from "@/constant/integration";
+import { accountDatabaseName } from "@/services/api/workbench";
 import { ArrowLeft, ArrowRight, BookOpen, CheckSquare, ClipboardPaste, Download, FolderPlus, History, LoaderCircle, Plus, SlidersHorizontal, Sparkles, Trash2, Upload, VideoIcon } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type DragEvent } from "react";
 import { App, Button, Checkbox, Drawer, Empty, Input, Modal, Tag, Typography } from "antd";
@@ -18,7 +21,7 @@ import { resolveImageUrl, ensureImagePreview, getImagePreviewRevision, previewUr
 import { createVideoGenerationTask, pollVideoGenerationTask, storeGeneratedVideo, type VideoGenerationTask } from "@/services/api/video";
 import { useAssetStore } from "@/stores/use-asset-store";
 import { useWorkbenchAgentStore } from "@/stores/use-workbench-agent-store";
-import { boolConfig, modelOptionLabel, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
+import { boolConfig, isWorkbenchModel, modelOptionLabel, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { ReferenceImage } from "@/types/image";
 import i18n from "@/i18n";
@@ -65,10 +68,11 @@ type GenerationLogConfig = Pick<AiConfig, "model" | "videoModel" | "size" | "vqu
 type UpdateAiConfig = <K extends keyof AiConfig>(key: K, value: AiConfig[K]) => void;
 
 const LOG_STORE_KEY = "infinite-canvas:video_generation_logs";
-const logStore = localforage.createInstance({ name: "infinite-canvas", storeName: "video_generation_logs" });
+const requestStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "workbench_requests" });
+const logStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "video_generation_logs" });
 
 export default function VideoPage() {
-    const { message } = App.useApp();
+    const { message, modal } = App.useApp();
     const { t } = useTranslation();
     useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -184,9 +188,20 @@ export default function VideoPage() {
         const batchStartedAt = performance.now();
         setStartedAt(batchStartedAt);
         try {
-            const task = await createVideoGenerationTask(snapshot.config, snapshot.text, snapshot.references);
+            let requestKey: string | undefined;
+            if (isWorkbenchModel(snapshot.config, snapshot.config.model || snapshot.config.videoModel)) {
+                const estimate = workbenchVideoInput(snapshot.config);
+                const confirmed = await new Promise<boolean>((resolve) => modal.confirm({ title: "Generate video", content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). Workbench applies eligible free quota.`, okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false) }));
+                if (!confirmed) { setRunning(false); setResults([]); return; }
+                const signature = JSON.stringify({ prompt: snapshot.text, model, duration: estimate.duration, ratio: estimate.ratio, references: snapshot.references.map((item) => item.storageKey || item.id) });
+                const previous = await requestStore.getItem<{ signature: string; requestKey: string }>("workbench-pending-request");
+                requestKey = previous?.signature === signature ? previous.requestKey : crypto.randomUUID();
+                await requestStore.setItem("workbench-pending-request", { signature, requestKey });
+            }
+            const task = await createVideoGenerationTask(snapshot.config, snapshot.text, snapshot.references, { requestKey });
             const log = buildLog({ prompt: snapshot.text, model, config: snapshot.config, references: snapshot.references, durationMs: 0, status: "pending", task });
             await saveLog(log, false);
+            if (isWorkbenchModel(snapshot.config, snapshot.config.model || snapshot.config.videoModel)) await requestStore.removeItem("workbench-pending-request");
             void pollGenerationLog(log, snapshot.config, agentTaskId);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : t("workbench.generationFailed");

@@ -1,4 +1,4 @@
-import { canvasApiBase } from "@/constant/integration";
+import { canvasApiBase, isOverseas } from "@/constant/integration";
 import type { WorkbenchBootstrap } from "@/types/workbench";
 
 let session: WorkbenchBootstrap | undefined;
@@ -28,4 +28,8 @@ export async function bootstrapWorkbench() {
 }
 export function accountDatabaseName() {
     return `infinite-canvas:workbench:${workbenchSession().user.id}`;
+}
+
+export function accountPreferenceKey(key: string) {
+    return isOverseas ? `${accountDatabaseName()}:${key}` : key;
 }

@@ -1,3 +1,6 @@
+import { isOverseas } from "@/constant/integration";
+import { accountDatabaseName } from "./workbench";
+import { fetchPersonalPrompts, PERSONAL_PROMPT_SOURCE } from "./personal-prompts";
 import localforage from "localforage";
 
 import { runPromptSource, type RawPrompt } from "./prompt-source-runtime";
@@ -6,6 +9,7 @@ import i18n from "@/i18n";
 import type { PromptSource } from "./prompt-source-presets";
 
 export type Prompt = RawPrompt & {
+    cloudRevision?: number;
     sourceId: string;
     category: string;
     githubUrl: string;
@@ -46,7 +50,7 @@ type SourceCache = PromptSourceStatus & {
 };
 
 const cacheTtlMs = 1000 * 60 * 60;
-const promptCacheStore = localforage.createInstance({ name: "infinite-canvas", storeName: "prompt_cache" });
+const promptCacheStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "prompt_cache" });
 const loadingSources = new Map<string, Promise<PromptSourceRefreshResult>>();
 
 function enabledSources() {
@@ -133,7 +137,7 @@ async function getAllPrompts(): Promise<Prompt[]> {
             }
         }),
     );
-    return settled.flat();
+    return isOverseas ? [...await fetchPersonalPrompts(), ...settled.flat()] : settled.flat();
 }
 
 export async function fetchPrompts({ keyword = "", tag = [], category = ALL_PROMPTS_OPTION, page = 1, pageSize = 20 }: { keyword?: string; tag?: string[]; category?: string; page?: number; pageSize?: number } = {}) {
@@ -143,7 +147,7 @@ export async function fetchPrompts({ keyword = "", tag = [], category = ALL_PROM
     const normalizedPageSize = Math.max(1, Math.min(100, pageSize));
     const withoutTagFilter = filterPrompts(items, { keyword: normalizedKeyword, category, tags: [] });
     const filtered = filterPrompts(items, { keyword: normalizedKeyword, category, tags: tag });
-    const categories = enabledSources().map((source) => source.name);
+    const categories = isOverseas ? [...new Set(items.map((item) => item.category))] : enabledSources().map((source) => source.name);
 
     return {
         items: filtered.slice((normalizedPage - 1) * normalizedPageSize, normalizedPage * normalizedPageSize),
@@ -154,6 +158,7 @@ export async function fetchPrompts({ keyword = "", tag = [], category = ALL_PROM
 }
 
 export async function fetchSourcePrompts(sourceId: string): Promise<Prompt[]> {
+    if (isOverseas && sourceId === PERSONAL_PROMPT_SOURCE) return fetchPersonalPrompts();
     const source = usePromptSourceStore.getState().sources.find((item) => item.id === sourceId);
     if (!source) throw new Error(i18n.t("prompts.sourceMissing"));
     return getSourcePrompts(source);

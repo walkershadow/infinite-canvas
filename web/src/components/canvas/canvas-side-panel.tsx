@@ -1,3 +1,5 @@
+import { isOverseas } from "@/constant/integration";
+import { PERSONAL_PROMPT_SOURCE } from "@/services/api/personal-prompts";
 import { memo, useEffect, useMemo, useRef, useState, useSyncExternalStore, type PointerEvent as ReactPointerEvent } from "react";
 import { App, Empty, Input, Popconfirm, Select, Spin, Tag } from "antd";
 import { useQuery } from "@tanstack/react-query";
@@ -550,7 +552,7 @@ const CanvasPromptsTab = memo(function CanvasPromptsTab({ onInsert, theme }: { o
     const { message } = App.useApp();
     const { t } = useTranslation();
     const sources = usePromptSourceStore((state) => state.sources);
-    const enabledSources = useMemo(() => sources.filter((source) => source.enabled), [sources]);
+    const enabledSources = useMemo(() => [...(isOverseas ? [{ id: PERSONAL_PROMPT_SOURCE, name: "My prompts" }] : []), ...sources.filter((source) => source.enabled)], [sources]);
     const [keyword, setKeyword] = useState("");
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const [detail, setDetail] = useState<Prompt | null>(null);

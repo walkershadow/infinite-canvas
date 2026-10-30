@@ -1,4 +1,3 @@
-import { isOverseas, assertStandalone } from "@/constant/integration";
 import i18n from "@/i18n";
 import type { CanvasAgentSnapshot } from "@/lib/canvas/canvas-agent-ops";
 import type { AgentReasoningEffort } from "@/stores/use-agent-store";
@@ -43,7 +42,6 @@ export type AgentSkillResponse = { ok?: boolean; data?: AgentSkillDetail };
 export type AgentSkillDraftResponse = { ok?: boolean; data?: AgentSkillDraft };
 
 export async function postState(endpoint: string, token: string, clientId: string, snapshot: CanvasAgentSnapshot | null) {
-    if (isOverseas) return;
     try {
         const response = await fetch(`${endpoint}/canvas/state?token=${encodeURIComponent(token)}&clientId=${encodeURIComponent(clientId)}`, {
             method: "POST",
@@ -57,7 +55,6 @@ export async function postState(endpoint: string, token: string, clientId: strin
 }
 
 export async function activateAgentClient(endpoint: string, token: string, clientId: string) {
-    if (isOverseas) return;
     try {
         await fetch(`${endpoint}/canvas/activate?token=${encodeURIComponent(token)}&clientId=${encodeURIComponent(clientId)}`, { method: "POST" });
     } catch {}
@@ -119,7 +116,6 @@ export function setCodexSkillEnabled(endpoint: string, token: string, skill: Pic
 }
 
 export async function fetchAgentJson<T>(endpoint: string, token: string, path: string, init?: RequestInit) {
-    assertStandalone("Canvas Agent");
     const url = `${endpoint}${path}${path.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`;
     const res = await fetch(url, init);
     const data = (await res.json().catch(() => ({}))) as T & { error?: string; msg?: string };
@@ -128,7 +124,6 @@ export async function fetchAgentJson<T>(endpoint: string, token: string, path: s
 }
 
 export async function discoverAgentConfig(endpoint: string) {
-    if (isOverseas) return;
     try {
         const res = await fetch(`${endpoint}/config`);
         if (!res.ok) return null;

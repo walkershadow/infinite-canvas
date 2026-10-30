@@ -14,30 +14,23 @@ import NotFound from "@/pages/not-found";
 import PromptsPage from "@/pages/prompts";
 import VideoPage from "@/pages/video";
 
-export const router = createBrowserRouter(isOverseas ? [
-    { element: <WorkbenchLayout><Outlet /></WorkbenchLayout>, children: [
-        { path: "/canvas", element: <CanvasPage /> },
-        { path: "/canvas/:id", element: <CanvasProjectPage /> },
-    ] },
-    { path: "*", element: <NotFound /> },
-] : [
+const pages = [
+    { path: "/", element: <HomePage /> },
+    { path: "/image", element: <ImagePage /> },
+    { path: "/video", element: <VideoPage /> },
+    { path: "/assets", element: <AssetsPage /> },
+    { path: "/prompts", element: <PromptsPage /> },
+    { path: "/canvas", element: <CanvasPage /> },
+    { path: "/canvas/:id", element: <CanvasProjectPage /> },
+    { path: "/config", element: <ConfigPage /> },
+];
+
+export const router = createBrowserRouter([
     {
-        element: (
-            <UserLayout>
-                <AnalyticsTracker />
-                <Outlet />
-            </UserLayout>
-        ),
-        children: [
-            { path: "/", element: <HomePage /> },
-            { path: "/image", element: <ImagePage /> },
-            { path: "/video", element: <VideoPage /> },
-            { path: "/assets", element: <AssetsPage /> },
-            { path: "/prompts", element: <PromptsPage /> },
-            { path: "/canvas", element: <CanvasPage /> },
-            { path: "/canvas/:id", element: <CanvasProjectPage /> },
-            { path: "/config", element: <ConfigPage /> },
-        ],
+        element: isOverseas
+            ? <WorkbenchLayout><UserLayout><Outlet /></UserLayout></WorkbenchLayout>
+            : <UserLayout><AnalyticsTracker /><Outlet /></UserLayout>,
+        children: [...pages, ...(isOverseas ? [{ path: "/:id", element: <CanvasProjectPage /> }] : [])],
     },
     { path: "*", element: <NotFound /> },
-]);
+], { basename: isOverseas ? "/canvas" : "/" });

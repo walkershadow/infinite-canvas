@@ -1,8 +1,8 @@
+import { initializeWorkbenchConfig } from "./config";
+import { initializeCloudLibrary } from "./library";
 import { useWorkbenchStore, type WorkbenchRecovery as Recovery } from "@/stores/use-workbench-store";
 import { localForageStorage } from "@/lib/localforage-storage";
 import { useCanvasStore, type CanvasProject } from "@/stores/canvas/use-canvas-store";
-import { useAssetStore, type Asset as LocalAsset } from "@/stores/use-asset-store";
-import { useConfigStore, defaultConfig, encodeChannelModel } from "@/stores/use-config-store";
 import { bootstrapWorkbench, workbenchRequest, workbenchSession } from "@/services/api/workbench";
 import { getImageBlob } from "@/services/image-storage";
 import { getMediaBlob } from "@/services/file-storage";
@@ -19,6 +19,7 @@ const saved = new Map<string, CanvasProject>();
 const assets = new Map<string, Asset>();
 let queue: Promise<unknown> = Promise.resolve();
 let starting: Promise<void> | undefined;
+let projectsLoaded = false;
 
 function exclusive<T>(operation: () => Promise<T>): Promise<T> {
     const run = queue.then(operation);
@@ -82,6 +83,11 @@ export async function refreshWorkbenchBalance() {
 }
 export function initializeCloudProjects() {
     return starting ??= (async () => {
+        await initializeWorkbenchConfig();
+        useCanvasStore.subscribe((state, previous) => {
+            if (!useWorkbenchStore.getState().ready || (state.projects === previous.projects && state.deletedProjects === previous.deletedProjects)) return;
+            void saveCloudProjects().catch(() => undefined);
+        });
         const cache = await localForageStorage.getItem(PREVIOUS_RECOVERY_KEY) || await localForageStorage.getItem(RECOVERY_KEY);
         if (cache) {
             const recovery = JSON.parse(cache) as Recovery;
@@ -105,29 +111,15 @@ export function initializeCloudProjects() {
                 if (node && (!node.metadata?.content || node.metadata.content.startsWith("/api/tasks/"))) node.metadata = { ...node.metadata, videoTaskId: task.id, videoTaskProvider: "workbench", workbenchProjectId: envelope.id, workbenchRequestKey: task.requestKey, ...(task.status === "completed" && task.videoUrl ? { content: ownedAssetUrl(task.videoUrl), status: "success" as const } : { content: "" }) };
             }
         }
-        await useAssetStore.persist.rehydrate();
-        const cloudAssets: LocalAsset[] = media.assets.flatMap((asset): LocalAsset[] => {
-            const kind = asset.mime.split("/")[0];
-            if (kind !== "image" && kind !== "video") return [];
-            const base = { id: `workbench:${asset.id}`, title: asset.name, coverUrl: kind === "image" ? asset.url : "", tags: [], createdAt: asset.createdAt || "", updatedAt: asset.createdAt || "" };
-            const data = { storageKey: assetKey(asset), width: 0, height: 0, bytes: asset.bytes, mimeType: asset.mime };
-            return kind === "image" ? [{ ...base, kind, data: { ...data, dataUrl: asset.url } }] : [{ ...base, kind, data: { ...data, url: asset.url } }];
-        });
-        useAssetStore.getState().replaceAssets([...cloudAssets, ...useAssetStore.getState().assets.filter((asset) => !asset.id.startsWith("workbench:"))]);
+        projectsLoaded = true;
+        await initializeCloudLibrary().catch((error) => useWorkbenchStore.setState({ libraryError: error instanceof Error ? error.message : String(error) }));
         const session = workbenchSession();
-        const models = session.models.map((model) => ({ name: model.id, capability: "video" as const }));
-        const videoModel = models[0] ? encodeChannelModel("workbench", models[0].name) : "";
-        useConfigStore.setState({ config: { ...defaultConfig, channels: [{ id: "workbench", name: "Workbench", baseUrl: "", apiKey: "", apiFormat: "openai", models }], models: models.map((m) => encodeChannelModel("workbench", m.name)), model: videoModel, videoModel, imageModel: "", textModel: "", audioModel: "", videoSeconds: String(session.models[0]?.defaultDuration || ""), size: session.models[0]?.ratios[0]?.value || "16:9", proxyEnabled: false } });
         useCanvasStore.setState({ projects: response.projects.map((p) => p.document), deletedProjects: [], hydrated: true });
         useWorkbenchStore.setState({ ready: true, balance: session.quota.points });
-        useCanvasStore.subscribe((state, previous) => {
-            if (state.projects === previous.projects && state.deletedProjects === previous.deletedProjects) return;
-            void saveCloudProjects().catch(() => undefined);
-        });
         window.addEventListener("beforeunload", (event) => {
-            if (useWorkbenchStore.getState().saving || useWorkbenchStore.getState().error) event.preventDefault();
+            if (useWorkbenchStore.getState().saving || useWorkbenchStore.getState().librarySaving || useWorkbenchStore.getState().error || useWorkbenchStore.getState().libraryError) event.preventDefault();
         });
-    })().catch((error) => { useWorkbenchStore.setState({ error: String(error instanceof Error ? error.message : error) }); throw error; });
+    })().catch((error) => { useWorkbenchStore.setState({ ready: true, error: String(error instanceof Error ? error.message : error) }); useCanvasStore.setState({ hydrated: true }); throw error; });
 }
 async function saveCurrentProjects() {
     const state = useCanvasStore.getState();
@@ -135,6 +127,7 @@ async function saveCurrentProjects() {
     useWorkbenchStore.setState({ saving: true });
     try {
         await localForageStorage.setItem(RECOVERY_KEY, JSON.stringify(recovery));
+        if (!projectsLoaded) throw new Error("Cloud projects could not be loaded. Export local work and reload before saving.");
         if (useWorkbenchStore.getState().error) throw new Error(useWorkbenchStore.getState().error);
         for (const project of state.projects) {
             if (saved.get(project.id) === project) continue;
@@ -181,7 +174,8 @@ export async function createWorkbenchVideo(projectId: string, nodeId: string, re
 }
 export async function workbenchReference(reference: { storageKey?: string; url?: string; dataUrl?: string }) {
     if (reference.storageKey) return (await cloudAsset(reference.storageKey)).url;
-    const url = ownedAssetUrl(reference.url || reference.dataUrl || "");
+    const source = reference.url || reference.dataUrl || "";
+    const url = source.startsWith("blob:") || /^data:(image|video|audio)\//.test(source) ? source : ownedAssetUrl(source);
     if (url.startsWith("/api/canvas/assets/") || url.startsWith("/api/images/")) return url;
     const existing = assets.get(url);
     if (existing) return existing.url;
@@ -200,4 +194,9 @@ export function cloudMediaUrl(storageKey: string) { return assets.get(storageKey
 export async function dismissRecovery() {
     await localForageStorage.removeItem(PREVIOUS_RECOVERY_KEY);
     useWorkbenchStore.setState({ recovery: null });
+}
+
+export async function durableDocument<T>(value: T): Promise<T> {
+    await collectDurableUrls(value);
+    return await durableValue(value) as T;
 }

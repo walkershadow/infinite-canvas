@@ -1,3 +1,4 @@
+import { isOverseas } from "@/constant/integration";
 import { Bot, Menu } from "lucide-react";
 import { Button, Tooltip } from "antd";
 import { Link, useLocation } from "react-router-dom";
@@ -27,7 +28,7 @@ export function AppTopNav() {
     const activeToolSlug = navigationTools.some((tool) => tool.slug === slug) ? (slug as NavigationToolSlug) : undefined;
 
     useEffect(() => {
-        if (autoConnectRef.current || agentEnabled || agentConnected || !agentToken.trim()) return;
+        if (isOverseas || autoConnectRef.current || agentEnabled || agentConnected || !agentToken.trim()) return;
         autoConnectRef.current = true;
         connectAgent({ silent: true });
     }, [agentConnected, agentEnabled, agentToken, connectAgent]);
@@ -42,8 +43,8 @@ export function AppTopNav() {
                                 <span
                                     className="size-5 shrink-0 bg-current"
                                     style={{
-                                        mask: "url(/logo.svg) center / contain no-repeat",
-                                        WebkitMask: "url(/logo.svg) center / contain no-repeat",
+                                        mask: `url(${import.meta.env.BASE_URL}logo.svg) center / contain no-repeat`,
+                                        WebkitMask: `url(${import.meta.env.BASE_URL}logo.svg) center / contain no-repeat`,
                                     }}
                                 />
                                 <span className="text-base font-medium">{t("meta.title")}</span>

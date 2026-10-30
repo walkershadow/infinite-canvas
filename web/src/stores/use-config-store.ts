@@ -1,4 +1,4 @@
-import { workbenchSession } from "@/services/api/workbench";
+import { accountDatabaseName, workbenchSession } from "@/services/api/workbench";
 import { isOverseas } from "@/constant/integration";
 import { useMemo } from "react";
 import { create } from "zustand";
@@ -209,8 +209,12 @@ export function resolveModelScript(config: AiConfig, value: string) {
     return findChannelModel(config, value)?.model.script?.trim() || "";
 }
 
+export function isWorkbenchModel(config: AiConfig, value: string) {
+    return isOverseas && findChannelModel(config, value)?.channel.id === "workbench";
+}
+
 function isAiConfigReady(config: AiConfig, model: string) {
-    if (isOverseas) return Boolean(findChannelModel(config, model));
+    if (isWorkbenchModel(config, model)) return true;
     const match = findChannelModel(config, model);
     return Boolean(match && match.channel.baseUrl.trim() && match.channel.apiKey.trim());
 }
@@ -249,7 +253,7 @@ export const useConfigStore = create<ConfigStore>()(
             clearPromptContinue: () => set({ shouldPromptContinue: false }),
         }),
         {
-            name: isOverseas ? "infinite-canvas:workbench:preferences" : CONFIG_STORE_KEY,
+            name: isOverseas ? `${accountDatabaseName()}:preferences` : CONFIG_STORE_KEY,
             skipHydration: isOverseas,
             partialize: (state) => ({ config: state.config, webdav: state.webdav }),
             merge: (persisted, current) => {
@@ -269,10 +273,10 @@ export const useConfigStore = create<ConfigStore>()(
                         apiFormat: normalizeApiFormat(config.apiFormat),
                         channels,
                         models,
-                        imageModel: normalizeModelOptionValue(config.imageModel || config.model, channels),
-                        videoModel: normalizeModelOptionValue(config.videoModel, channels),
-                        textModel: normalizeModelOptionValue(config.textModel || config.model, channels),
-                        audioModel: normalizeModelOptionValue(config.audioModel || defaultConfig.audioModel, channels),
+                        imageModel: isOverseas ? config.imageModel : normalizeModelOptionValue(config.imageModel || config.model, channels),
+                        videoModel: isOverseas ? config.videoModel : normalizeModelOptionValue(config.videoModel, channels),
+                        textModel: isOverseas ? config.textModel : normalizeModelOptionValue(config.textModel || config.model, channels),
+                        audioModel: isOverseas ? config.audioModel : normalizeModelOptionValue(config.audioModel || defaultConfig.audioModel, channels),
                         audioVoice: config.audioVoice || defaultConfig.audioVoice,
                         audioFormat: config.audioFormat || defaultConfig.audioFormat,
                         audioSpeed: config.audioSpeed || defaultConfig.audioSpeed,
@@ -410,7 +414,7 @@ export function modelOptionName(value: string) {
 }
 
 export function modelOptionLabel(config: AiConfig, value: string) {
-    if (isOverseas) return workbenchSession().models.find((item) => item.id === modelOptionName(value))?.name || value;
+    if (isWorkbenchModel(config, value)) return [...workbenchSession().models, ...(workbenchSession().aiModels || [])].find((item) => item.id === modelOptionName(value))?.name || value;
     const decoded = decodeChannelModel(value);
     if (!decoded) return value;
     const channel = config.channels.find((item) => item.id === decoded.channelId);
@@ -504,7 +508,6 @@ export function normalizeLocalProxyUrl(value: string) {
 
 /** Prefix an outgoing request with the local forwarding proxy so the browser is not blocked by CORS. */
 export function withLocalProxy(url: string) {
-    if (isOverseas) return url;
     const { proxyEnabled, proxyUrl } = useConfigStore.getState().config;
     if (!proxyEnabled || !/^https?:\/\//i.test(url)) return url;
     const base = normalizeLocalProxyUrl(proxyUrl);

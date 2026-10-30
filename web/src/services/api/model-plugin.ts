@@ -1,4 +1,3 @@
-import { assertStandalone } from "@/constant/integration";
 import axios, { type AxiosRequestConfig } from "axios";
 
 import i18n from "@/i18n";
@@ -112,7 +111,6 @@ function createPoll(signal?: AbortSignal) {
  * The script still runs as an async function body and must `return` the result.
  */
 export async function runModelPlugin<T = unknown>(args: RunPluginArgs): Promise<T> {
-    assertStandalone("External plugins");
     const { config } = args;
     const http = createPluginHttp(config, { signal: args.signal });
     const request = createPluginRequest(config, { signal: args.signal });

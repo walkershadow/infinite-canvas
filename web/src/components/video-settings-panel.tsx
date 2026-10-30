@@ -1,6 +1,5 @@
-import { isOverseas } from "@/constant/integration";
 import { workbenchSession } from "@/services/api/workbench";
-import { modelOptionName } from "@/stores/use-config-store";
+import { isWorkbenchModel, modelOptionName } from "@/stores/use-config-store";
 import { type ReactNode } from "react";
 import { Slider } from "antd";
 import { useTranslation } from "react-i18next";
@@ -49,7 +48,7 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
         else applySize(nextResolution, selectedRatio);
     };
 
-    if (isOverseas) {
+    if (isWorkbenchModel(config, config.model || config.videoModel)) {
         const model = workbenchSession().models.find((item) => item.id === modelOptionName(config.model || config.videoModel));
         return <div className={className} style={{ color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
             <SettingGroup title="Duration" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.durations.map((value) => <OptionPill key={value} selected={Number(config.videoSeconds) === value} theme={theme} onClick={() => onConfigChange("videoSeconds", String(value))}>{value}s</OptionPill>)}</div></SettingGroup>

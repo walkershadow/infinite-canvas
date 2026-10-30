@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbenchModel } from "@/stores/use-config-store";
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { createPortal } from "react-dom";
 import { Settings2 } from "lucide-react";
@@ -51,7 +51,7 @@ export function CanvasVideoSettingsPopover({ config, onConfigChange, buttonClass
             <span ref={buttonRef} className="inline-flex min-w-0">
                 <Button size="small" type="text" className={buttonClassName || "!h-8 !max-w-[220px] !justify-start !rounded-full !px-2.5"} style={{ background: theme.node.fill, color: theme.node.text }} icon={<Settings2 className="size-3.5" />} onClick={() => setOpen((current) => !current)}>
                     <span className="truncate">
-                        {isOverseas ? `${videoSizeLabel(config.size)} · ${videoSecondsLabel(config.videoSeconds)}` : `${videoResolutionLabel(config.vquality)} · ${videoSizeLabel(config.size)} · ${videoSecondsLabel(config.videoSeconds)} · ${videoModeLabel(config.videoMode)}`}
+                        {isWorkbenchModel(config, config.model || config.videoModel) ? `${videoSizeLabel(config.size)} · ${videoSecondsLabel(config.videoSeconds)}` : `${videoResolutionLabel(config.vquality)} · ${videoSizeLabel(config.size)} · ${videoSecondsLabel(config.videoSeconds)} · ${videoModeLabel(config.videoMode)}`}
                     </span>
                 </Button>
             </span>

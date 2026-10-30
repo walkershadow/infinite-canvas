@@ -1,3 +1,7 @@
+import { isOverseas } from "@/constant/integration";
+import { useQueryClient } from "@tanstack/react-query";
+import { PERSONAL_PROMPT_SOURCE, deletePersonalPrompt } from "@/services/api/personal-prompts";
+import { PersonalPromptEditor } from "./components/personal-prompt-editor";
 import { FolderPlus, Search } from "lucide-react";
 import { type ReactNode, type UIEvent, useEffect, useState } from "react";
 import { App, Button, Empty, Input, Spin, Tag } from "antd";
@@ -12,7 +16,9 @@ import { useAssetStore } from "@/stores/use-asset-store";
 import { ALL_PROMPTS_OPTION, type Prompt } from "@/services/api/prompts";
 
 export default function PromptsPage() {
-    const { message } = App.useApp();
+    const { message, modal } = App.useApp();
+    const client = useQueryClient();
+    const [editing, setEditing] = useState<{ prompt?: Prompt } | null>(null);
     const { t } = useTranslation();
     const [titleKeyword, setTitleKeyword] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -26,6 +32,16 @@ export default function PromptsPage() {
         if (query.isError) message.error(query.error instanceof Error ? query.error.message : t("prompts.loadFailed"));
     }, [message, query.error, query.isError, t]);
 
+    const removePersonal = (prompt: Prompt) => modal.confirm({
+        title: "Delete personal prompt?", content: prompt.title, okText: "Delete", cancelText: "Cancel", okButtonProps: { danger: true },
+        onOk: async () => {
+            try {
+                await deletePersonalPrompt(prompt);
+                await Promise.all([client.invalidateQueries({ queryKey: ["prompts"] }), client.invalidateQueries({ queryKey: ["side-panel-prompts", PERSONAL_PROMPT_SOURCE] })]);
+                if (selectedPrompt?.id === prompt.id) setSelectedPrompt(null);
+            } catch (error) { void message.error(error instanceof Error ? error.message : "Unable to delete prompt."); throw error; }
+        },
+    });
     const toggleTag = (tag: string) => {
         if (tag === ALL_PROMPTS_OPTION) return setSelectedTags([]);
         setSelectedTags((items) => (items.includes(tag) ? items.filter((item) => item !== tag) : [...items, tag]));
@@ -46,6 +62,7 @@ export default function PromptsPage() {
             <main className="min-h-0 flex-1 overflow-y-auto bg-background bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-4 py-6 [background-size:16px_16px] sm:px-6 lg:py-8 dark:bg-[radial-gradient(rgba(245,245,244,.16)_1px,transparent_1px)]" onScroll={handleListScroll}>
                 <div className="mx-auto max-w-7xl">
                     <div className="text-center">
+                        {isOverseas && <Button className="float-right" onClick={() => setEditing({})}>New prompt</Button>}
                         <h1 className="text-2xl font-semibold text-stone-950 dark:text-stone-100">{t("prompts.title")}</h1>
                         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("prompts.total", { count: totalPrompts })}</p>
                     </div>
@@ -65,13 +82,14 @@ export default function PromptsPage() {
                         <section className="min-w-0">
                             <Input size="large" prefix={<Search className="size-4 text-stone-400" />} value={titleKeyword} placeholder={t("prompts.search")} onChange={(event) => setTitleKeyword(event.target.value)} />
                             {query.isLoading ? <div className="flex h-60 items-center justify-center"><Spin /></div> : null}
-                            {!query.isLoading ? <div className="mt-5"><PromptGrid items={promptItems} onOpen={setSelectedPrompt} renderActions={(item) => <Button type="text" size="small" icon={<FolderPlus className="size-3.5" />} onClick={() => savePromptAsset(item)}>{t("common.addToAssets")}</Button>} onCopy={(item) => copyText(item.prompt, t("common.promptCopied"))} emptyText={t("prompts.empty")} /></div> : null}
+                            {!query.isLoading ? <div className="mt-5"><PromptGrid items={promptItems} onOpen={setSelectedPrompt} renderActions={(item) => <div className="flex flex-wrap gap-1"><Button type="text" size="small" icon={<FolderPlus className="size-3.5" />} onClick={() => savePromptAsset(item)}>{t("common.addToAssets")}</Button>{isOverseas && item.sourceId === PERSONAL_PROMPT_SOURCE && <><Button type="text" size="small" onClick={() => setEditing({ prompt: item })}>Edit</Button><Button type="text" size="small" danger onClick={() => removePersonal(item)}>Delete</Button></>}</div>} onCopy={(item) => copyText(item.prompt, t("common.promptCopied"))} emptyText={t("prompts.empty")} /></div> : null}
                             <div className="mt-6 text-center text-xs text-stone-500 dark:text-stone-400">{query.isFetchingNextPage ? t("prompts.loading") : query.hasNextPage ? t("prompts.loadMore") : promptItems.length > 0 ? t("prompts.end") : null}</div>
                         </section>
                     </div>
                 </div>
             </main>
 
+            {editing && <PersonalPromptEditor prompt={editing.prompt} onClose={() => setEditing(null)} />}
             <PromptDetailDialog prompt={selectedPrompt} onClose={() => setSelectedPrompt(null)} onCopy={(prompt) => copyText(prompt, t("common.promptCopied"))} onSaveAsset={savePromptAsset} />
         </div>
     );

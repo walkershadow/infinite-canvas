@@ -19,7 +19,7 @@
 - [Canvas Data Structure](/docs/development/canvas-data-structure)
 - [How the Local Codex Connection Works](/docs/development/local-codex-canvas)
 
-- [Overseas Workbench Integration](/docs/development/overseas-workbench)
+- [海外 Workbench 集成](/docs/development/overseas-workbench)
 
 ## Business
 

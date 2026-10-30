@@ -1,3 +1,4 @@
+import { isWorkbenchModel } from "@/stores/use-config-store";
 import { isOverseas } from "@/constant/integration";
 import { workbenchRequest } from "@/services/api/workbench";
 import { createWorkbenchVideo, ownedAssetUrl, refreshWorkbenchBalance, workbenchReference } from "@/services/workbench/projects";
@@ -75,12 +76,19 @@ function videoTaskFailed(message: string) {
 }
 
 export async function createVideoGenerationTask(config: AiConfig, prompt: string, references: ReferenceImage[] = [], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
-    if (isOverseas) {
-        if (!options?.projectId || !options.nodeId || !options.requestKey) throw new Error("Workbench generation requires a saved project, node and request key.");
+    if (isWorkbenchModel(config, config.model || config.videoModel)) {
+        if (!options?.requestKey) throw new Error("Workbench generation requires a stable request key.");
         const { model, duration, ratio } = workbenchVideoInput(config);
         if ((!model.supportsImage && references.length) || (!model.supportsVideo && options.videos?.length) || (!model.supportsAudio && options.audios?.length)) throw new Error("This model does not support the connected reference media.");
         const [images, videos, audios] = await Promise.all([Promise.all(references.map(workbenchReference)), Promise.all((options.videos || []).map(workbenchReference)), Promise.all((options.audios || []).map(workbenchReference))]);
-        const task = await createWorkbenchVideo(options.projectId, options.nodeId, options.requestKey, { prompt, model: model.id, duration, ratio, images, videos, audios }, options.signal);
+        const input = { prompt, model: model.id, duration, ratio, images, videos, audios };
+        if (!options.projectId) {
+            const { task } = await workbenchRequest<{ task: WorkbenchTask }>("/video/generate", { method: "POST", signal: options.signal, body: JSON.stringify({ requestKey: options.requestKey, input }) });
+            void refreshWorkbenchBalance().catch(() => undefined);
+            return { id: task.id, provider: "workbench", model: model.id };
+        }
+        if (!options.nodeId) throw new Error("A canvas generation requires a target node.");
+        const task = await createWorkbenchVideo(options.projectId, options.nodeId, options.requestKey, input, options.signal);
         return { id: task.id, provider: "workbench", model: model.id, projectId: task.projectId };
     }
     const selectedModel = (config.model || config.videoModel).trim();
@@ -93,17 +101,17 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
 }
 
 export async function pollVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
-    if (isOverseas) {
-        if (task.provider !== "workbench" || !task.projectId) throw new Error("This task is not owned by Workbench.");
-        const { tasks } = await workbenchRequest<{ tasks: WorkbenchTask[] }>(`/projects/${encodeURIComponent(task.projectId)}/tasks`, { signal: options?.signal });
-        const item = tasks.find((item) => item.id === task.id);
+    if (task.provider === "workbench") {
+        if (!isOverseas) throw new Error("Open this task in Workbench.");
+        const item = task.projectId
+            ? (await workbenchRequest<{ tasks: WorkbenchTask[] }>(`/projects/${encodeURIComponent(task.projectId)}/tasks`, { signal: options?.signal })).tasks.find((item) => item.id === task.id)
+            : (await workbenchRequest<{ task: WorkbenchTask }>(`/video/tasks/${encodeURIComponent(task.id)}`, { signal: options?.signal })).task;
         if (!item) throw new Error("Workbench task not found.");
         if (["completed", "failed", "cancelled", "canceled"].includes(item.status)) void refreshWorkbenchBalance().catch(() => undefined);
         if (item.status === "completed" && item.videoUrl) return { status: "completed", result: { url: ownedAssetUrl(item.videoUrl), mimeType: "video/mp4" } };
         if (["failed", "cancelled", "canceled"].includes(item.status)) return { status: "failed", error: item.error || "Video generation failed." };
         return { status: "pending" };
     }
-    if (task.provider === "workbench") throw new Error("Open this task in Workbench.");
     if (task.provider === "plugin") {
         const result = pluginVideoResults.get(task.id);
         return result ? { status: "completed", result } : { status: "failed", error: apiText("pluginVideoExpired") };
@@ -159,7 +167,7 @@ function videoPluginResult(result: unknown): VideoGenerationResult {
 }
 
 export async function storeGeneratedVideo(result: VideoGenerationResult): Promise<UploadedFile> {
-    if (isOverseas && result.url) return { url: ownedAssetUrl(result.url), storageKey: "", bytes: 0, mimeType: result.mimeType || "video/mp4" };
+    if (isOverseas && result.url?.startsWith("/api/")) return { url: ownedAssetUrl(result.url), storageKey: "", bytes: 0, mimeType: result.mimeType || "video/mp4" };
     if (result.blob) return uploadMediaFile(result.blob, "video");
     if (result.url) {
         try {
