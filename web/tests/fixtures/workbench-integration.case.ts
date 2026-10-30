@@ -23,6 +23,10 @@ let account = "account-a";
 let conflict = false;
 let libraryConflict = false;
 let libraryUnavailable = true;
+let videoChecks = 0;
+let videoPending = 0;
+let videoQueryError = false;
+let videoFailed = false;
 const libraryItems = new Map<string, any>();
 const promptItems = new Map<string, any>();
 const requests: { path: string; method: string; body: any; account: string | null }[] = [];
@@ -49,6 +53,11 @@ globalThis.fetch = mock(async (url: string | URL | Request, init?: RequestInit) 
         return Response.json(item);
     }
     if (path.endsWith("/assets")) return Response.json(init?.method === "POST" ? { id: "asset-1", name: "fixture.png", url: "/api/canvas/assets/asset-1/content", mime: "image/png", bytes: 7 } : { assets: [] });
+    if (path.includes("/video/tasks/")) {
+        videoChecks += 1;
+        if (videoQueryError) return Response.json({ error: "Temporary query failure" }, { status: 503 });
+        return Response.json({ task: { id: "long-task", status: videoFailed ? "failed" : videoChecks <= videoPending ? "pending" : "completed", error: "Provider rejected task", videoUrl: "/api/tasks/long-task/video" } });
+    }
     if (path.endsWith("/tasks")) return Response.json({ tasks: [
         { id: "new-task", nodeId: "video", status: "completed", createdAt: "2026-10-02", videoUrl: "/api/tasks/new-task/video" },
         { id: "old-task", nodeId: "video", status: "failed", createdAt: "2026-10-01" },
@@ -230,10 +239,68 @@ test("custom video creation and polling use the provider, and external output us
     } finally { axios.defaults.adapter = original; }
 });
 
+test("platform polling exceeds five minutes and resumes the same task without creating a generation", async () => {
+    const { pollVideoTaskWindow, canResumePlatformVideo } = await import("@/pages/video/poll-video-task");
+    const originalTimer = globalThis.setTimeout;
+    const waits: number[] = [];
+    globalThis.setTimeout = ((callback: () => void, ms: number) => { waits.push(ms); queueMicrotask(callback); return 0; }) as any;
+    const task = { id: "long-task", provider: "workbench" as const, model: "platform-video" };
+    const config = configModule.useConfigStore.getState().config;
+    const creates = () => requests.filter((r) => r.path.endsWith("/generate")).length;
+    const before = creates();
+    try {
+        videoChecks = 0; videoPending = 301;
+        const result = await pollVideoTaskWindow(config, task, new AbortController().signal);
+        expect(result.status).toBe("completed");
+        expect(videoChecks).toBe(302);
+        expect(waits).toHaveLength(301);
+        expect(waits.every((ms) => ms === 2500)).toBe(true);
+        expect(canResumePlatformVideo({ status: "failed", task })).toBe(true);
+        expect(canResumePlatformVideo({ status: "failed", terminal: true, task })).toBe(false);
+        videoQueryError = true;
+        expect((await pollVideoTaskWindow(config, task, new AbortController().signal)).status).toBe("paused");
+        videoQueryError = false; videoPending = 0;
+        expect((await pollVideoTaskWindow(config, task, new AbortController().signal)).status).toBe("completed");
+        videoFailed = true;
+        expect((await pollVideoTaskWindow(config, task, new AbortController().signal)).status).toBe("failed");
+        videoFailed = false;
+        const controller = new AbortController();
+        controller.abort();
+        const checks = videoChecks;
+        await expect(pollVideoTaskWindow(config, task, controller.signal)).rejects.toThrow();
+        expect(videoChecks).toBe(checks);
+        expect(creates()).toBe(before);
+    } finally { globalThis.setTimeout = originalTimer; videoFailed = false; videoQueryError = false; }
+});
+
 test("account change is rejected and media rejects external URLs", async () => {
     expect(api.accountDatabaseName()).toBe("infinite-canvas:workbench:account-a");
     expect(() => projects.ownedAssetUrl("https://external.test/private.mp4")).toThrow();
     account = "account-b";
     await expect(api.bootstrapWorkbench()).rejects.toThrow("Your account changed");
     expect(api.workbenchSession().user.id).toBe("account-a");
+});
+
+test("ali-image uses URL output and rejects unsupported count and editing before sending", async () => {
+    const axios = (await import("axios")).default;
+    const original = axios.defaults.adapter;
+    const calls: Record<string, unknown>[] = [];
+    axios.defaults.adapter = async (config) => {
+        calls.push(JSON.parse(config.data));
+        return { data: { data: [{ url: "https://media.invalid/image.png" }] }, status: 200, statusText: "OK", headers: {}, config };
+    };
+    try {
+        const { requestGeneration, requestEdit } = await import("@/services/api/image");
+        const channel = configModule.createModelChannel({ id: "ali-fixture", baseUrl: "https://provider.invalid/v1", apiKey: "fixture", models: ["ali-image"] });
+        const config = { ...configModule.useConfigStore.getState().config, channels: [channel], model: configModule.encodeChannelModel(channel.id, "ali-image"), count: "1", size: "1024x1024" };
+        expect((await requestGeneration(config, "Fixture"))[0].dataUrl).toBe("https://media.invalid/image.png");
+        expect(calls[0]).toMatchObject({ model: "ali-image", n: 1, response_format: "url" });
+        await requestGeneration({ ...config, count: "6" }, "Fixture");
+        expect(calls[1].n).toBe(6);
+        await expect(requestGeneration({ ...config, count: "7" }, "Fixture")).rejects.toThrow("apiErrors.aliImageCount");
+        await expect(requestEdit(config, "Fixture", [])).rejects.toThrow("apiErrors.aliImageTextOnly");
+        expect(calls).toHaveLength(2);
+        await requestGeneration({ ...config, model: configModule.encodeChannelModel(channel.id, "other-image") }, "Fixture");
+        expect(calls[2].response_format).toBe("b64_json");
+    } finally { axios.defaults.adapter = original; }
 });

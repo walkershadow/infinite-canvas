@@ -1,3 +1,4 @@
+import { WorkbenchActions } from "./workbench-actions";
 import { isOverseas } from "@/constant/integration";
 import { Bot, Menu } from "lucide-react";
 import { Button, Tooltip } from "antd";
@@ -36,9 +37,9 @@ export function AppTopNav() {
     return (
         <>
             {!hideHeader ? (
-                <header className="sticky top-0 z-20 h-14 shrink-0 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
-                    <div className="mx-auto flex h-full max-w-7xl items-stretch justify-between gap-5 px-6">
-                        <div className="flex min-w-0 items-center">
+                <header className={cn("sticky top-0 z-20 shrink-0 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800", isOverseas ? "min-h-14" : "h-14")}>
+                    <div className={cn("mx-auto flex h-full items-stretch justify-between gap-2 px-3 sm:gap-4 sm:px-6", isOverseas ? "flex-wrap py-2 sm:flex-nowrap sm:py-0" : "max-w-7xl")}>
+                        <div className={cn("flex min-w-0 items-center", isOverseas && "sm:h-14")}>
                             <Link to="/" className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
                                 <span
                                     className="size-5 shrink-0 bg-current"
@@ -47,12 +48,12 @@ export function AppTopNav() {
                                         WebkitMask: `url(${import.meta.env.BASE_URL}logo.svg) center / contain no-repeat`,
                                     }}
                                 />
-                                <span className="text-base font-medium">{t("meta.title")}</span>
+                                <span className={isOverseas ? "hidden text-base font-medium sm:inline" : "text-base font-medium"}>{t("meta.title")}</span>
                             </Link>
 
                             <button
                                 type="button"
-                                className="ml-3 inline-flex size-8 shrink-0 items-center justify-center text-stone-600 transition hover:text-stone-950 md:hidden dark:text-stone-300 dark:hover:text-white"
+                                className={cn("ml-3 inline-flex size-8 shrink-0 items-center justify-center text-stone-600 transition hover:text-stone-950 dark:text-stone-300 dark:hover:text-white", isOverseas ? "2xl:hidden" : "md:hidden")}
                                 onClick={() => setMobileNavOpen(true)}
                                 aria-label={t("topNav.openMenu")}
                                 title={t("topNav.menu")}
@@ -60,7 +61,7 @@ export function AppTopNav() {
                                 <Menu className="size-5" />
                             </button>
 
-                            <nav className="hide-scrollbar ml-8 hidden h-14 min-w-0 items-center gap-7 overflow-x-auto md:flex">
+                            <nav className={cn("hide-scrollbar hidden h-14 min-w-0 items-center overflow-x-auto", isOverseas ? "ml-5 gap-4 2xl:flex" : "ml-8 gap-7 md:flex")}>
                                 {navigationTools.map((tool) => {
                                     const Icon = tool.icon;
                                     const active = tool.slug === activeToolSlug;
@@ -83,7 +84,8 @@ export function AppTopNav() {
                             </nav>
                         </div>
 
-                        <div className="my-auto flex h-9 min-w-0 items-center justify-end gap-2 justify-self-end whitespace-nowrap">
+                        <div className={cn("my-auto flex h-9 items-center justify-end justify-self-end whitespace-nowrap", isOverseas ? "shrink-0 gap-1 sm:gap-2" : "min-w-0 gap-2")}>
+                            {isOverseas && <WorkbenchActions />}
                             <Tooltip title={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")}>
                                 <Button type="text" shape="circle" className="!h-8 !w-8 !min-w-8" icon={<Bot className="size-4" />} onClick={togglePanel} aria-label={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")} />
                             </Tooltip>

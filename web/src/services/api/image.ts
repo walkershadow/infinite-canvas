@@ -697,6 +697,7 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
     if (isWorkbenchModel(config, config.model || config.imageModel)) return platformImages(config, prompt, [], options?.signal);
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
+    if (requestConfig.model === "ali-image" && n > 6) throw new Error(apiText("aliImageCount"));
     const script = resolveModelScript(config, config.model || config.imageModel);
     if (script) {
         const quality = normalizeQuality(config.quality);
@@ -738,7 +739,7 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
                 ...(requestSize ? { size: requestSize } : {}),
                 ...(background ? { background } : {}),
                 // gpt-image models reject response_format; they always return b64.
-                ...(/gpt-image/.test(requestConfig.model) ? {} : { response_format: "b64_json" }),
+                ...(/gpt-image/.test(requestConfig.model) ? {} : { response_format: requestConfig.model === "ali-image" ? "url" : "b64_json" }),
                 output_format: IMAGE_OUTPUT_FORMAT,
             },
             {
@@ -757,6 +758,7 @@ export async function requestGeneration(config: AiConfig, prompt: string, option
 export async function requestEdit(config: AiConfig, prompt: string, references: ReferenceImage[], options?: RequestOptions) {
     if (isWorkbenchModel(config, config.model || config.imageModel)) return platformImages(config, prompt, references, options?.signal);
     const requestConfig = resolveModelRequestConfig(config, config.model || config.imageModel);
+    if (requestConfig.model === "ali-image") throw new Error(apiText("aliImageTextOnly"));
     const n = Math.max(1, Math.min(15, Math.floor(Math.abs(Number(config.count)) || 1)));
     const requestPrompt = buildImageReferencePromptText(prompt, references);
     const script = resolveModelScript(config, config.model || config.imageModel);

@@ -12,3 +12,13 @@
 接口与真实缺口见 [接入契约](native-canvas-next-interfaces.md)，启动、运维和存储说明见 [开发文档](content/docs/development/overseas-workbench.mdx)，本地测试与截图记录见 [验收记录](native-canvas-acceptance.md)。
 
 平台当前没有确认图片/文本/音频模型及价格，相关平台适配只是未启用草案；可用原自配渠道完成这些操作。插件和 Agent 是用户自配能力，没有完成平台托管接入。文档保存成功不等于外部媒体已备份。
+
+## 本轮视频与导航修正交接
+
+本轮仅提交 dev，不部署、不重启服务、不迁移数据。静态前端可由主会话按现有 jp1 流程发布，海外产物需保持 /canvas/ base 与运行时配置。
+
+验收重点：选择旧的 Workbench 超时历史后点击 Check status，应只查询原 taskId、不调用 generate、不新增扣费。已成功的长任务应显示视频，真实 failed 仍失败。后台/离开页面停止查询，回来继续；切换到其他历史后，后台完成结果不得覆盖当前选择。云状态弹层中保留项目/收藏恢复操作，加载失败也可访问。
+
+ali-image 内置请求现支持 URL 响应和协议数量校验，禁止 edits。主会话的真实 API 成功与本会话 mock 测试是两类证据，不能等同浏览器端完整链路通过。无需再调用真实视频测试。Video Studio 仍仅支持上传参考图片（7 张），音视频参考上传入口列入 todo，原画布音视频功能保留。
+
+截图与检查结果见 native-canvas-acceptance.md 的本轮修正验收段。构建产物位于 /private/tmp/canvas-feedback-overseas 与 /private/tmp/canvas-feedback-standalone，仅用于本地验证。
