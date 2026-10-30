@@ -1,4 +1,3 @@
-import { isOverseas } from "@/constant/integration";
 import { Drawer } from "antd";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -16,7 +15,7 @@ export function MobileNavDrawer({ open, activeToolSlug, onClose }: MobileNavDraw
     const { t } = useTranslation();
 
     return (
-        <Drawer title={t("topNav.navigation")} placement="left" size={280} open={open} onClose={onClose} className={isOverseas ? "2xl:hidden" : "md:hidden"}>
+        <Drawer title={t("topNav.navigation")} placement="left" size={280} open={open} onClose={onClose} className="md:hidden">
             <div className="space-y-1">
                 {navigationTools.map((tool) => {
                     const Icon = tool.icon;

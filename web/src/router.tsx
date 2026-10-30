@@ -1,6 +1,6 @@
 import { isOverseas } from "@/constant/integration";
 import WorkbenchLayout from "@/layouts/workbench-layout";
-import { createBrowserRouter, Outlet } from "react-router-dom";
+import { createBrowserRouter, Navigate, Outlet } from "react-router-dom";
 
 import { AnalyticsTracker } from "@/components/layout/analytics-tracker";
 import UserLayout from "@/layouts/user-layout";
@@ -15,7 +15,7 @@ import PromptsPage from "@/pages/prompts";
 import VideoPage from "@/pages/video";
 
 const pages = [
-    { path: "/", element: <HomePage /> },
+    { path: "/", element: isOverseas ? <Navigate to="/canvas" replace /> : <HomePage /> },
     { path: "/image", element: <ImagePage /> },
     { path: "/video", element: <VideoPage /> },
     { path: "/assets", element: <AssetsPage /> },

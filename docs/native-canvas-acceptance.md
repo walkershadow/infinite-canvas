@@ -79,3 +79,7 @@
 - [手机宽度视频页](acceptance/native-canvas/feedback-mobile.jpg)
 
 检查：TypeScript、全量 bun test（16 个外层测试及 13 个隔离集成测试）和海外/独立 Vite 构建通过。构建保留已有大 chunk、静态/动态混合导入及运行时 config.js 提示。生产旧超时任务续查、多任务切换结果隔离和浏览器 ali-image 完整出图链路仍需发布后人工确认。
+
+## 原导航恢复验收
+
+按最新要求恢复原版 max-w-7xl、gap-5、px-6 与导航 gap-7；删除额外 Workbench/云按钮。海外品牌链接为 Workbench 根路径，积分替代原 GitHub 位置，保留云恢复和旧画布导入。实际打开 /canvas/ 已跳转 /canvas/canvas；浏览器确认海外导航无 GitHub 链接且积分弹层正常。独立版仍使用原首页与 GitHub。截图：[原导航及积分弹层](acceptance/native-canvas/original-navigation.jpg)。

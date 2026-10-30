@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button, Empty, Modal, Popover, Spin, Tooltip, theme } from "antd";
-import { ArrowUpRight, CloudCheck, CloudUpload, CloudAlert, FolderOpen, Import, RefreshCw } from "lucide-react";
+import { Button, Empty, Modal, Popover, Spin, theme } from "antd";
+import { FolderOpen, Import, RefreshCw } from "lucide-react";
 import { Link } from "react-router-dom";
 import { saveAs } from "file-saver";
 import { useWorkbenchStore } from "@/stores/use-workbench-store";
@@ -23,7 +23,6 @@ export function WorkbenchActions() {
     const busy = saving || librarySaving;
     const attention = Boolean(error || libraryError || recovery || libraryRecovery || notice);
     const status = attention ? "Cloud storage needs attention" : busy ? "Saving documents…" : ready ? "Documents saved" : "Loading cloud documents…";
-    const StatusIcon = attention ? CloudAlert : busy ? CloudUpload : CloudCheck;
     const report = (error: unknown) => { setNotice(error instanceof Error ? error.message : String(error)); setOpen(true); };
     const download = (content: string, filename: string) => saveAs(new Blob([content], { type: "application/json" }), filename);
     const exportRecovery = async (previous = false) => {
@@ -73,10 +72,9 @@ export function WorkbenchActions() {
         </div>
     </div>;
     return <>
-        <Tooltip title="Return to Workbench"><a href="/" aria-label="Return to Workbench" className="inline-flex h-8 shrink-0 items-center gap-1 rounded px-1.5 text-xs hover:bg-black/5 dark:hover:bg-white/10"><span className="hidden 2xl:inline">Workbench</span><ArrowUpRight className="size-4" /></a></Tooltip>
         <Popover trigger="click" placement="bottomRight" open={open} onOpenChange={setOpen} content={details}>
-            <button type="button" aria-label={`${status}. ${balance} points. Open cloud storage`} title={status} className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded px-1.5 text-xs hover:bg-black/5 dark:hover:bg-white/10" style={{ color: attention ? token.colorWarning : token.colorTextSecondary }}>
-                <StatusIcon className={`size-4 ${busy ? "animate-pulse" : ""}`} /><span className="tabular-nums">{balance}<span className="hidden sm:inline"> pts</span></span>
+            <button type="button" aria-label={`${status}. ${balance} points. Open cloud storage`} title={status} className="inline-flex h-7 shrink-0 items-center rounded px-1 text-xs hover:bg-black/5 dark:hover:bg-white/10" style={{ color: attention ? token.colorWarning : token.colorTextSecondary }}>
+                <span className="tabular-nums">{balance} pts</span>
             </button>
         </Popover>
         <Modal title="Import existing Workbench canvas" open={importOpen} onCancel={() => !importing && setImportOpen(false)} footer={null} closable={!importing} maskClosable={!importing}>

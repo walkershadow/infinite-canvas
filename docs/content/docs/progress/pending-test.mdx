@@ -7,6 +7,8 @@ description: Implemented changes that still need manual verification
 
 The current release needs manual verification in these areas:
 
+- 海外原导航恢复：宽度、间距与原版一致；品牌返回 Workbench，GitHub 位置显示积分并展开云恢复/导入操作；/canvas/ 跳转项目列表，旧项目路由仍可访问。独立版品牌、首页、GitHub 保持原行为。
+
 - 海外视频页：超过五分钟仍查询原任务；切到后台或离开页面暂停查询，返回后恢复；查询故障保留任务并显示 Check status，旧超时记录可续查，服务端真正失败仍显示失败；多个恢复任务不得覆盖当前选中的结果。云状态、余额、项目入口和旧画布导入整合到原导航，需确认浅色/深色及窄屏。
 - ali-image：自配渠道使用 URL 响应，单次 1–6 张；超过数量、参考图编辑在请求前显示提示；其他模型响应格式不变。协议 mock 回归通过；另一会话报告本机 new-api 真实单图请求成功，浏览器端出图链路仍待验收。
 

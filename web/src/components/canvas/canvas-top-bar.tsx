@@ -1,5 +1,3 @@
-import { isOverseas } from "@/constant/integration";
-import { WorkbenchActions } from "@/components/layout/workbench-actions";
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, Bot, Download, Home, Images, Menu, PanelLeftClose, PanelLeftOpen, Plus, Redo2, Trash2, Undo2, Upload } from "lucide-react";
 import { Button, Dropdown, Modal, Tooltip } from "antd";
@@ -75,7 +73,7 @@ export function CanvasTopBar({
 
     return (
         <>
-            <div className={isOverseas ? "pointer-events-none absolute left-0 right-0 top-0 z-50 flex min-h-16 flex-wrap items-center justify-between gap-y-1 px-2 py-2 sm:flex-nowrap sm:pl-1 sm:pr-4" : "pointer-events-none absolute left-0 right-0 top-0 z-50 flex h-16 items-center justify-between pl-1 pr-4"}>
+            <div className="pointer-events-none absolute left-0 right-0 top-0 z-50 flex h-16 items-center justify-between pl-1 pr-4">
                 <div className="pointer-events-auto flex min-w-0 items-center gap-2">
                     <Tooltip title={sidePanelOpen ? t("canvas.collapsePanel") : t("canvas.expandPanel")}>
                         <button
@@ -140,8 +138,7 @@ export function CanvasTopBar({
                     <CompactAgentStatus status={compactAgentStatus} onClick={onToggleAgent} />
                 </div>
 
-                <div className={isOverseas ? "pointer-events-auto flex max-w-full items-center gap-1 overflow-x-auto sm:gap-1.5" : "pointer-events-auto flex items-center gap-1.5"}>
-                    {isOverseas && <WorkbenchActions />}
+                <div className="pointer-events-auto flex items-center gap-1.5">
                     <UserStatusActions variant="canvas" onOpenShortcuts={() => setShortcutsOpen(true)} onOpenPlugins={onOpenPlugins} />
                     <span className="h-6 w-px" style={{ background: theme.toolbar.border }} />
                     <Button
