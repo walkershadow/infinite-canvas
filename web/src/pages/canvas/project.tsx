@@ -22,7 +22,7 @@ import { nanoid } from "nanoid";
 import { getDataUrlByteSize, readImageMeta } from "@/lib/image-utils";
 import { imageReferenceLabel } from "@/lib/image-reference-prompt";
 import { canvasThemes, type CanvasBackgroundMode } from "@/lib/canvas-theme";
-import { useAssetStore, type AssetKind } from "@/stores/use-asset-store";
+import { useAssetStore } from "@/stores/use-asset-store";
 import { useThemeStore } from "@/stores/use-theme-store";
 import { cropDataUrl, splitDataUrl, upscaleDataUrl } from "@/lib/canvas/canvas-image-data";
 import { fitNodeSize, nodeSizeFromRatio } from "@/lib/canvas/canvas-node-size";
@@ -3119,24 +3119,6 @@ function InfiniteCanvasPage() {
         [insertAssistantImage, insertAssistantText, screenToCanvas, size.height, size.width],
     );
 
-    const insertAssetReference = async (payload: InsertAssetPayload) => {
-        const target = nodesRef.current.find((node) => node.id === referencePickerNodeId);
-        if (!target || !referenceKindsForNode(target, effectiveConfig).includes(payload.kind)) return;
-        setAssetPickerOpen(false);
-        try {
-            const type = payload.kind === "text" ? CanvasNodeType.Text : payload.kind === "image" ? CanvasNodeType.Image : CanvasNodeType.Video;
-            const metadata = payload.kind === "image" ? imageMetadata(await uploadImage(payload.dataUrl)) : payload.kind === "video" ? { content: payload.url, storageKey: payload.storageKey, naturalWidth: payload.width, naturalHeight: payload.height, status: NODE_STATUS_SUCCESS } : { content: payload.content, status: NODE_STATUS_SUCCESS };
-            if (!nodesRef.current.some((node) => node.id === target.id)) return;
-            const node = createCanvasNode(type, target.position, metadata);
-            node.title = payload.title;
-            if (metadata.naturalWidth && metadata.naturalHeight) Object.assign(node, fitNodeSize(metadata.naturalWidth, metadata.naturalHeight));
-            node.position = { x: target.position.x - node.width - 40, y: target.position.y };
-            setNodes((previous) => [...previous, node]);
-            setConnections((previous) => [...previous, { id: nanoid(), fromNodeId: node.id, toNodeId: target.id }]);
-            message.success(t("canvas.references.added"));
-        } catch (error) { message.error(error instanceof Error ? error.message : String(error)); }
-    };
-
     // Memoize every callback and render function passed to CanvasNode.
     // CanvasNode uses React.memo, but new prop references would invalidate it on every render and rerender every node
     // during click, hover, or viewport changes, which is especially expensive for Markdown. These useCallback values
@@ -3398,7 +3380,6 @@ function InfiniteCanvasPage() {
                     {referenceKinds.length === 1 && <p className="text-xs" style={{ color: theme.node.muted }}>{t("canvas.references.textOnly")}</p>}
                     <div className="flex flex-wrap items-center gap-2">
                         <span className="mr-auto text-xs" style={{ color: theme.node.muted }}>{t("canvas.references.connectedCount", { count: connectedNodesByNodeId.get(referencePickerNodeId)?.length || 0 })}</span>
-                        <Button type="text" size="small" onClick={() => setAssetPickerOpen(true)}>{t("canvas.references.fromAssets")}</Button>
                         <Button type="text" size="small" onClick={exitNodeReferenceSelection}>{t("canvas.references.done")}</Button>
                     </div>
                 </div> : null}
@@ -3579,7 +3560,7 @@ function InfiniteCanvasPage() {
                     <p className="text-sm opacity-60">{t("canvas.projectPage.clearDescription")}</p>
                 </Modal>
 
-                <AssetPickerModal open={assetPickerOpen} allowedKinds={referencePickerNodeId ? referenceKinds.filter((kind): kind is AssetKind => kind !== "audio") : undefined} description={referencePickerNodeId ? t("canvas.references.assetHint") : undefined} onInsert={referencePickerNodeId ? (payload) => void insertAssetReference(payload) : handleAssetInsert} onClose={() => setAssetPickerOpen(false)} />
+                <AssetPickerModal open={assetPickerOpen} onInsert={handleAssetInsert} onClose={() => setAssetPickerOpen(false)} />
             </section>
         </main>
     );

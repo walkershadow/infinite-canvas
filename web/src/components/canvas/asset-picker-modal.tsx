@@ -6,25 +6,22 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
 import { getImagePreviewRevision, subscribeImagePreviews } from "@/services/image-storage";
 import { useAssetCover } from "@/hooks/use-asset-cover";
-import { useAssetStore, type Asset, type AssetKind } from "@/stores/use-asset-store";
+import { useAssetStore, type Asset } from "@/stores/use-asset-store";
 
 export type InsertAssetPayload = { kind: "text"; content: string; title: string } | { kind: "image"; dataUrl: string; title: string; storageKey?: string } | { kind: "video"; url: string; title: string; storageKey?: string; width?: number; height?: number };
 
 type Props = {
     open: boolean;
     defaultTab?: string;
-    allowedKinds?: AssetKind[];
-    description?: string;
     onInsert: (payload: InsertAssetPayload) => void;
     onClose: () => void;
 };
 
-export function AssetPickerModal({ open, onInsert, onClose, allowedKinds, description }: Props) {
+export function AssetPickerModal({ open, onInsert, onClose }: Props) {
     const { t } = useTranslation();
     return (
         <Modal title={t("canvas.assetPicker.title")} open={open} onCancel={onClose} footer={null} width={860} destroyOnHidden styles={{ body: { padding: "0 24px 24px", minHeight: 480 } }}>
-            {description && <p className="mb-4 text-sm text-muted-foreground">{description}</p>}
-            <MyAssetsTab onInsert={onInsert} allowedKinds={allowedKinds} />
+            <MyAssetsTab onInsert={onInsert} />
         </Modal>
     );
 }
@@ -60,7 +57,7 @@ function PickerCard({ asset, onClick }: { asset: Asset; onClick: () => void }) {
     );
 }
 
-function MyAssetsTab({ onInsert, allowedKinds }: { onInsert: (payload: InsertAssetPayload) => void; allowedKinds?: AssetKind[] }) {
+function MyAssetsTab({ onInsert }: { onInsert: (payload: InsertAssetPayload) => void }) {
     const { t } = useTranslation();
     useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
     const assets = useAssetStore((state) => state.assets);
@@ -71,10 +68,10 @@ function MyAssetsTab({ onInsert, allowedKinds }: { onInsert: (payload: InsertAss
     const filtered = useMemo(() => {
         const query = keyword.trim().toLowerCase();
         return assets
-            .filter((a) => allowedKinds ? allowedKinds.includes(a.kind) : a.kind === "text" || a.kind === "image" || a.kind === "video")
+            .filter((a) => a.kind === "text" || a.kind === "image" || a.kind === "video")
             .filter((a) => kindFilter === "all" || a.kind === kindFilter)
             .filter((a) => !query || [a.title, ...(a.tags || [])].join(" ").toLowerCase().includes(query));
-    }, [assets, keyword, kindFilter, allowedKinds]);
+    }, [assets, keyword, kindFilter]);
 
     const visible = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
@@ -107,7 +104,7 @@ function MyAssetsTab({ onInsert, allowedKinds }: { onInsert: (payload: InsertAss
                     }}
                 />
                 <div className="flex gap-1.5">
-                    {kindOptions.filter((option) => option === "all" || !allowedKinds || allowedKinds.includes(option as AssetKind)).map((option) => (
+                    {kindOptions.map((option) => (
                         <Tag.CheckableTag
                             key={option}
                             checked={kindFilter === option}
