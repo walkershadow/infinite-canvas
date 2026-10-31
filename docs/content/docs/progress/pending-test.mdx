@@ -7,6 +7,8 @@ description: Implemented changes that still need manual verification
 
 The current release needs manual verification in these areas:
 
+- 海外画布视频 Retry：计费确认移到参考图片 hydrate/download 之前，点击同步锁定并显示现有加载状态；确认取消或请求中止不启动生成，准备失败/生成失败后可再次重试。已有可恢复任务仍只轮询，未知旧任务签名保护和幂等键不变。延迟媒体与快速多击模拟通过，需生产复验慢网络下弹窗及时出现、取消后按钮恢复；未执行真实收费生成，独立版重试路径不变。
+
 - 海外视频参数补修：Video Studio 按 videoModel 查询目录，画布仍尊重节点显式 model；模型切换按目录归一化时长/画幅，Ali 720p/1080p 选项与请求一致，普通/首尾帧参考上限随目录和模式显示，超量导入明确拒绝。Studio 与画布重试签名包含参考模式；旧画布未知签名请求阻止重发，需先核对原任务。图片/文字/音频能力提示按目录更新。已以完整 Video Studio 页面在独立本地模拟目录验证 Ali/Seedance 切换与 390px 抽屉；生产真实目录、已有任务恢复与 Image Studio 文案仍待发布后复验。
 
 - 海外 ali 参考能力：图片任务传 `images`；视频普通模式传 `images/videos/audios`，一张首帧传 `input_reference`，两张首尾帧传 `media`，禁止混用；语音克隆传 `ref_audio`；ali-llm 保留 `text/image_url/video_url` 多模态消息，音频理解不开放。所有参考先经原素材上传链路，后端负责归属校验与上游 URL 转换。数量使用已确认目录值：图片10、LLM 每消息图片10/视频5，视频普通图片10/视频5/音频5，语音单参考；超限明确报错，不裁剪。协议回归覆盖字段、顺序、互斥、超限和不支持类型；真实生成与发布后英文 UI 由主会话验收。My Assets 自动插入连线入口保持移除，原数据、独立版及自配渠道不变。

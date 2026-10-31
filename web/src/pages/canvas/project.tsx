@@ -1,3 +1,4 @@
+import { runConfirmedRetry } from "@/lib/canvas/confirmed-retry";
 import { loadProjectVideoTasks } from "@/services/workbench/projects";
 import { isVideoRecoveryTarget, recoverVideoNodes } from "@/lib/canvas/workbench-video-recovery";
 import { assertWorkbenchReferences, isCompatibleReference, referenceKindsForNode } from "@/lib/canvas/canvas-reference-selection";
@@ -305,6 +306,7 @@ function InfiniteCanvasPage() {
     const pendingConnectionCreateRef = useRef(pendingConnectionCreate);
     const generationRequestsRef = useRef(new Map<string, CanvasGenerationRequest>());
     const videoPollIdsRef = useRef(new Set<string>());
+    const videoRetryIdsRef = useRef(new Set<string>());
 
     const createHistoryEntry = useCallback(
         (): CanvasHistoryEntry => ({
@@ -339,21 +341,32 @@ function InfiniteCanvasPage() {
         if (request?.controller === controller) generationRequestsRef.current.delete(targetNodeId);
     }, []);
 
+    const confirmVideoGeneration = useCallback(async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], signal: AbortSignal) => {
+        const estimate = workbenchVideoInput(config);
+        const confirmed = await new Promise<boolean>((resolve) => {
+            const dialog = modal.confirm({
+                title: "Generate video",
+                content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). ${estimate.model.freeQuota ? "Eligible daily free quota is applied by Workbench." : "This model does not use daily free quota."} Stopping the wait does not cancel billing.`,
+                afterClose: () => { signal.removeEventListener("abort", abort); resolve(false); },
+                okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false),
+            });
+            const abort = () => { dialog.destroy(); resolve(false); };
+            signal.addEventListener("abort", abort, { once: true });
+            if (signal.aborted) abort();
+        });
+        if (!confirmed || signal.aborted) {
+            const originId = generationRequestsRef.current.get(nodeId)?.originNodeId;
+            setNodes((prev) => prev.map((item) => item.id === nodeId || item.id === originId ? { ...item, metadata: { ...item.metadata, status: item.metadata?.content ? NODE_STATUS_SUCCESS : NODE_STATUS_IDLE } } : item));
+            throw new DOMException("Aborted", "AbortError");
+        }
+    }, [modal]);
+
     const completeVideoNodeTask = useCallback(
-        async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], prompt: string, images: Parameters<typeof createVideoGenerationTask>[2], signal: AbortSignal, extra: CanvasNodeData["metadata"] = {}, videos: ReferenceVideo[] = [], audios: ReferenceAudio[] = []) => {
+        async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], prompt: string, images: Parameters<typeof createVideoGenerationTask>[2], signal: AbortSignal, extra: CanvasNodeData["metadata"] = {}, videos: ReferenceVideo[] = [], audios: ReferenceAudio[] = [], alreadyConfirmed = false) => {
             let requestKey: string | undefined;
             if (isWorkbenchModel(config, config.model || config.videoModel)) {
                 const estimate = workbenchVideoInput(config);
-                const confirmed = await new Promise<boolean>((resolve) => modal.confirm({
-                    title: "Generate video",
-                    content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). ${estimate.model.freeQuota ? "Eligible daily free quota is applied by Workbench." : "This model does not use daily free quota."} Stopping the wait does not cancel billing.`,
-                    okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false),
-                }));
-                if (!confirmed || signal.aborted) {
-                    const originId = generationRequestsRef.current.get(nodeId)?.originNodeId;
-                    setNodes((prev) => prev.map((item) => item.id === nodeId || item.id === originId ? { ...item, metadata: { ...item.metadata, status: item.metadata?.content ? NODE_STATUS_SUCCESS : NODE_STATUS_IDLE } } : item));
-                    throw new DOMException("Aborted", "AbortError");
-                }
+                if (!alreadyConfirmed) await confirmVideoGeneration(nodeId, config, signal);
                 const target = nodesRef.current.find((item) => item.id === nodeId);
                 const signature = JSON.stringify({ model: config.model, prompt, duration: estimate.duration, ratio: estimate.ratio, videoMode: config.videoMode, images: (images || []).map((item) => item.storageKey || item.dataUrl), videos: videos.map((item) => item.storageKey || item.url), audios: audios.map((item) => item.storageKey || item.url) });
                 const pendingKey = !target?.metadata?.content && target?.metadata?.workbenchRequestKey;
@@ -371,7 +384,7 @@ function InfiniteCanvasPage() {
             const video = await storeGeneratedVideo(await waitForVideoGenerationTask(config, task, { signal }));
             setNodes((prev) => prev.map((item) => (item.id === nodeId ? applyGeneratedVideo(item, video, { prompt, model: config.model, ...extra }) : item)));
         },
-        [modal, projectId, updateProject],
+        [confirmVideoGeneration, projectId, updateProject],
     );
 
     const pollVideoNodeTask = useCallback(
@@ -2873,6 +2886,48 @@ function InfiniteCanvasPage() {
                 return;
             }
 
+            if (node.type === CanvasNodeType.Video && isWorkbenchModel(generationConfig, generationConfig.model)) {
+                if (generationRequestsRef.current.has(node.id)) return;
+                let controller: AbortController | undefined;
+                try {
+                    await runConfirmedRetry(videoRetryIdsRef.current, node.id, async () => {
+                        const current = nodesRef.current.find((item) => item.id === node.id);
+                        if (!current) throw new DOMException("Aborted", "AbortError");
+                        if (!current.metadata?.content && current.metadata?.workbenchRequestKey && !current.metadata.workbenchRequestSignature) throw new Error("An earlier video request has an unknown outcome. Check its task before starting another generation.");
+                        controller = startGenerationRequest(node.id, sourceNode.id, node.id);
+                        setRunningNodeId(node.id);
+                        setNodes((prev) => prev.map((item) => item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_LOADING, errorDetails: undefined } } : item));
+                        await confirmVideoGeneration(node.id, generationConfig, controller.signal);
+                    }, async () => {
+                        const signal = controller!.signal;
+                        signal.throwIfAborted();
+                        const rawContext = buildNodeGenerationContext(sourceNode.id, nodesRef.current, connectionsRef.current, sourceNode.metadata?.prompt || node.metadata?.prompt || "");
+                        assertWorkbenchReferences(generationConfig, "video", rawContext);
+                        if (!rawContext.prompt.trim()) throw new Error(t("canvas.projectPage.retryPromptMissing"));
+                        const context = await hydrateNodeGenerationContext(rawContext);
+                        signal.throwIfAborted();
+                        await completeVideoNodeTask(node.id, generationConfig, context.prompt.trim(), context.referenceImages, signal, {
+                            size: generationConfig.size, seconds: generationConfig.videoSeconds, vquality: generationConfig.vquality,
+                            generateAudio: generationConfig.videoGenerateAudio, watermark: generationConfig.videoWatermark, videoMode: generationConfig.videoMode,
+                        }, context.referenceVideos, context.referenceAudios, true);
+                    });
+                } catch (error) {
+                    if (isGenerationCanceled(error)) {
+                        setNodes((prev) => prev.map((item) => item.id === node.id ? { ...item, metadata: { ...item.metadata, status: item.metadata?.content ? NODE_STATUS_SUCCESS : NODE_STATUS_IDLE } } : item));
+                    } else {
+                        const errorDetails = error instanceof Error ? error.message : t("canvas.projectPage.generationFailed");
+                        isWorkbenchTaskPending(error) ? message.info(errorDetails) : message.error(errorDetails);
+                        setNodes((prev) => prev.map((item) => item.id === node.id ? { ...item, metadata: { ...item.metadata, status: item.metadata?.content ? NODE_STATUS_SUCCESS : isWorkbenchTaskPending(error) ? NODE_STATUS_IDLE : NODE_STATUS_ERROR, errorDetails, ...(isVideoTaskFailed(error) ? { videoTaskId: undefined, workbenchRequestKey: undefined } : {}) } } : item));
+                    }
+                } finally {
+                    if (controller) {
+                        finishGenerationRequest(node.id, controller);
+                        setRunningNodeId(null);
+                    }
+                }
+                return;
+            }
+
             const context = hasSavedImageMetadata ? null : await hydrateNodeGenerationContext(buildNodeGenerationContext(sourceNode.id, nodesRef.current, connectionsRef.current, sourceNode.metadata?.prompt || node.metadata?.prompt || ""));
             const prompt = (savedImageMetadata?.prompt || context?.prompt || "").trim();
             if (!prompt) {
@@ -3000,7 +3055,7 @@ function InfiniteCanvasPage() {
                 setRunningNodeId(null);
             }
         },
-        [completeVideoNodeTask, effectiveConfig, finishGenerationRequest, isAiConfigReady, message, openConfigDialog, pollVideoNodeTask, startGenerationRequest, t],
+        [completeVideoNodeTask, confirmVideoGeneration, effectiveConfig, finishGenerationRequest, isAiConfigReady, message, openConfigDialog, pollVideoNodeTask, startGenerationRequest, t],
     );
 
     const deleteBatchImage = useCallback((nodeId: string, imageId: string) => {
