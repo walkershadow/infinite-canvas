@@ -38,7 +38,7 @@ export function AppTopNav() {
             {!hideHeader ? (
                 <header className="sticky top-0 z-20 shrink-0 md:h-14 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
                     <div className="mx-auto flex h-full max-w-7xl flex-col items-stretch justify-between gap-1 px-3 py-2 md:flex-row md:gap-5 md:px-6 md:py-0">
-                        <div className="flex min-w-0 items-center justify-between md:justify-start">
+                        <div className={cn("flex min-w-0 items-center justify-between md:justify-start", isOverseas && "md:flex-1")}>
                             <Link to={isOverseas ? `${window.location.origin}/workbench` : "/"} reloadDocument={isOverseas} aria-label={isOverseas ? "Return to Workbench" : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
                                 <span
                                     className="size-5 shrink-0 bg-current"
@@ -83,7 +83,7 @@ export function AppTopNav() {
                             </nav>
                         </div>
 
-                        <div className="my-auto flex h-9 min-w-0 items-center justify-end gap-2 justify-self-end whitespace-nowrap">
+                        <div className={cn("my-auto flex h-9 min-w-0 items-center justify-end gap-2 justify-self-end whitespace-nowrap", isOverseas && "shrink-0")}>
                             <Tooltip title={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")}>
                                 <Button type="text" shape="circle" className="!h-8 !w-8 !min-w-8" icon={<Bot className="size-4" />} onClick={togglePanel} aria-label={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")} />
                             </Tooltip>

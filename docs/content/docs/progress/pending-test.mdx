@@ -7,6 +7,8 @@ description: Implemented changes that still need manual verification
 
 The current release needs manual verification in these areas:
 
+- 海外顶部导航点击区域：右侧工具区禁止收缩，左侧使用剩余空间并沿用导航横向滚动，避免工具内容向左溢出遮挡文字。独立模式样式不变。真实 AppTopNav 本地浏览器在 900/1000px 验证可见链接上中下命中、横向滚动后命中及文字/上部点击切换路由；待生产发布后复验含真实余额及 Agent 展开场景。
+
 - 海外画布视频 Retry：计费确认移到参考图片 hydrate/download 之前，点击同步锁定并显示现有加载状态；确认取消或请求中止不启动生成，准备失败/生成失败后可再次重试。已有可恢复任务仍只轮询，未知旧任务签名保护和幂等键不变。延迟媒体与快速多击模拟通过，需生产复验慢网络下弹窗及时出现、取消后按钮恢复；未执行真实收费生成，独立版重试路径不变。
 
 - 海外视频参数补修：Video Studio 按 videoModel 查询目录，画布仍尊重节点显式 model；模型切换按目录归一化时长/画幅，Ali 720p/1080p 选项与请求一致，普通/首尾帧参考上限随目录和模式显示，超量导入明确拒绝。Studio 与画布重试签名包含参考模式；旧画布未知签名请求阻止重发，需先核对原任务。图片/文字/音频能力提示按目录更新。已以完整 Video Studio 页面在独立本地模拟目录验证 Ali/Seedance 切换与 390px 抽屉；生产真实目录、已有任务恢复与 Image Studio 文案仍待发布后复验。
