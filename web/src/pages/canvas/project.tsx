@@ -1,6 +1,6 @@
 import { loadProjectVideoTasks } from "@/services/workbench/projects";
 import { isVideoRecoveryTarget, recoverVideoNodes } from "@/lib/canvas/workbench-video-recovery";
-import { isCompatibleReference, referenceKindsForNode } from "@/lib/canvas/canvas-reference-selection";
+import { assertWorkbenchReferences, isCompatibleReference, referenceKindsForNode } from "@/lib/canvas/canvas-reference-selection";
 import { isWorkbenchTaskPending } from "@/services/api/workbench-ai-tasks";
 import { useWorkbenchAiRecovery } from "./hooks/use-workbench-ai-recovery";
 import { isOverseas } from "@/constant/integration";
@@ -2458,6 +2458,7 @@ function InfiniteCanvasPage() {
             if (markSourceStatus) setNodes((prev) => prev.map((node) => (node.id === nodeId ? { ...node, metadata: { ...node.metadata, ...(node.type === CanvasNodeType.Config ? {} : { prompt }), status: NODE_STATUS_LOADING, errorDetails: undefined } } : node)));
 
             try {
+                assertWorkbenchReferences(generationConfig, mode, generationContext);
                 if (mode === "image") {
                     const count = getGenerationCount(generationConfig.count);
                     const isConfigNode = sourceNode?.type === CanvasNodeType.Config;
@@ -2686,7 +2687,7 @@ function InfiniteCanvasPage() {
                     if (!reuseAudioNode) setConnections((prev) => [...prev, { id: nanoid(), fromNodeId: nodeId, toNodeId: audioId }]);
                     const controller = startGenerationRequest(audioId, nodeId, nodeId, runController);
                     try {
-                        const audio = await storeGeneratedAudio(await requestAudioGeneration(generationConfig, effectivePrompt, { signal: controller.signal, owner: { projectId, nodeId: audioId } }), generationConfig.audioFormat);
+                        const audio = await storeGeneratedAudio(await requestAudioGeneration(generationConfig, effectivePrompt, { signal: controller.signal, owner: { projectId, nodeId: audioId }, audios: generationContext.referenceAudios }), generationConfig.audioFormat);
                         setNodes((prev) => prev.map((node) => (node.id === audioId ? { ...node, metadata: { ...node.metadata, ...audioMetadata(audio), prompt: effectivePrompt, ...buildAudioGenerationMetadata(generationConfig) } } : node)));
                     } finally {
                         finishGenerationRequest(audioId, controller);
@@ -2757,7 +2758,7 @@ function InfiniteCanvasPage() {
                                         ),
                                     );
                                 },
-                                { signal: controller.signal, owner: { projectId, nodeId: rootId, itemId: textId } },
+                                { signal: controller.signal, owner: { projectId, nodeId: rootId, itemId: textId }, videos: generationContext.referenceVideos },
                             );
                             const content = answer || streamed;
                             setNodes((prev) =>
@@ -2890,6 +2891,7 @@ function InfiniteCanvasPage() {
             const controller = startGenerationRequest(node.id, sourceNode.id, node.id);
 
             try {
+                if (context) assertWorkbenchReferences(generationConfig, node.type === CanvasNodeType.Video ? "video" : node.type === CanvasNodeType.Audio ? "audio" : node.type === CanvasNodeType.Text ? "text" : "image", context);
                 if (node.type === CanvasNodeType.Text) {
                     if (!context) return;
                     let streamed = "";
@@ -2900,7 +2902,7 @@ function InfiniteCanvasPage() {
                             streamed = text;
                             setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, type: CanvasNodeType.Text, metadata: { ...item.metadata, content: text, status: NODE_STATUS_LOADING } } : item)));
                         },
-                        { signal: controller.signal, owner: { projectId, nodeId: node.id } },
+                        { signal: controller.signal, owner: { projectId, nodeId: node.id }, videos: context.referenceVideos },
                     );
                     setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, type: CanvasNodeType.Text, metadata: { ...item.metadata, content: answer || streamed, prompt, status: NODE_STATUS_SUCCESS } } : item)));
                     return;
@@ -2917,7 +2919,7 @@ function InfiniteCanvasPage() {
                     return;
                 }
                 if (node.type === CanvasNodeType.Audio) {
-                    const audio = await storeGeneratedAudio(await requestAudioGeneration(generationConfig, prompt, { signal: controller.signal, owner: { projectId, nodeId: node.id } }), generationConfig.audioFormat);
+                    const audio = await storeGeneratedAudio(await requestAudioGeneration(generationConfig, prompt, { signal: controller.signal, owner: { projectId, nodeId: node.id }, audios: context?.referenceAudios }), generationConfig.audioFormat);
                     setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, ...audioMetadata(audio), prompt, ...buildAudioGenerationMetadata(generationConfig) } } : item)));
                     return;
                 }

@@ -20,6 +20,7 @@ const preferences = new Map<string, string>();
 Object.assign(globalThis, { localStorage: { getItem: (key: string) => preferences.get(key) || null, setItem: (key: string, value: string) => preferences.set(key, value), removeItem: (key: string) => preferences.delete(key) } });
 Object.assign(globalThis, { window: { localStorage: globalThis.localStorage, location: { origin: "http://localhost:3200" }, addEventListener() {} } });
 let account = "account-a";
+let referenceCatalog: Record<string, unknown> = {};
 let conflict = false;
 let libraryConflict = false;
 let libraryUnavailable = true;
@@ -64,7 +65,7 @@ globalThis.fetch = mock(async (url: string | URL | Request, init?: RequestInit) 
         task.result = task.status === "completed" ? task.kind === "images" ? { images: [{ id: "image-result", url: "/api/canvas/assets/image/content" }] } : task.kind === "text" ? { text: "Recovered text" } : { url: "/api/canvas/assets/audio/content", mimeType: "audio/wav" } : null;
         return Response.json({ task });
     }
-    if (path.endsWith("/bootstrap")) return Response.json({ user: { id: account }, models: [{ id: "platform-video", name: "Platform video", price: 1, billingUnit: "request", durations: [5], defaultDuration: 5, ratios: [{ value: "16:9", label: "16:9", size: "1280x720" }] }], currency: "USD", pointsPerUsd: 100, quota: { points: 12 }, capabilities: { video: true } });
+    if (path.endsWith("/bootstrap")) return Response.json({ user: { id: account }, models: [{ id: "platform-video", name: "Platform video", price: 1, billingUnit: "request", durations: [5], defaultDuration: 5, ratios: [{ value: "16:9", label: "16:9", size: "1280x720" }] }], currency: "USD", pointsPerUsd: 100, quota: { points: 12 }, capabilities: { video: true }, ...referenceCatalog });
     if (path.includes("/library") || path.includes("/prompts")) {
         const library = path.includes("/library");
         if (library) await libraryGate;
@@ -416,7 +417,7 @@ test("platform adapters return asynchronous text, image and speech results witho
         const before = aiTasks.size;
         await expect(platformImages({ ...config, count: "7" }, "Fixture", [])).rejects.toThrow("1–6");
         await expect(platformImages({ ...config, background: "transparent" }, "Fixture", [])).rejects.toThrow("transparent");
-        await expect(platformImages(config, "Fixture", [{} as any])).rejects.toThrow("text-to-image");
+        await expect(platformImages(config, "Fixture", [{} as any])).rejects.toThrow("does not accept reference images");
         await expect(platformText({ ...config, model: config.textModel }, [{ role: "user", content: [{ type: "image_url", image_url: { url: "data:image/png;base64,AA==" } }] }], () => {})).rejects.toThrow("text messages");
         await expect(platformAudio({ ...config, model: config.audioModel, audioFormat: "mp3" }, "Fixture")).rejects.toThrow("WAV");
         await expect(platformAudio({ ...config, model: config.audioModel }, "a".repeat(501))).rejects.toThrow("500");
@@ -503,4 +504,73 @@ test("cover generation deduplicates requests and never overwrites a newer cover 
     await new Promise((resolve) => setTimeout(resolve, 0));
     assetStore.setState({ assets: [] }); release(); await deleted;
     expect(assetStore.getState().assets).toEqual([]);
+});
+
+test("ali reference contracts preserve owned media, frame roles and multimodal messages", async () => {
+    const session = api.workbenchSession();
+    session.aiModels = [
+        { id: "ali-image", name: "Image", capability: "image", price: 0, constraints: { textOnly: false, maxImages: 10 } },
+        { id: "ali-llm", name: "Text", capability: "text", price: 0, constraints: { textOnly: false, referenceKinds: ["text", "image", "video"], maxImages: 10, maxVideos: 5 } },
+        { id: "ali-audio", name: "Speech", capability: "audio", price: 0, constraints: { referenceAudio: true, maxAudios: 1 } },
+    ];
+    const videoModel = { ...session.models[0], id: "ali-video", supportsImage: true, supportsVideo: true, supportsAudio: true, supportsFrames: true, maxImages: 10, maxVideos: 5, maxAudios: 5 };
+    session.models.push(videoModel);
+    referenceCatalog = { aiModels: session.aiModels, models: session.models, capabilities: session.capabilities };
+    const channel = { id: "workbench", name: "Workbench", baseUrl: "/api/canvas", apiKey: "", apiFormat: "openai" as const, models: [...session.aiModels.map((model) => ({ name: model.id, capability: model.capability })), { name: "ali-video", capability: "video" as const }] };
+    const config = { ...configModule.defaultConfig, channels: [channel], model: "workbench::ali-image", imageModel: "workbench::ali-image", textModel: "workbench::ali-llm", audioModel: "workbench::ali-audio", videoModel: "workbench::ali-video", size: "1024x1024", count: "1", audioFormat: "wav", apiKey: "" };
+    const image = { id: "ref-image", name: "fixture", type: "image/png", dataUrl: "/api/canvas/assets/ref-image/content" };
+    const audio = { id: "ref-audio", name: "fixture", type: "audio/wav", url: "/api/canvas/assets/ref-audio/content" };
+    const video = { id: "ref-video", name: "fixture", type: "video/mp4", url: "/api/canvas/assets/ref-video/content" };
+    const { platformImages, platformText, platformAudio } = await import("@/services/api/workbench-ai");
+    const { createVideoGenerationTask } = await import("@/services/api/video");
+    const { referenceKindsForGeneration, assertWorkbenchReferences } = await import("@/lib/canvas/canvas-reference-selection");
+    const originalTimer = globalThis.setTimeout;
+    globalThis.setTimeout = ((callback: () => void) => { queueMicrotask(callback); return 0; }) as any;
+    try {
+        await platformImages(config, "Edit fixture", [image], { owner: { nodeId: "ref-image-output" } });
+        expect(requests.filter((r) => r.path === "/api/canvas/ai/images" && r.method === "POST").at(-1)!.body.images).toEqual([image.dataUrl]);
+        const messages = [{ role: "user" as const, content: [{ type: "text" as const, text: "Describe" }, { type: "image_url" as const, image_url: { url: image.dataUrl } }] }];
+        await platformText({ ...config, model: config.textModel }, messages, () => {}, { owner: { nodeId: "ref-text-output" } });
+        expect(requests.filter((r) => r.path === "/api/canvas/ai/text" && r.method === "POST").at(-1)!.body.messages).toEqual(messages);
+        const { requestImageQuestion } = await import("@/services/api/image");
+        await requestImageQuestion({ ...config, model: config.textModel }, messages, () => {}, { videos: [video], owner: { nodeId: "ref-video-understanding" } });
+        expect(requests.filter((r) => r.path === "/api/canvas/ai/text" && r.method === "POST").at(-1)!.body.messages[0].content).toEqual([...messages[0].content, { type: "video_url", video_url: { url: video.url } }]);
+        expect(messages[0].content).toHaveLength(2);
+        await platformAudio({ ...config, model: config.audioModel }, "Fixture", { audios: [audio], owner: { nodeId: "ref-audio-output" } });
+        expect(requests.filter((r) => r.path === "/api/canvas/ai/audio" && r.method === "POST").at(-1)!.body.ref_audio).toBe(audio.url);
+        const videoConfig = { ...config, model: config.videoModel, size: "1280x720", vquality: "720", videoSeconds: "5" };
+        const lastVideoInput = () => requests.filter((r) => r.path === "/api/canvas/video/generate").at(-1)!.body.input;
+        await createVideoGenerationTask({ ...videoConfig, videoMode: "reference" }, "Fixture", [image], { requestKey: "mixed-fixture", videos: [video], audios: [audio] });
+        expect(lastVideoInput()).toMatchObject({ images: [image.dataUrl], videos: [video.url], audios: [audio.url] });
+        expect(lastVideoInput().media).toBeUndefined();
+        await createVideoGenerationTask({ ...videoConfig, videoMode: "frames" }, "Fixture", [image], { requestKey: "first-fixture" });
+        expect(lastVideoInput().input_reference).toBe(image.dataUrl);
+        expect(lastVideoInput().images).toBeUndefined();
+        await createVideoGenerationTask({ ...videoConfig, videoMode: "frames" }, "Fixture", [image, { ...image, dataUrl: "/api/canvas/assets/last/content" }], { requestKey: "frames-fixture" });
+        expect(lastVideoInput().media).toEqual([{ type: "first_frame", url: image.dataUrl }, { type: "last_frame", url: "/api/canvas/assets/last/content" }]);
+        expect(lastVideoInput().images).toBeUndefined();
+        expect(lastVideoInput().input_reference).toBeUndefined();
+        expect(referenceKindsForGeneration(config, "image")).toEqual(["text", "image"]);
+        expect(referenceKindsForGeneration({ ...config, model: config.audioModel }, "audio")).toEqual(["text", "audio"]);
+        expect(referenceKindsForGeneration({ ...config, model: config.textModel }, "text")).toEqual(["text", "image", "video"]);
+        expect(referenceKindsForGeneration({ ...videoConfig, videoMode: "frames" }, "video")).toEqual(["text", "image"]);
+        expect(referenceKindsForGeneration({ ...videoConfig, videoMode: "reference" }, "video")).toEqual(["text", "image", "video", "audio"]);
+        expect(referenceKindsForGeneration({ ...config, channels: [], model: "custom" }, "audio")).toEqual(["text"]);
+        await platformText({ ...config, model: config.textModel }, [
+            { role: "user", content: Array(6).fill({ type: "image_url", image_url: { url: image.dataUrl } }) },
+            { role: "user", content: Array(6).fill({ type: "image_url", image_url: { url: image.dataUrl } }) },
+        ], () => {}, { owner: { nodeId: "per-message-limits" } });
+        const before = requests.length;
+        await expect(platformImages(config, "Fixture", Array(11).fill(image))).rejects.toThrow("10");
+        await expect(platformText({ ...config, model: config.textModel }, [{ role: "user", content: Array(11).fill({ type: "image_url", image_url: { url: image.dataUrl } }) }], () => {})).rejects.toThrow("10");
+        await expect(platformText({ ...config, model: config.textModel }, [{ role: "user", content: [{ type: "input_audio", input_audio: { data: "fixture", format: "wav" } }] }] as any, () => {})).rejects.toThrow("text, image and video");
+        await expect(platformText({ ...config, model: config.textModel }, messages, () => {}, { videos: Array(6).fill(video) })).rejects.toThrow("5");
+        await expect(platformAudio({ ...config, model: config.audioModel }, "Fixture", { audios: [audio, audio] })).rejects.toThrow("one reference");
+        await expect(createVideoGenerationTask({ ...videoConfig, videoMode: "frames" }, "Fixture", [image], { requestKey: "invalid-mix", audios: [audio] })).rejects.toThrow("cannot include");
+        await expect(createVideoGenerationTask({ ...videoConfig, videoMode: "frames" }, "Fixture", [image, image, image], { requestKey: "invalid-frames" })).rejects.toThrow("two first/last");
+        await expect(createVideoGenerationTask({ ...videoConfig, videoMode: "reference" }, "Fixture", [], { requestKey: "invalid-count", videos: Array(6).fill(video) })).rejects.toThrow("5");
+        expect(() => assertWorkbenchReferences({ ...config, model: config.textModel }, "text", { imageCount: 0, videoCount: 0, audioCount: 1 })).toThrow("does not accept audio");
+        expect(() => assertWorkbenchReferences(config, "image", { imageCount: 0, videoCount: 0, audioCount: 1 })).toThrow("does not accept audio");
+        expect(requests).toHaveLength(before);
+    } finally { globalThis.setTimeout = originalTimer; }
 });

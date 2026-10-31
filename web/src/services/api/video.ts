@@ -2,7 +2,7 @@ import { isWorkbenchModel } from "@/stores/use-config-store";
 import { isOverseas } from "@/constant/integration";
 import { workbenchRequest } from "@/services/api/workbench";
 import { createWorkbenchVideo, ownedAssetUrl, refreshWorkbenchBalance, workbenchReference } from "@/services/workbench/projects";
-import { workbenchVideoInput } from "@/services/workbench/video";
+import { workbenchVideoInput, workbenchVideoReferenceMode } from "@/services/workbench/video";
 import type { WorkbenchTask } from "@/types/workbench";
 import axios from "axios";
 import { nanoid } from "nanoid";
@@ -79,9 +79,12 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
     if (isWorkbenchModel(config, config.model || config.videoModel)) {
         if (!options?.requestKey) throw new Error("Workbench generation requires a stable request key.");
         const { model, duration, ratio } = workbenchVideoInput(config);
-        if ((!model.supportsImage && references.length) || (!model.supportsVideo && options.videos?.length) || (!model.supportsAudio && options.audios?.length)) throw new Error("This model does not support the connected reference media.");
+        const referenceMode = workbenchVideoReferenceMode(model, config.videoMode, { images: references.length, videos: options.videos?.length || 0, audios: options.audios?.length || 0 });
         const [images, videos, audios] = await Promise.all([Promise.all(references.map(workbenchReference)), Promise.all((options.videos || []).map(workbenchReference)), Promise.all((options.audios || []).map(workbenchReference))]);
-        const input = { prompt, model: model.id, duration, ratio, images, videos, audios };
+        const media = referenceMode === "first" ? { input_reference: images[0] }
+            : referenceMode === "first-last" ? { media: [{ type: "first_frame", url: images[0] }, { type: "last_frame", url: images[1] }] }
+            : referenceMode === "none" ? {} : { images, videos, audios };
+        const input = { prompt, model: model.id, duration, ratio, ...media };
         if (!options.projectId) {
             const { task } = await workbenchRequest<{ task: WorkbenchTask }>("/video/generate", { method: "POST", signal: options.signal, body: JSON.stringify({ requestKey: options.requestKey, input }) });
             void refreshWorkbenchBalance().catch(() => undefined);

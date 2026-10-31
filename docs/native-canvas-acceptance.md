@@ -136,3 +136,23 @@
 本地验证：`bun run typecheck`、`bun test`（22 个外层测试，另有 24 个隔离进程用例）通过；独立版和海外版生产构建通过，保留原有大块及静态 config.js 警告。浏览器只使用 localhost:3203 的新建空白画布，未发起付费生成、未操作生产数据。截图 `docs/acceptance/native-canvas/mobile-library.png`、`mobile-editor.png` 均为该可丢弃测试内容。截图证明窄屏布局和鼠标点击，不冒充真机触控证明。
 
 本轮只提交 dev，不推送或部署。发布与真实双 origin/生产验收由主会话完成；不重启既有服务。用户尚未确认的项目继续留在 pending-test，不写入正式功能说明。
+
+
+## 海外 ali 参考能力契约
+
+仅海外 Workbench 模型启用；独立版及用户自配渠道保持原请求行为。bootstrap 契约如下：
+
+| 模型 | 能力目录 | 前端到 Canvas 后端的字段 |
+| --- | --- | --- |
+| ali-image | `constraints.textOnly:false,maxImages:10` | `/ai/images` 的 `images:string[]` |
+| ali-llm | `constraints.textOnly:false,referenceKinds:['text','image','video'],maxImages:10,maxVideos:5` | `/ai/text` 保留 `messages[].content` 的 `text` / `image_url` / `video_url` |
+| ali-audio | `constraints.referenceAudio:true,maxAudios:1` | `/ai/audio` 的单条 `ref_audio` |
+| ali-video | `supportsImage/Video/Audio:true,supportsFrames:true,maxImages:10,maxVideos:5,maxAudios:5` | 原 `input` 中普通模式 `images/videos/audios`；首帧 `input_reference`；首尾帧 `media:[{type:'first_frame',url},{type:'last_frame',url}]` |
+
+三种视频表示互斥。首尾帧按原参考顺序取两张；超过两张或带音视频时要求选择普通 Reference 模式，不能静默忽略素材。LLM 的图片/视频数量按每条消息计算。数量上限来自已确认的 relay/后端目录，前端先提示，后端再次校验；不添加新的请求时限、重试或裁剪。音视频实际格式、时长与上游可读性由后端/上游校验。ali-llm 图片及视频理解由主会话真实调用核实，音频返回不支持，故前端不开放音频理解。过短视频可能被上游拒绝，前端不猜测最短时长。
+
+参考继续调用 `workbenchReference`：本地数据先上传为用户自有素材，前端发送同源素材引用，后端 `ownedNativeMedia` 校验归属并转为上游可访问 URL。图片消息不再压平成文字；已有不支持的连线会阻止提交并提示用户调整。旧请求键、异步任务查询、结果恢复和收费检查不变。本轮未扩大语音的格式/变速/指令参数；仍沿用先前平台参数范围，新增单音频参考音色。
+
+复验：连接已有图片节点到 ali-image，检查请求含 images；连接到 ali-llm，检查 text/image_url 顺序保留，并连接视频检查 video_url 保留；连接单音频到 ali-audio，检查 ref_audio；在 ali-video 参数中切换 Frames/Reference，分别确认一图首帧、两图首尾帧和图/视频/音频混合参考。对超限、帧混合音频、不支持的 LLM 音频进行负例验证，确认没有生成请求发出。参考选择横幅仍无 My Assets 按钮，已有节点、连线和本地数据保留。
+
+本轮 `bun run typecheck`、`bun test`（22 个外层测试、25 个隔离用例）通过；海外版与独立版生产构建通过，保留现有大包警告。协议回归覆盖自有素材字段、参考顺序、互斥/超限、LLM 每消息图片/视频限制与音频拒绝。独立本地浏览器页以 390px 容器挂载真实视频/音频参数组件，确认首尾帧/普通参考往返切换、英文说明换行及音频参考提示；这不是整页手机或真机验收。Image Studio、画布音频/文本节点的完整连线交互及发布后检查仍由主会话完成；本轮未在浏览器执行真实生成或操作生产数据。

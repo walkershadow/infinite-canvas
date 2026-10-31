@@ -53,6 +53,10 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
         return <div className={className} style={{ color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
             <SettingGroup title="Duration" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.durations.map((value) => <OptionPill key={value} selected={Number(config.videoSeconds) === value} theme={theme} onClick={() => onConfigChange("videoSeconds", String(value))}>{value}s</OptionPill>)}</div></SettingGroup>
             <SettingGroup title="Aspect ratio" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.ratios.map((item) => <OptionPill key={item.value} selected={selectedRatio === item.value} theme={theme} onClick={() => onConfigChange("size", item.value)}>{item.label}</OptionPill>)}</div></SettingGroup>
+            {model?.supportsFrames && <SettingGroup title="Reference mode" color={theme.node.muted}>
+                <div className="flex flex-wrap gap-2">{videoModeOptions.map((item) => <OptionPill key={item.value} selected={videoMode === item.value} theme={theme} onClick={() => onConfigChange("videoMode", item.value)}>{t(`settingsPanels.video.modes.${item.labelKey}`)}</OptionPill>)}</div>
+                <p className="mt-2 text-xs" style={{ color: theme.node.muted }}>{videoMode === "frames" ? "One image is the first frame; two images are the first and last frames, in reference order. Video and audio references cannot be mixed with frames." : "Use images, videos and audio as ordinary references. No first or last frame is assigned."}</p>
+            </SettingGroup>}
             <p className="text-xs" style={{ color: theme.node.muted }}>Model options and pricing are managed by Workbench.</p>
         </div>;
     }

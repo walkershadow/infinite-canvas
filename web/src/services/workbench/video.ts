@@ -17,3 +17,15 @@ export function workbenchVideoInput(config: AiConfig) {
     if (!Number.isFinite(points) || points < 0 || !(session.pointsPerUsd > 0)) throw new Error("Workbench pricing is unavailable. Refresh the model catalog before generating.");
     return { model, duration, ratio, points, currency: session.currency, usd: points / session.pointsPerUsd };
 }
+
+/** Keep frame and ordinary references mutually exclusive; never discard excess inputs. */
+export function workbenchVideoReferenceMode(model: import("@/types/workbench").WorkbenchModel, mode: string, counts: { images: number; videos: number; audios: number }) {
+    for (const [kind, supported, maximum] of [["images", model.supportsImage, model.maxImages], ["videos", model.supportsVideo, model.maxVideos], ["audios", model.supportsAudio, model.maxAudios]] as const) {
+        if (counts[kind] && !supported) throw new Error(`This model does not support reference ${kind}.`);
+        if (maximum != null && counts[kind] > maximum) throw new Error(`This model accepts at most ${maximum} reference ${kind}. Disconnect extra references before generating.`);
+    }
+    if (!model.supportsFrames || mode === "reference") return "reference";
+    if (counts.videos || counts.audios) throw new Error("Frame mode cannot include video or audio references. Choose Reference mode for mixed media.");
+    if (counts.images > 2) throw new Error("Frame mode accepts one first frame or two first/last frames. Choose Reference mode for more images.");
+    return counts.images === 2 ? "first-last" : counts.images === 1 ? "first" : "none";
+}

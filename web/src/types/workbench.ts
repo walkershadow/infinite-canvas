@@ -12,12 +12,16 @@ export type WorkbenchModel = {
     supportsImage: boolean;
     supportsVideo: boolean;
     supportsAudio: boolean;
+    supportsFrames?: boolean;
+    maxImages?: number;
+    maxVideos?: number;
+    maxAudios?: number;
     freeQuota: boolean;
 };
 export type WorkbenchBootstrap = {
     user: { id: string; name?: string; image?: string };
     models: WorkbenchModel[];
-    aiModels?: { id: string; name: string; capability: "image" | "text" | "audio"; price: number; constraints?: Record<string, unknown> }[];
+    aiModels?: { id: string; name: string; capability: "image" | "text" | "audio"; price: number; constraints?: { textOnly?: boolean; maxImages?: number; maxVideos?: number; referenceAudio?: boolean; maxAudios?: number; referenceKinds?: ("text" | "image" | "video" | "audio")[] } }[];
     quota: { points: number; daily: { remaining: number } };
     capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean };
     currency: string;
