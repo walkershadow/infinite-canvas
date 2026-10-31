@@ -1,3 +1,4 @@
+import { workbenchSession } from "@/services/api/workbench";
 import { useEffect, useId, useMemo, useState } from "react";
 import { Cpu } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -24,7 +25,8 @@ export function ModelPicker({ config, value, onChange, capability, className, fu
     const [open, setOpen] = useState(false);
     const options = useMemo(() => Array.from(new Set([...(config.channelMode === "local" && !capability ? [value] : []), ...selectableModelsByCapability(config, capability)].filter((model): model is string => Boolean(model)))), [capability, config, value]);
     const current = value || "";
-    const platformHint = isWorkbenchModel(config, current) ? capability === "image" ? "Text-to-image only · default 1024×1024 · 512–2048px · no transparency · quality is provider-controlled" : capability === "audio" ? "Text only · up to 500 characters · alloy/default · WAV · speed 1" : capability === "text" ? "Text messages only · no media or tools · reasoning is provider-controlled" : "" : "";
+    const limits = isWorkbenchModel(config, current) ? workbenchSession().aiModels?.find((item) => item.id === modelOptionName(current))?.constraints : undefined;
+    const platformHint = isWorkbenchModel(config, current) ? capability === "image" ? `${limits?.textOnly === false ? `Reference editing${limits.maxImages != null ? ` · up to ${limits.maxImages} images` : ""}` : "Text-to-image only"} · default 1024×1024 · 512–2048px · no transparency · quality is provider-controlled` : capability === "audio" ? `${limits?.referenceAudio ? "One reference audio for voice cloning" : "Text only"} · up to 500 characters · alloy/default · WAV · speed 1` : capability === "text" ? `${limits?.referenceKinds?.join(", ") || "Text messages only"} · no tools · reasoning is provider-controlled` : "" : "";
     const pickerPlaceholder = placeholder || t("settingsPanels.model.select");
 
     useEffect(() => {

@@ -355,8 +355,11 @@ function InfiniteCanvasPage() {
                     throw new DOMException("Aborted", "AbortError");
                 }
                 const target = nodesRef.current.find((item) => item.id === nodeId);
-                requestKey = (!target?.metadata?.content && target?.metadata?.workbenchRequestKey) || crypto.randomUUID();
-                const next = nodesRef.current.map((item) => item.id === nodeId ? { ...item, metadata: { ...item.metadata, workbenchRequestKey: requestKey } } : item);
+                const signature = JSON.stringify({ model: config.model, prompt, duration: estimate.duration, ratio: estimate.ratio, videoMode: config.videoMode, images: (images || []).map((item) => item.storageKey || item.dataUrl), videos: videos.map((item) => item.storageKey || item.url), audios: audios.map((item) => item.storageKey || item.url) });
+                const pendingKey = !target?.metadata?.content && target?.metadata?.workbenchRequestKey;
+                if (pendingKey && !target?.metadata?.workbenchRequestSignature) throw new Error("An earlier video request has an unknown outcome. Check its task before starting another generation.");
+                requestKey = pendingKey && target?.metadata?.workbenchRequestSignature === signature ? pendingKey : crypto.randomUUID();
+                const next = nodesRef.current.map((item) => item.id === nodeId ? { ...item, metadata: { ...item.metadata, workbenchRequestKey: requestKey, workbenchRequestSignature: signature } } : item);
                 nodesRef.current = next;
                 setNodes(next);
                 updateProject(projectId, { nodes: next, connections: connectionsRef.current });
@@ -2627,6 +2630,7 @@ function InfiniteCanvasPage() {
                         height: reuseVideoNode ? sourceNode.height : spec.height,
                         metadata: {
                             prompt: effectivePrompt,
+                            workbenchRequestSignature: reuseVideoNode && !sourceNode?.metadata?.content ? sourceNode?.metadata?.workbenchRequestSignature : undefined,
                             workbenchRequestKey: reuseVideoNode && !sourceNode?.metadata?.content ? sourceNode?.metadata?.workbenchRequestKey : undefined,
                             status: NODE_STATUS_LOADING,
                             model: generationConfig.model,

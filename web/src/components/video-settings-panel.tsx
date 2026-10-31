@@ -1,3 +1,4 @@
+import { workbenchVideoSelection } from "@/services/workbench/video";
 import { workbenchSession } from "@/services/api/workbench";
 import { isWorkbenchModel, modelOptionName } from "@/stores/use-config-store";
 import { type ReactNode } from "react";
@@ -50,9 +51,10 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
 
     if (isWorkbenchModel(config, config.model || config.videoModel)) {
         const model = workbenchSession().models.find((item) => item.id === modelOptionName(config.model || config.videoModel));
+        const selected = model ? workbenchVideoSelection(config, model) : undefined;
         return <div className={className} style={{ color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
-            <SettingGroup title="Duration" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.durations.map((value) => <OptionPill key={value} selected={Number(config.videoSeconds) === value} theme={theme} onClick={() => onConfigChange("videoSeconds", String(value))}>{value}s</OptionPill>)}</div></SettingGroup>
-            <SettingGroup title="Aspect ratio" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.ratios.map((item) => <OptionPill key={item.value} selected={selectedRatio === item.value} theme={theme} onClick={() => onConfigChange("size", item.value)}>{item.label}</OptionPill>)}</div></SettingGroup>
+            <SettingGroup title="Duration" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.durations.map((value) => <OptionPill key={value} selected={selected?.duration === value} theme={theme} onClick={() => onConfigChange("videoSeconds", String(value))}>{value}s</OptionPill>)}</div></SettingGroup>
+            <SettingGroup title="Aspect ratio" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.ratios.map((item) => <OptionPill key={item.value} selected={selected?.ratio === item.value} theme={theme} onClick={() => { onConfigChange("size", item.value); if (model.id === "ali-video") onConfigChange("vquality", item.value.endsWith("-1080p") ? "1080" : "720"); }}>{item.label}</OptionPill>)}</div></SettingGroup>
             {model?.supportsFrames && <SettingGroup title="Reference mode" color={theme.node.muted}>
                 <div className="flex flex-wrap gap-2">{videoModeOptions.map((item) => <OptionPill key={item.value} selected={videoMode === item.value} theme={theme} onClick={() => onConfigChange("videoMode", item.value)}>{t(`settingsPanels.video.modes.${item.labelKey}`)}</OptionPill>)}</div>
                 <p className="mt-2 text-xs" style={{ color: theme.node.muted }}>{videoMode === "frames" ? "One image is the first frame; two images are the first and last frames, in reference order. Video and audio references cannot be mixed with frames." : "Use images, videos and audio as ordinary references. No first or last frame is assigned."}</p>

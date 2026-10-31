@@ -1,4 +1,5 @@
-import { isWorkbenchModel } from "@/stores/use-config-store";
+import { workbenchSession } from "@/services/api/workbench";
+import { isWorkbenchModel, modelOptionName } from "@/stores/use-config-store";
 import { type ReactNode, useState } from "react";
 import { ConfigProvider, Switch } from "antd";
 import { useTranslation } from "react-i18next";
@@ -34,6 +35,7 @@ type ImageSettingsPanelProps = {
 
 export function ImageSettingsPanel({ config, onConfigChange, theme, showTitle = true, className = "w-[320px] space-y-4 rounded-2xl px-1 py-0.5", maxCount = 15, quickCount = 10 }: ImageSettingsPanelProps) {
     const { t } = useTranslation();
+    const limits = isWorkbenchModel(config, config.model) ? workbenchSession().aiModels?.find((item) => item.id === modelOptionName(config.model))?.constraints : undefined;
     const [snapDimensionToStep, setSnapDimensionToStep] = useState(true);
     const quality = config.quality || "auto";
     const count = Math.max(1, Math.min(maxCount, Math.floor(Math.abs(Number(config.count)) || 1)));
@@ -64,7 +66,7 @@ export function ImageSettingsPanel({ config, onConfigChange, theme, showTitle = 
                 }}
             >
                 {showTitle ? <div className="text-lg font-semibold">{t("settingsPanels.image.title")}</div> : null}
-                {isWorkbenchModel(config, config.model) && <p className="text-xs leading-relaxed" style={{ color: theme.node.muted }}>Platform images: text only, default 1024×1024, dimensions 512–2048px. Transparent backgrounds are not supported. Quality is controlled by the provider; the quality selector has no effect on this platform model.</p>}
+                {isWorkbenchModel(config, config.model) && <p className="text-xs leading-relaxed" style={{ color: theme.node.muted }}>Platform images: {limits?.textOnly === false ? `reference editing supported${limits.maxImages != null ? `, up to ${limits.maxImages} reference images` : ""}` : "text only"}, default 1024×1024, dimensions 512–2048px. Transparent backgrounds are not supported. Quality is controlled by the provider; the quality selector has no effect on this platform model.</p>}
                 <div className="space-y-2.5">
                     <SettingTitle color={theme.node.muted}>{t("settingsPanels.image.quality")}</SettingTitle>
                     <div className="grid grid-cols-3 gap-2.5">

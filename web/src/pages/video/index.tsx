@@ -1,8 +1,8 @@
 import { ensureAssetVideoCover } from "@/services/asset-video-cover";
 import { canResumePlatformVideo, pollVideoTaskWindow } from "./poll-video-task";
-import { workbenchVideoInput } from "@/services/workbench/video";
+import { workbenchVideoInput, workbenchVideoSelection } from "@/services/workbench/video";
 import { isOverseas } from "@/constant/integration";
-import { accountDatabaseName } from "@/services/api/workbench";
+import { accountDatabaseName, workbenchSession } from "@/services/api/workbench";
 import { ArrowLeft, ArrowRight, BookOpen, CheckSquare, ClipboardPaste, Download, FolderPlus, History, LoaderCircle, Plus, SlidersHorizontal, Sparkles, Trash2, Upload, VideoIcon } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type DragEvent } from "react";
 import { App, Button, Checkbox, Drawer, Empty, Input, Modal, Tag, Typography } from "antd";
@@ -23,7 +23,7 @@ import { resolveImageUrl, ensureImagePreview, getImagePreviewRevision, previewUr
 import { createVideoGenerationTask, storeGeneratedVideo, type VideoGenerationTask } from "@/services/api/video";
 import { useAssetStore } from "@/stores/use-asset-store";
 import { useWorkbenchAgentStore } from "@/stores/use-workbench-agent-store";
-import { boolConfig, isWorkbenchModel, modelOptionLabel, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
+import { boolConfig, isWorkbenchModel, modelOptionName, modelOptionLabel, useConfigStore, useEffectiveConfig, type AiConfig } from "@/stores/use-config-store";
 import { useThemeStore } from "@/stores/use-theme-store";
 import type { ReferenceImage } from "@/types/image";
 import i18n from "@/i18n";
@@ -115,6 +115,23 @@ export default function VideoPage() {
     const agentTaskIdRef = useRef<string | undefined>(undefined);
 
     const model = effectiveConfig.videoModel || effectiveConfig.model;
+    const platformModel = isWorkbenchModel(effectiveConfig, model) ? workbenchSession().models.find((item) => item.id === modelOptionName(model)) : undefined;
+    useEffect(() => {
+        if (!platformModel) return;
+        const selected = workbenchVideoSelection(effectiveConfig, platformModel);
+        if (selected.ratio && selected.ratio !== effectiveConfig.size) updateConfig("size", selected.ratio);
+        if (String(selected.duration) !== effectiveConfig.videoSeconds) updateConfig("videoSeconds", String(selected.duration));
+        if (platformModel.id === "ali-video") {
+            const quality = selected.ratio?.endsWith("-1080p") ? "1080" : "720";
+            if (quality !== effectiveConfig.vquality) updateConfig("vquality", quality);
+        }
+    }, [platformModel, effectiveConfig.size, effectiveConfig.videoSeconds, effectiveConfig.vquality, updateConfig]);
+    const referenceLimit = platformModel ? (platformModel.supportsFrames && effectiveConfig.videoMode !== "reference" ? 2 : platformModel.maxImages ?? 7) : 7;
+    const rejectExtraReferences = (count: number) => {
+        if (!platformModel || references.length + count <= referenceLimit) return false;
+        message.warning(`This reference mode accepts at most ${referenceLimit} images. Remove extra images or change reference mode.`);
+        return true;
+    };
     const currentLog = logs.find((log) => log.id === currentLogId);
     const resumableLog = canResumePlatformVideo(currentLog) ? currentLog : undefined;
     const canGenerate = Boolean(prompt.trim());
@@ -144,14 +161,15 @@ export default function VideoPage() {
         const selectedFiles = Array.from(files || []);
         const unsupported = selectedFiles.filter((file) => !file.type.startsWith("image/"));
         if (unsupported.length) message.warning(t("videoWorkbench.unsupportedFiles"));
-        const imageFiles = selectedFiles.filter((file) => file.type.startsWith("image/")).slice(0, 7 - references.length);
+        if (rejectExtraReferences(selectedFiles.filter((file) => file.type.startsWith("image/")).length)) return;
+        const imageFiles = selectedFiles.filter((file) => file.type.startsWith("image/")).slice(0, Math.max(0, referenceLimit - references.length));
         const nextReferences = await Promise.all(
             imageFiles.map(async (file) => {
                 const image = await uploadImage(file);
                 return { id: nanoid(), name: file.name, type: image.mimeType, dataUrl: image.url, storageKey: image.storageKey };
             }),
         );
-        setReferences((value) => [...value, ...nextReferences].slice(0, 7));
+        setReferences((value) => [...value, ...nextReferences].slice(0, referenceLimit));
     };
 
     const handleReferenceDragEnter = (event: DragEvent<HTMLDivElement>) => {
@@ -181,13 +199,14 @@ export default function VideoPage() {
                 message.error(t("videoWorkbench.clipboardEmpty"));
                 return;
             }
+            if (rejectExtraReferences(blobs.length)) return;
             const nextReferences = await Promise.all(
-                blobs.slice(0, 7 - references.length).map(async (blob, index) => {
+                blobs.slice(0, Math.max(0, referenceLimit - references.length)).map(async (blob, index) => {
                     const image = await uploadImage(blob);
                     return { id: nanoid(), name: `clipboard-${index + 1}.png`, type: image.mimeType, dataUrl: image.url, storageKey: image.storageKey };
                 }),
             );
-            setReferences((value) => [...value, ...nextReferences].slice(0, 7));
+            setReferences((value) => [...value, ...nextReferences].slice(0, referenceLimit));
             message.success(t("videoWorkbench.clipboardAdded", { count: nextReferences.length }));
         } catch {
             message.error(t("videoWorkbench.clipboardEmpty"));
@@ -215,8 +234,9 @@ export default function VideoPage() {
                 const estimate = workbenchVideoInput(snapshot.config);
                 const confirmed = await new Promise<boolean>((resolve) => modal.confirm({ title: "Generate video", content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). ${estimate.model.freeQuota ? "Workbench applies eligible free quota." : "This model does not use daily free quota."}`, okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false) }));
                 if (!confirmed) { setRunning(false); setResults([]); return; }
-                const signature = JSON.stringify({ prompt: snapshot.text, model, duration: estimate.duration, ratio: estimate.ratio, references: snapshot.references.map((item) => item.storageKey || item.id) });
+                const signature = JSON.stringify({ prompt: snapshot.text, model, duration: estimate.duration, ratio: estimate.ratio, videoMode: snapshot.config.videoMode, references: snapshot.references.map((item) => item.storageKey || item.id) });
                 const previous = await requestStore.getItem<{ signature: string; requestKey: string }>("workbench-pending-request");
+                if (previous && !JSON.parse(previous.signature).videoMode) throw new Error("An earlier video request has an unknown reference mode. Check its task before starting another generation.");
                 requestKey = previous?.signature === signature ? previous.requestKey : crypto.randomUUID();
                 await requestStore.setItem("workbench-pending-request", { signature, requestKey });
             }
@@ -299,8 +319,9 @@ export default function VideoPage() {
         if (payload.kind === "text") {
             setPrompt(payload.content);
         } else if (payload.kind === "image") {
+            if (rejectExtraReferences(1)) return;
             const stored = await uploadImage(payload.dataUrl);
-            setReferences((value) => [...value, { id: nanoid(), name: payload.title, type: stored.mimeType, dataUrl: stored.url, storageKey: stored.storageKey }].slice(0, 7));
+            setReferences((value) => [...value, { id: nanoid(), name: payload.title, type: stored.mimeType, dataUrl: stored.url, storageKey: stored.storageKey }].slice(0, referenceLimit));
         }
         setAssetPickerOpen(false);
     };
@@ -480,13 +501,13 @@ export default function VideoPage() {
                                             </button>
                                         </div>
                                     ))}
-                                    {!references.length ? <div className="flex min-w-full items-center justify-center text-sm text-stone-500">{referenceDragTarget ? t("videoWorkbench.dropReferences") : t("videoWorkbench.noImages")}</div> : null}
+                                    {!references.length ? <div className="flex min-w-full items-center justify-center text-sm text-stone-500">{referenceDragTarget ? t("videoWorkbench.dropReferences") : (platformModel ? `No reference images. Drag in up to ${referenceLimit} images.` : t("videoWorkbench.noImages"))}</div> : null}
                                 </div>
                             </div>
 
                             <div className="flex items-center justify-between rounded-lg border border-stone-200 bg-stone-50 px-3 py-2 text-sm dark:border-stone-800 dark:bg-stone-900 sm:hidden">
                                 <span className="truncate text-stone-500 dark:text-stone-400">
-                                    {modelOptionLabel(effectiveConfig, model)} · {normalizeResolution(effectiveConfig.vquality)}p · {videoSizeLabel(effectiveConfig.size)} · {normalizeVideoSeconds(effectiveConfig.videoSeconds)}s · {videoModeLabel(effectiveConfig.videoMode)}
+                                    {modelOptionLabel(effectiveConfig, model)} · {normalizeResolution(effectiveConfig.vquality)}p · {platformModel ? effectiveConfig.size : videoSizeLabel(effectiveConfig.size)} · {normalizeVideoSeconds(effectiveConfig.videoSeconds)}s · {videoModeLabel(effectiveConfig.videoMode)}
                                 </span>
                                 <Button size="small" type="text" icon={<SlidersHorizontal className="size-4" />} onClick={() => setSettingsOpen(true)}>
                                     {t("workbench.adjust")}
@@ -562,7 +583,7 @@ function GenerationSettings({ config, model, updateConfig, openConfigDialog }: {
                 <ModelPicker config={config} value={model} onChange={(value) => updateConfig("videoModel", value)} capability="video" fullWidth onMissingConfig={() => openConfigDialog(false)} />
             </label>
             <div className="col-span-2">
-                <VideoSettingsPanel config={config} onConfigChange={(key, value) => updateConfig(key, value)} theme={theme} showTitle={false} className="space-y-4" />
+                <VideoSettingsPanel config={isWorkbenchModel(config, model) ? { ...config, model } : config} onConfigChange={(key, value) => updateConfig(key, value)} theme={theme} showTitle={false} className="space-y-4" />
             </div>
         </>
     );
@@ -820,7 +841,7 @@ function buildVideoConfig(config: AiConfig, model: string): AiConfig {
         ...config,
         model,
         videoModel: model,
-        size: normalizeVideoSize(config.size),
+        size: isWorkbenchModel(config, model) ? config.size : normalizeVideoSize(config.size),
         videoSeconds: normalizeVideoSeconds(config.videoSeconds),
         vquality: normalizeResolution(config.vquality),
         videoGenerateAudio: String(boolConfig(config.videoGenerateAudio, true)),

@@ -560,6 +560,16 @@ test("ali reference contracts preserve owned media, frame roles and multimodal m
             { role: "user", content: Array(6).fill({ type: "image_url", image_url: { url: image.dataUrl } }) },
             { role: "user", content: Array(6).fill({ type: "image_url", image_url: { url: image.dataUrl } }) },
         ], () => {}, { owner: { nodeId: "per-message-limits" } });
+        const { workbenchVideoInput } = await import("@/services/workbench/video");
+        videoModel.ratios = ["16:9", "9:16", "16:9-1080p", "9:16-1080p"].map((value) => ({ value, label: value, size: value }));
+        for (const ratio of videoModel.ratios) {
+            const selected = { ...videoConfig, size: ratio.value, vquality: ratio.value.endsWith("-1080p") ? "1080" : "720", videoMode: "reference" };
+            expect(workbenchVideoInput(selected).ratio).toBe(ratio.value);
+            await createVideoGenerationTask(selected, "Fixture", [], { requestKey: `ratio-${ratio.value}` });
+            expect(lastVideoInput().ratio).toBe(ratio.value);
+        }
+        expect(workbenchVideoInput({ ...videoConfig, videoSeconds: "6", vquality: "480" }).duration).toBe(videoModel.defaultDuration);
+        expect(workbenchVideoInput({ ...videoConfig, vquality: "480" }).ratio).toBe("16:9");
         const before = requests.length;
         await expect(platformImages(config, "Fixture", Array(11).fill(image))).rejects.toThrow("10");
         await expect(platformText({ ...config, model: config.textModel }, [{ role: "user", content: Array(11).fill({ type: "image_url", image_url: { url: image.dataUrl } }) }], () => {})).rejects.toThrow("10");

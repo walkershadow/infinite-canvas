@@ -85,6 +85,7 @@ export type CanvasNodeMetadata = {
     videoTaskProvider?: "openai" | "gemini" | "workbench";
     workbenchProjectId?: string;
     workbenchRequestKey?: string;
+    workbenchRequestSignature?: string;
     groupId?: string;
     interactive?: boolean; // Plugin node interaction/move state; see CanvasNodeDefinition.interactionToggle.
 };
