@@ -1,3 +1,4 @@
+import { pinchViewport } from "@/lib/canvas/canvas-touch";
 import React, { useEffect, useRef, useState } from "react";
 
 import { canvasThemes, type CanvasBackgroundMode } from "@/lib/canvas-theme";
@@ -15,10 +16,11 @@ type InfiniteCanvasProps = {
     onCanvasDoubleClick?: (event: React.MouseEvent<HTMLDivElement>) => void;
     onContextMenu?: (event: React.MouseEvent) => void;
     onDrop?: (event: React.DragEvent<HTMLDivElement>) => void;
+    onGestureStart?: () => void;
     children: React.ReactNode;
 };
 
-export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = "lines", onViewportChange, onCanvasMouseDown, onCanvasDeselect, onCanvasDoubleClick, onContextMenu, onDrop, children }: InfiniteCanvasProps) {
+export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = "lines", onViewportChange, onCanvasMouseDown, onCanvasDeselect, onCanvasDoubleClick, onContextMenu, onDrop, onGestureStart, children }: InfiniteCanvasProps) {
     const theme = canvasThemes[useThemeStore((state) => state.theme)];
     const panState = useRef({
         isPanning: false,
@@ -29,6 +31,9 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
         hasMoved: false,
         startedOnBackground: false,
     });
+    const touches = useRef(new Map<number, { x: number; y: number }>());
+    const viewportRef = useRef(viewport);
+    viewportRef.current = viewport;
     const scaleRef = useRef(viewport.k);
     const frameRef = useRef<number | null>(null);
     const nextViewportRef = useRef<ViewportTransform | null>(null);
@@ -69,6 +74,7 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
         const handleBlur = () => {
             setIsSpacePressed(false);
             setIsControlPressed(false);
+            touches.current.clear();
             panState.current.isPanning = false;
             setIsPanning(false);
             document.body.style.cursor = "";
@@ -113,7 +119,7 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
         const isBackgroundClick = !target?.closest("[data-node-id],[data-connection-id]");
         const temporaryTool = event.ctrlKey || isSpacePressed;
         const activeTool = temporaryTool ? (tool === "select" ? "pan" : "select") : tool;
-        const shouldPan = event.button === 1 || (event.button === 0 && activeTool === "pan" && isBackgroundClick);
+        const shouldPan = event.button === 1 || (event.button === 0 && (activeTool === "pan" || event.pointerType === "touch") && isBackgroundClick);
 
         if (shouldPan) {
             event.preventDefault();
@@ -147,6 +153,22 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
 
     useEffect(() => {
         const handlePointerMove = (event: PointerEvent) => {
+            const points = touches.current;
+            if (points.has(event.pointerId)) {
+                const before = [...points.values()].slice(0, 2);
+                const rect = containerRef.current?.getBoundingClientRect();
+                if (!rect) return;
+                points.set(event.pointerId, { x: event.clientX - rect.left, y: event.clientY - rect.top });
+                if (points.size >= 2) {
+                    if (frameRef.current) cancelAnimationFrame(frameRef.current);
+                    frameRef.current = null;
+                    const next = pinchViewport(viewportRef.current, before as [{ x: number; y: number }, { x: number; y: number }], [...points.values()].slice(0, 2) as [{ x: number; y: number }, { x: number; y: number }]);
+                    viewportRef.current = next;
+                    scaleRef.current = next.k;
+                    onViewportChange(next);
+                    return;
+                }
+            }
             if (!panState.current.isPanning) return;
 
             const dx = event.clientX - panState.current.startX;
@@ -167,7 +189,17 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
             });
         };
 
-        const handlePointerUp = () => {
+        const handlePointerUp = (event: PointerEvent) => {
+            const wasPinching = touches.current.size >= 2;
+            touches.current.delete(event.pointerId);
+            if (wasPinching) {
+                const remaining = [...touches.current.values()][0];
+                const rect = containerRef.current?.getBoundingClientRect();
+                if (remaining && rect) {
+                    panState.current = { isPanning: true, startX: remaining.x + rect.left, startY: remaining.y + rect.top, initialX: viewportRef.current.x, initialY: viewportRef.current.y, hasMoved: true, startedOnBackground: false };
+                    return;
+                }
+            }
             if (!panState.current.isPanning) return;
 
             if (!panState.current.hasMoved && panState.current.startedOnBackground) {
@@ -187,7 +219,7 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
             window.removeEventListener("pointercancel", handlePointerUp);
             document.body.style.cursor = "";
         };
-    }, [onCanvasDeselect, onViewportChange]);
+    }, [containerRef, onCanvasDeselect, onViewportChange]);
 
     useEffect(() => {
         const container = containerRef.current;
@@ -211,7 +243,20 @@ export function InfiniteCanvas({ containerRef, viewport, tool, backgroundMode = 
         <div
             ref={containerRef}
             className="relative h-full w-full select-none overflow-hidden"
-            style={{ background: theme.canvas.background, cursor }}
+            style={{ background: theme.canvas.background, cursor, touchAction: "none" }}
+            onPointerDownCapture={(event) => {
+                if (event.pointerType !== "touch" || (event.target as Element).closest("[data-canvas-no-zoom],input,textarea,button,video,audio,[contenteditable=true]")) return;
+                const rect = event.currentTarget.getBoundingClientRect();
+                touches.current.set(event.pointerId, { x: event.clientX - rect.left, y: event.clientY - rect.top });
+                if (touches.current.size < 2) return;
+                event.preventDefault();
+                event.stopPropagation();
+                event.currentTarget.setPointerCapture(event.pointerId);
+                if (frameRef.current) cancelAnimationFrame(frameRef.current);
+                frameRef.current = null;
+                panState.current.isPanning = false;
+                onGestureStart?.();
+            }}
             onPointerDown={handlePointerDown}
             onDoubleClick={handleDoubleClick}
             onWheel={handleWheel}

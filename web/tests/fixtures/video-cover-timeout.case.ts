@@ -102,3 +102,8 @@ test("cloud source download shares the 30-second deadline and is aborted before 
         expect(assets[1].videoCover.storageKey).toBe("image:cover");
     } finally { globalThis.setTimeout = originalTimer; globalThis.clearTimeout = originalClear; }
 });
+
+test("cold-device media display returns its authenticated URL without downloading the full video", async () => {
+    const { resolveMediaUrl } = await import("@/services/file-storage");
+    expect(await resolveMediaUrl("video:workbench:remote", "blob:expired-on-another-device")).toBe("/owned-video");
+});

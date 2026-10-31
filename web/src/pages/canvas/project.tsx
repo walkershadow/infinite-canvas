@@ -1,3 +1,5 @@
+import { loadProjectVideoTasks } from "@/services/workbench/projects";
+import { isVideoRecoveryTarget, recoverVideoNodes } from "@/lib/canvas/workbench-video-recovery";
 import { isCompatibleReference, referenceKindsForNode } from "@/lib/canvas/canvas-reference-selection";
 import { isWorkbenchTaskPending } from "@/services/api/workbench-ai-tasks";
 import { useWorkbenchAiRecovery } from "./hooks/use-workbench-ai-recovery";
@@ -25,7 +27,7 @@ import { useThemeStore } from "@/stores/use-theme-store";
 import { cropDataUrl, splitDataUrl, upscaleDataUrl } from "@/lib/canvas/canvas-image-data";
 import { fitNodeSize, nodeSizeFromRatio } from "@/lib/canvas/canvas-node-size";
 import { captureVideoFrame, type VideoFramePosition } from "@/lib/canvas/canvas-video-frame";
-import { App, Button, Modal } from "antd";
+import { App, Button, Grid, Modal } from "antd";
 import { NODE_DEFAULT_SIZE, getNodeSpec } from "@/constant/canvas";
 import { ActiveConnectionPath, ConnectionPath } from "@/components/canvas/canvas-connections";
 import { CanvasConfigComposer } from "@/components/canvas/canvas-config-composer";
@@ -180,6 +182,20 @@ function InfiniteCanvasPage() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const projectId = params.id || "";
+    const activeProjectIdRef = useRef(projectId);
+    activeProjectIdRef.current = projectId;
+    const loadedProjectIdRef = useRef("");
+    const compactCanvas = Grid.useBreakpoint().md === false;
+    const [keyboardInset, setKeyboardInset] = useState(0);
+    useEffect(() => {
+        if (!compactCanvas || !window.visualViewport) return;
+        const viewport = window.visualViewport;
+        const update = () => setKeyboardInset(Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop));
+        update();
+        viewport.addEventListener("resize", update);
+        viewport.addEventListener("scroll", update);
+        return () => { viewport.removeEventListener("resize", update); viewport.removeEventListener("scroll", update); };
+    }, [compactCanvas]);
     const localAgentConnected = useAgentStore((state) => state.connected);
     const localAgentActivity = useAgentStore((state) => state.activity);
     const localAgentEnabled = useAgentStore((state) => state.enabled);
@@ -365,19 +381,19 @@ function InfiniteCanvasPage() {
                 const generationConfig = buildGenerationConfig(effectiveConfig, node, "video");
                 if (node.metadata?.videoTaskProvider !== "workbench" && !isAiConfigReady(generationConfig, generationConfig.model)) {
                     if (silent) {
-                        setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_ERROR, errorDetails: t("workbench.configFirst") } } : item)));
+                        setNodes((prev) => prev.map((item) => (activeProjectIdRef.current === projectId && isVideoRecoveryTarget(item, node) ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_ERROR, errorDetails: t("workbench.configFirst") } } : item)));
                         return;
                     }
                     openConfigDialog(true);
                     return;
                 }
                 setRunningNodeId(node.id);
-                setNodes((prev) => prev.map((item) => (item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_LOADING, errorDetails: undefined } } : item)));
+                setNodes((prev) => prev.map((item) => (activeProjectIdRef.current === projectId && isVideoRecoveryTarget(item, node) ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_LOADING, errorDetails: undefined } } : item)));
                 controller = startGenerationRequest(node.id, node.id, node.id);
                 const video = await storeGeneratedVideo(await waitForVideoGenerationTask(generationConfig, { id: taskId, provider: node.metadata?.videoTaskProvider === "workbench" ? "workbench" : node.metadata?.videoTaskProvider === "gemini" ? "gemini" : "openai", projectId: node.metadata?.workbenchProjectId, model: generationConfig.model }, { signal: controller.signal }));
                 setNodes((prev) =>
                     prev.map((item) =>
-                        item.id === node.id
+                        activeProjectIdRef.current === projectId && isVideoRecoveryTarget(item, node)
                             ? applyGeneratedVideo(item, video, {
                                   prompt: item.metadata?.prompt,
                                   model: generationConfig.model,
@@ -392,12 +408,12 @@ function InfiniteCanvasPage() {
                     ),
                 );
             } catch (error) {
-                if (isGenerationCanceled(error)) return;
+                if (activeProjectIdRef.current !== projectId || isGenerationCanceled(error)) return;
                 const errorDetails = error instanceof Error ? error.message : t("canvas.projectPage.generationFailed");
                 isWorkbenchTaskPending(error) ? message.info(errorDetails) : message.error(errorDetails);
                 setNodes((prev) =>
                     prev.map((item) =>
-                        item.id === node.id
+                        activeProjectIdRef.current === projectId && isVideoRecoveryTarget(item, node)
                             ? {
                                   ...item,
                                   metadata: {
@@ -418,7 +434,7 @@ function InfiniteCanvasPage() {
                 }
             }
         },
-        [effectiveConfig, finishGenerationRequest, isAiConfigReady, message, openConfigDialog, startGenerationRequest, t],
+        [projectId, effectiveConfig, finishGenerationRequest, isAiConfigReady, message, openConfigDialog, startGenerationRequest, t],
     );
 
     const stopGenerationByRunningId = useCallback((runningId: string) => {
@@ -466,6 +482,7 @@ function InfiniteCanvasPage() {
 
     useEffect(() => {
         if (!hydrated) return;
+        loadedProjectIdRef.current = "";
         setProjectLoaded(false);
         const project = openProject(projectId);
         if (!project) {
@@ -473,9 +490,12 @@ function InfiniteCanvasPage() {
             return;
         }
 
+        let cancelled = false;
         const restore = async () => {
             const restoredNodes = await hydrateCanvasImages(resetInterruptedGeneration(project.nodes));
             const restoredSessions = await hydrateAssistantImages(project.chatSessions || []);
+            if (cancelled) return;
+            nodesRef.current = restoredNodes;
             setNodes(restoredNodes);
             setConnections(project.connections);
             setChatSessions(restoredSessions);
@@ -497,17 +517,33 @@ function InfiniteCanvasPage() {
                 showImageInfo: project.showImageInfo || false,
             };
             setHistoryState({ canUndo: false, canRedo: false });
+            loadedProjectIdRef.current = projectId;
             setProjectLoaded(true);
         };
         void restore();
+        return () => { cancelled = true; };
     }, [hydrated, navigate, openProject, projectId]);
 
+    const resumableVideoTasks = nodes.filter(hasResumableVideoTask).map((node) => `${node.id}:${node.metadata?.videoTaskId}`).join("|");
     useEffect(() => {
-        if (!projectLoaded) return;
-        nodesRef.current.filter(hasResumableVideoTask).forEach((node) => void pollVideoNodeTask(node, true));
-        // Resume once after the current canvas is restored, not on later config identity changes.
+        if (projectLoaded && loadedProjectIdRef.current === projectId) nodes.filter(hasResumableVideoTask).forEach((node) => void pollVideoNodeTask(node, true));
+        // A failed query retains the same identity and waits for an explicit retry.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [projectLoaded]);
+    }, [projectLoaded, resumableVideoTasks]);
+
+    useEffect(() => {
+        if (!projectLoaded || loadedProjectIdRef.current !== projectId) return;
+        let cancelled = false;
+        const snapshot = nodesRef.current;
+
+        if (isOverseas) void loadProjectVideoTasks(projectId).then((tasks) => {
+            if (cancelled) return;
+            setNodes((current) => recoverVideoNodes(current, snapshot, tasks));
+        }).catch((error) => { if (!cancelled) message.error(String(error)); });
+        return () => { cancelled = true; };
+        // Restore each opened project once; ordinary edits must not restart task recovery.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [projectLoaded, projectId]);
 
     useEffect(() => {
         if (isOverseas || !projectLoaded || !["new", "recent", "choose"].includes(searchParams.get("mode") || "")) return;
@@ -1491,8 +1527,10 @@ function InfiniteCanvasPage() {
     );
 
     useEffect(() => {
+        const handleTouchMove = (event: PointerEvent) => { if (event.pointerType === "touch") handleGlobalMouseMove(event); };
         const handlePointerUp = (event: PointerEvent) => finishNodeDrag(event.clientX, event.clientY);
         const cancelNodeDrag = () => finishNodeDrag();
+        window.addEventListener("pointermove", handleTouchMove);
         window.addEventListener("mousemove", handleGlobalMouseMove);
         window.addEventListener("mouseup", handleGlobalMouseUp);
         window.addEventListener("pointerup", handlePointerUp);
@@ -1500,6 +1538,7 @@ function InfiniteCanvasPage() {
         window.addEventListener("blur", cancelNodeDrag);
         window.addEventListener("pointermove", handleGlobalPointerMove);
         return () => {
+            window.removeEventListener("pointermove", handleTouchMove);
             window.removeEventListener("mousemove", handleGlobalMouseMove);
             window.removeEventListener("mouseup", handleGlobalMouseUp);
             window.removeEventListener("pointerup", handlePointerUp);
@@ -3211,7 +3250,7 @@ function InfiniteCanvasPage() {
     if (!projectLoaded) return <CanvasRefreshShell />;
 
     return (
-        <main className="flex h-full min-h-0 overflow-hidden" style={{ background: theme.canvas.background, color: theme.node.text }}>
+        <main className="relative flex h-full min-h-0 overflow-hidden" style={{ background: theme.canvas.background, color: theme.node.text }}>
             <CanvasSidePanel nodes={nodes} selectedNodeIds={selectedNodeIds} onFocusNode={focusNode} onPreviewNode={setPreviewNodeId} onHoverNode={setHoverPreviewNodeId} onInsertAsset={handleAssetInsert} />
             <section className="relative min-w-0 flex-1 overflow-hidden">
                 <CanvasTopBar
@@ -3239,6 +3278,7 @@ function InfiniteCanvasPage() {
                 />
 
                 <InfiniteCanvas
+                    onGestureStart={() => { dragRef.current.hasMoved = true; finishNodeDrag(); }}
                     containerRef={containerRef}
                     viewport={viewport}
                     tool={canvasTool}
@@ -3293,7 +3333,7 @@ function InfiniteCanvasPage() {
                             isConnectionTarget={connectionTargetNodeId === node.id}
                             isConnecting={Boolean(connectingParams)}
                             referenceSelectionState={!referencePickerNodeId ? undefined : node.id === referencePickerNodeId ? "target" : !availableReferenceIds.has(node.id) ? "disabled" : "available"}
-                            showPanel={!isNodeResizing && dialogNodeId === node.id && !selectionBox && !getNodeDefinition(node.type)?.hidePanel}
+                            showPanel={!compactCanvas && !isNodeResizing && dialogNodeId === node.id && !selectionBox && !getNodeDefinition(node.type)?.hidePanel}
                             groupChildCount={groupChildCountById.get(node.id) || 0}
                             isGroupDropTarget={dropTargetGroupId === node.id}
                             batchExpanded={expandedBatchNodeIds.has(node.id)}
@@ -3353,7 +3393,7 @@ function InfiniteCanvasPage() {
                     ) : null}
                 </InfiniteCanvas>
 
-                {referencePickerNodeId ? <div className="absolute left-1/2 top-4 z-[90] w-[min(36rem,calc(100%-2rem))] -translate-x-1/2 space-y-2 p-3 text-sm" style={{ background: theme.toolbar.panel, color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
+                {referencePickerNodeId ? <div className="absolute left-1/2 top-24 md:top-16 z-[90] w-[min(36rem,calc(100%-2rem))] -translate-x-1/2 space-y-2 p-3 text-sm" style={{ background: theme.toolbar.panel, color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
                     <p>{t(availableReferenceIds.size ? "canvas.references.selectingHint" : "canvas.references.noCandidates")}</p>
                     {referenceKinds.length === 1 && <p className="text-xs" style={{ color: theme.node.muted }}>{t("canvas.references.textOnly")}</p>}
                     <div className="flex flex-wrap items-center gap-2">
@@ -3383,6 +3423,11 @@ function InfiniteCanvasPage() {
                         ) : null}
                     </div>
                 </div>
+
+                {compactCanvas && dialogNodeId && !referencePickerNodeId && nodeById.get(dialogNodeId) ? <div data-canvas-no-zoom className="absolute inset-x-2 z-[100] overflow-y-auto rounded-xl" style={{ background: theme.toolbar.panel, bottom: keyboardInset + 8, maxHeight: `calc((100dvh - ${keyboardInset}px) * 0.6)` }}>
+                    <div className="flex justify-end"><Button type="text" onClick={() => setDialogNodeId(null)}>{t("canvas.references.done")}</Button></div>
+                    {renderNodePanel(nodeById.get(dialogNodeId)!)}
+                </div> : null}
 
                 <CanvasNodeHoverToolbar
                     node={isNodeDragging || isNodeResizing || nodeImageSettingsOpen || Boolean(referencePickerNodeId) || expandedBatchNodeIds.has(toolbarNode?.id || "") ? null : toolbarNode}

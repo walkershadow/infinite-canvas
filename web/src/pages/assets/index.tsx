@@ -486,10 +486,12 @@ function AssetDrawer({ asset, onClose, onCopy, onDownload }: { asset: Asset | nu
     useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
     const cover = asset ? assetCoverUrl(asset) : "";
     return (
-        <Drawer title={t("assets.details")} open={Boolean(asset)} size="large" onClose={onClose}>
+        <Drawer title={t("assets.details")} open={Boolean(asset)} destroyOnHidden size="large" onClose={onClose}>
             {asset ? (
                 <div className="space-y-5">
-                    {cover ? (
+                    {asset.kind === "video" ? (
+                        <video key={asset.id} src={asset.data.url} poster={cover || undefined} controls playsInline preload="metadata" className="w-full rounded-lg" />
+                    ) : cover ? (
                         <Image src={assetCoverUrl(asset)} preview={{ src: cover }} alt={asset.title} className="rounded-lg" />
                     ) : (
                         <div className="rounded-lg border border-stone-200 bg-stone-50 p-5 text-sm leading-6 text-stone-600 dark:border-stone-800 dark:bg-stone-900 dark:text-stone-300">{asset.kind === "text" ? asset.data.content : t("assets.noCover")}</div>
@@ -507,12 +509,10 @@ function AssetDrawer({ asset, onClose, onCopy, onDownload }: { asset: Asset | nu
                     </div>
                     <div className="rounded-lg border border-stone-200 p-4 dark:border-stone-800">
                         <Typography.Text type="secondary" className="block text-xs">
-                            {t("assets.fields.textContent")}
+                            {t(asset.kind === "text" ? "assets.fields.textContent" : `assets.kinds.${asset.kind}`)}
                         </Typography.Text>
                         {asset.kind === "text" ? (
                             <Typography.Paragraph className="mt-2 whitespace-pre-wrap">{asset.data.content}</Typography.Paragraph>
-                        ) : asset.kind === "video" ? (
-                            <video src={asset.data.url} poster={cover || undefined} controls className="mt-2 aspect-video w-full rounded-lg bg-black" />
                         ) : (
                             <Typography.Text className="mt-2 block">
                                 {asset.data.width}x{asset.data.height} · {formatBytes(asset.data.bytes)} · {asset.data.mimeType}

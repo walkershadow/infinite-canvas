@@ -25,6 +25,11 @@ export async function resolveMediaUrl(storageKey?: string, fallback = "", signal
     if (!storageKey) return fallback;
     const cached = objectUrls.get(storageKey);
     if (cached) return cached;
+    if (isOverseas) {
+        const { cloudMediaUrl } = await import("@/services/workbench/projects");
+        const cloud = cloudMediaUrl(storageKey);
+        if (cloud && !signal) return cloud;
+    }
     const blob = await getMediaBlob(storageKey, signal);
     signal?.throwIfAborted();
     if (!blob) return fallback;

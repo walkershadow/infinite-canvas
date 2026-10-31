@@ -12,15 +12,22 @@ const previousRecovery = "workbench:library-recovery:previous:v1";
 const recovery = "workbench:library-recovery:v1";
 let queue: Promise<unknown> = Promise.resolve();
 
+let preparation: Promise<void> | undefined;
+export function prepareCloudLibrary() { return preparation ??= Promise.resolve(useAssetStore.persist.rehydrate()); }
+let starting: Promise<void> | undefined;
 let loaded = false;
 let subscribed = false;
 let initializing = false;
 
-export async function initializeCloudLibrary() {
+export function initializeCloudLibrary() {
+    return starting ??= loadCloudLibrary().finally(() => { starting = undefined; });
+}
+async function loadCloudLibrary() {
     if (loaded) return;
     initializing = true;
     try {
-        await useAssetStore.persist.rehydrate();
+        await prepareCloudLibrary();
+        const beforeLoad = useAssetStore.getState().assets;
         if (!subscribed) {
             useAssetStore.subscribe((state, previous) => {
                 if (!initializing && state.assets !== previous.assets) void saveCloudLibrary().catch(() => undefined);
@@ -35,10 +42,9 @@ export async function initializeCloudLibrary() {
             if (!(await localForageStorage.getItem(previousRecovery))) await localForageStorage.setItem(previousRecovery, raw);
             useWorkbenchStore.setState({ libraryRecovery: snapshot });
         }
-        const beforeLoad = useAssetStore.getState().assets;
         const { items } = await workbenchRequest<{ items: Envelope[] }>("/library");
         const local = useAssetStore.getState().assets;
-        if (!raw && local !== beforeLoad) {
+        if (local !== beforeLoad) {
             raw = JSON.stringify(local);
             await localForageStorage.setItem(recovery, raw);
             useWorkbenchStore.setState({ libraryRecovery: local });
@@ -54,11 +60,15 @@ export async function initializeCloudLibrary() {
         if (firstSync && local.length && !raw) await localForageStorage.setItem(recovery, JSON.stringify(local));
         useAssetStore.setState({ assets, hydrated: true });
         loaded = true;
+        initializing = false;
         if (!raw) await saveCloudLibrary();
     } catch (error) {
         useWorkbenchStore.setState({ libraryError: error instanceof Error ? error.message : String(error) });
         throw error;
-    } finally { initializing = false; }
+    } finally {
+        initializing = false;
+        useWorkbenchStore.setState({ libraryReady: loaded });
+    }
 }
 export function saveCloudLibrary() {
     const run = queue.then(async () => {

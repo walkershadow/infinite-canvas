@@ -36,9 +36,9 @@ export function AppTopNav() {
     return (
         <>
             {!hideHeader ? (
-                <header className="sticky top-0 z-20 h-14 shrink-0 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
-                    <div className="mx-auto flex h-full max-w-7xl items-stretch justify-between gap-5 px-6">
-                        <div className="flex min-w-0 items-center">
+                <header className="sticky top-0 z-20 shrink-0 md:h-14 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
+                    <div className="mx-auto flex h-full max-w-7xl flex-col items-stretch justify-between gap-1 px-3 py-2 md:flex-row md:gap-5 md:px-6 md:py-0">
+                        <div className="flex min-w-0 items-center justify-between md:justify-start">
                             <Link to={isOverseas ? `${window.location.origin}/workbench` : "/"} reloadDocument={isOverseas} aria-label={isOverseas ? "Return to Workbench" : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
                                 <span
                                     className="size-5 shrink-0 bg-current"

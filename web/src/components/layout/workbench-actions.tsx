@@ -15,7 +15,7 @@ import { workbenchRequest } from "@/services/api/workbench";
 import type { CloudProject } from "@/types/workbench";
 
 export function WorkbenchActions() {
-    const { ready, saving, error, recovery, balance, libraryError, libraryRecovery, librarySaving } = useWorkbenchStore();
+    const { ready, saving, error, recovery, balance, libraryReady, libraryError, libraryRecovery, librarySaving } = useWorkbenchStore();
     const aiError = useAiTasksStore((state) => state.error);
     const { token } = theme.useToken();
     const [open, setOpen] = useState(false);
@@ -26,7 +26,7 @@ export function WorkbenchActions() {
     const [legacy, setLegacy] = useState<{ id: string; title: string }[]>([]);
     const busy = saving || librarySaving;
     const attention = Boolean(error || libraryError || recovery || libraryRecovery || notice || aiError);
-    const status = attention ? "Cloud storage needs attention" : busy ? "Saving documents…" : ready ? "Documents saved" : "Loading cloud documents…";
+    const status = attention ? "Cloud storage needs attention" : busy ? "Saving documents…" : ready && libraryReady ? "Documents saved" : "Loading cloud documents…";
     const report = (error: unknown) => { setNotice(error instanceof Error ? error.message : String(error)); setOpen(true); };
     const download = (content: string, filename: string) => saveAs(new Blob([content], { type: "application/json" }), filename);
     const exportRecovery = async (previous = false) => {
@@ -48,12 +48,12 @@ export function WorkbenchActions() {
         } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); setImporting(undefined); }
     };
     const details = <div className="w-80 max-w-[calc(100vw-48px)] space-y-3 whitespace-normal text-sm">
-        <div className="flex items-center justify-between gap-3"><span className="font-medium">{status}</span><span className="shrink-0 tabular-nums">{balance} points</span></div>
+        <div className="flex items-center justify-between gap-3"><span className="font-medium">{status}</span><span className="shrink-0 tabular-nums">{balance ?? "…"} points</span></div>
         <p className="text-xs leading-relaxed" style={{ color: token.colorTextSecondary }}>Local media files are uploaded with your documents. External links and task playback URLs are not guaranteed media backups.</p>
         {aiError && <p role="alert" className="break-words text-xs">{aiError}</p>}
         {notice && !importOpen && <div role="alert" className="break-words"><p>{notice}</p><Button type="text" size="small" onClick={() => setNotice("")}>Dismiss</Button></div>}
         {error && <section className="space-y-1" role="alert"><p className="break-words">{error}</p><div className="flex flex-wrap gap-1">
-            <Button type="text" size="small" onClick={() => void retryCloudSave().catch(report)}>Retry save</Button>
+            <Button type="text" size="small" onClick={() => void retryCloudSave().catch(report)}>{ready ? "Retry save" : "Retry loading"}</Button>
             <Button type="text" size="small" onClick={() => void exportRecovery().catch(report)}>Export recovery</Button>
             <Button type="text" size="small" onClick={() => window.location.reload()}>Reload cloud version</Button>
         </div></section>}
@@ -79,8 +79,8 @@ export function WorkbenchActions() {
     </div>;
     return <>
         <Popover trigger="click" placement="bottomRight" open={open} onOpenChange={setOpen} content={details}>
-            <button type="button" aria-label={`${status}. ${balance} points. Open cloud storage`} title={status} className="inline-flex h-7 shrink-0 items-center rounded px-1 text-xs hover:bg-black/5 dark:hover:bg-white/10" style={{ color: attention ? token.colorWarning : token.colorTextSecondary }}>
-                <span className="tabular-nums">{balance} pts</span>
+            <button type="button" aria-label={`${status}. ${balance ?? "…"} points. Open cloud storage`} title={status} className="inline-flex h-7 shrink-0 items-center rounded px-1 text-xs hover:bg-black/5 dark:hover:bg-white/10" style={{ color: attention ? token.colorWarning : token.colorTextSecondary }}>
+                <span className="tabular-nums">{balance ?? "…"} pts</span>
             </button>
         </Popover>
         <Modal title="Import existing Workbench canvas" open={importOpen} onCancel={() => !importing && setImportOpen(false)} footer={null} closable={!importing} maskClosable={!importing}>

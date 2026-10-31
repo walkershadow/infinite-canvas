@@ -23,6 +23,8 @@ let account = "account-a";
 let conflict = false;
 let libraryConflict = false;
 let libraryUnavailable = true;
+let releaseLibrary!: () => void;
+const libraryGate = new Promise<void>((resolve) => { releaseLibrary = resolve; });
 let videoChecks = 0;
 let videoPending = 0;
 let videoQueryError = false;
@@ -65,6 +67,7 @@ globalThis.fetch = mock(async (url: string | URL | Request, init?: RequestInit) 
     if (path.endsWith("/bootstrap")) return Response.json({ user: { id: account }, models: [{ id: "platform-video", name: "Platform video", price: 1, billingUnit: "request", durations: [5], defaultDuration: 5, ratios: [{ value: "16:9", label: "16:9", size: "1280x720" }] }], currency: "USD", pointsPerUsd: 100, quota: { points: 12 }, capabilities: { video: true } });
     if (path.includes("/library") || path.includes("/prompts")) {
         const library = path.includes("/library");
+        if (library) await libraryGate;
         if (library && libraryUnavailable) return Response.json({ error: "Collection offline" }, { status: 503 });
         const records = library ? libraryItems : promptItems;
         const base = library ? "/api/canvas/library" : "/api/canvas/prompts";
@@ -99,7 +102,17 @@ const projects = await import("@/services/workbench/projects");
 const { useCanvasStore } = await import("@/stores/canvas/use-canvas-store");
 const { useWorkbenchStore } = await import("@/stores/use-workbench-store");
 
-beforeAll(async () => { await api.bootstrapWorkbench(); await projects.initializeCloudProjects(); });
+beforeAll(async () => {
+    await api.bootstrapWorkbench();
+    await projects.initializeCloudProjects();
+    expect(useWorkbenchStore.getState().ready).toBe(true);
+    expect(useWorkbenchStore.getState().balance).toBe(12);
+    expect(useWorkbenchStore.getState().libraryReady).toBe(false);
+    expect(requests.some((r) => r.path.includes("/projects/") && r.path.endsWith("/tasks"))).toBe(false);
+    expect(requests.some((r) => r.path.includes("/library") && r.method !== "GET")).toBe(false);
+    releaseLibrary();
+    await (await import("@/services/workbench/library")).initializeCloudLibrary().catch(() => undefined);
+});
 
 test("collection initialization failure and malformed recovery never overwrite preserved bytes", async () => {
     const library = await import("@/services/workbench/library");
@@ -131,13 +144,17 @@ test("new account defaults to platform video and platform creation keeps the req
     expect(request.body.input.model).toBe("platform-video");
 });
 
-test("cloud load keeps native structure and resumes the newest task regardless of response order", () => {
+test("cloud load keeps native structure and discovers tasks only for an opened project", async () => {
     const project = useCanvasStore.getState().projects[0];
     expect(project.id).toBe("native-1");
     expect(project.nodes[0]).toEqual(native.nodes[0]);
     expect(project.viewport).toEqual(native.viewport);
-    expect(project.nodes[1].metadata?.videoTaskId).toBe("new-task");
-    expect(project.nodes[1].metadata?.content).toBe("/api/tasks/new-task/video");
+    const tasks = await projects.loadProjectVideoTasks(project.id);
+    const { recoverVideoNodes } = await import("@/lib/canvas/workbench-video-recovery");
+    const recovered = recoverVideoNodes(project.nodes, project.nodes, tasks);
+    expect(recovered[1].metadata?.videoTaskId).toBe("new-task");
+    expect(recovered[1].metadata?.workbenchProjectId).toBe("cloud-1");
+    expect(project.nodes[1].metadata?.videoTaskId).toBeUndefined();
     expect(requests.filter((r) => r.method === "PUT")).toHaveLength(0);
     expect(requests.some((r) => r.path === "/api/canvas/library")).toBe(true);
     expect(useWorkbenchStore.getState().libraryError).toBe("");

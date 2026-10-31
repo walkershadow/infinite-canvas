@@ -146,6 +146,11 @@ export async function resolveImageUrl(storageKey?: string, fallback = "") {
     if (!storageKey) return fallback;
     const cached = objectUrls.get(storageKey);
     if (cached) return cached;
+    if (isOverseas) {
+        const { cloudMediaUrl } = await import("@/services/workbench/projects");
+        const cloud = cloudMediaUrl(storageKey);
+        if (cloud) return cloud;
+    }
     const blob = await getImageBlob(storageKey);
     if (!blob) return fallback;
     const url = URL.createObjectURL(blob);

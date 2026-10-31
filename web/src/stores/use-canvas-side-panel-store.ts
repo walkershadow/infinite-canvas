@@ -20,7 +20,7 @@ function initialWidth() {
 
 function initialOpen() {
     if (typeof window === "undefined") return true;
-    return localStorage.getItem(OPEN_KEY) !== "0";
+    return !window.matchMedia("(max-width: 767px)").matches && localStorage.getItem(OPEN_KEY) !== "0";
 }
 
 function initialNodeView(): CanvasNodeViewMode {
