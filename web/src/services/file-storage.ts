@@ -20,24 +20,28 @@ export async function uploadMediaFile(input: string | Blob, prefix = "file"): Pr
     return { url, storageKey, bytes: blob.size, mimeType: blob.type || "application/octet-stream", ...meta };
 }
 
-export async function resolveMediaUrl(storageKey?: string, fallback = "") {
+export async function resolveMediaUrl(storageKey?: string, fallback = "", signal?: AbortSignal) {
+    signal?.throwIfAborted();
     if (!storageKey) return fallback;
     const cached = objectUrls.get(storageKey);
     if (cached) return cached;
-    const blob = await getMediaBlob(storageKey);
+    const blob = await getMediaBlob(storageKey, signal);
+    signal?.throwIfAborted();
     if (!blob) return fallback;
     const url = URL.createObjectURL(blob);
     objectUrls.set(storageKey, url);
     return url;
 }
 
-export async function getMediaBlob(storageKey: string) {
+export async function getMediaBlob(storageKey: string, signal?: AbortSignal) {
+    signal?.throwIfAborted();
     const local = await store.getItem<Blob>(storageKey);
+    signal?.throwIfAborted();
     if (local || !isOverseas) return local;
     const { cloudMediaUrl } = await import("@/services/workbench/projects");
     const url = cloudMediaUrl(storageKey);
     if (!url) return null;
-    const response = await fetch(url, { credentials: "same-origin" });
+    const response = await fetch(url, { credentials: "same-origin", signal });
     if (!response.ok) throw new Error("Unable to read owned media.");
     return response.blob();
 }

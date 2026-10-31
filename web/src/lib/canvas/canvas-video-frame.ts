@@ -28,7 +28,17 @@ export async function captureVideoFrame(source: string, position: VideoFramePosi
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         canvas.getContext("2d")!.drawImage(video, 0, 0);
-        return await new Promise<Blob>((resolve, reject) => canvas.toBlob((result) => (result ? resolve(result) : reject(new Error("Failed to capture video frame"))), "image/png"));
+        return await new Promise<Blob>((resolve, reject) => {
+            const abort = () => reject(signal?.reason);
+            signal?.addEventListener("abort", abort, { once: true });
+            try {
+                canvas.toBlob((result) => {
+                    signal?.removeEventListener("abort", abort);
+                    if (result) resolve(result);
+                    else reject(new Error("Failed to capture video frame"));
+                }, "image/png");
+            } catch (error) { signal?.removeEventListener("abort", abort); reject(error); }
+        });
     } finally {
         video.removeAttribute("src");
         video.load();
