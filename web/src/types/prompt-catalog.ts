@@ -1,0 +1,20 @@
+export type CatalogMedia = { kind: "image" | "video"; url: string; caption: string; poster?: string };
+export type OverseasPromptEntry = {
+    id: string;
+    contentKind: "template" | "case";
+    title: string;
+    titleZh?: string;
+    summary: string;
+    summaryZh?: string;
+    relatedIds?: string[];
+    category: string;
+    tags: string[];
+    sourceModel?: string;
+    notes?: string[];
+    sourceCompleteness?: "complete" | "excerpt" | "truncated";
+    mediaRights?: "pending" | "licensed";
+    sources: { role: "original" | "curation"; label: string; url: string; author?: string; license?: string }[];
+    steps: { id: string; title: string; instruction: string; prompts: { en?: string; zh?: string; original?: string }; originalLanguage?: string; textKind?: "licensed-template" | "adaptation"; originalKind?: "excerpt" | "full"; originalZh?: string }[];
+    referenceMedia: CatalogMedia[];
+    outputMedia: CatalogMedia[];
+};

@@ -20,6 +20,7 @@
 - [How the Local Codex Connection Works](/docs/development/local-codex-canvas)
 
 - [海外 Workbench 集成](/docs/development/overseas-workbench)
+- [海外公共提示词目录开发与验收](./overseas-prompt-catalog.md)
 
 ## Business
 
