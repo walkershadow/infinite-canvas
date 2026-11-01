@@ -60,3 +60,16 @@ NATIVE_CANVAS_DEV_ORIGIN=http://127.0.0.1:3204 npm run dev:international
 ```
 
 通过 http://localhost:3100/canvas/prompts?collection=case 验收；需要已有本地 Workbench 登录。预览产物是本地临时目录，不是生产部署。源代码变化后需重新构建并刷新。本轮临时 fixture 页面已删除，未推送、未部署；完整原作者提示词和参考图未转载，不将改写例称为原作者完整版。
+
+
+## 目录排序与文本素材复用
+
+海外入口顺序为 Case studies、Workflow templates、Image & personal prompts；现有链接与个人提示词入口保留。案例/模板每个步骤的 English、Chinese、Original 页签可将当前语言的文本添加到 My Assets，素材标题标明案例、步骤、语言及改写/许可/摘录类型，metadata 保留原始来源、目录id与步骤。不会保存样例视频或封面，不自动生成、不扣费。
+
+同一步骤、同一语言、相同内容已存在时按钮显示 Added to My Assets，避免连续点击重复创建。用户修改已保存副本后可重新保存原目录文本，不覆盖修改。复用现有账号隔离的资产云同步，不变更个人提示词记录或数据库结构。
+
+使用路径：打开画布 → Assets → Text → 选择对应素材并插入文本节点。工作流模板需要先在文本/Agent能力中编写图像和视频提示词；原文摘录不是完整生成指令。后续是否连接到生成节点及何时提交由用户决定。
+
+针对性测试新增 catalog-asset.test.ts，核对语言、步骤、来源、改写/摘录用途标识、无外部结果复制及非法步骤处理；与目录测试合计5项81断言通过。
+
+真实本地浏览器已验证：保存中文视频步骤后按钮禁用；隔离数据库NativeCanvasLibrary中确认为text，步骤video、语言zh和原作者来源正确；画布Assets中显示该素材并成功插入文本节点，正文保持一致，没有生成调用。

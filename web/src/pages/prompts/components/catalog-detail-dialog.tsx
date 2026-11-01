@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { Button, Modal, Tag, Tabs } from "antd";
-import { Copy, ExternalLink, Play } from "lucide-react";
+import { App, Button, Modal, Tag, Tabs } from "antd";
+import { Copy, ExternalLink, FolderPlus, Play } from "lucide-react";
+import { useAssetStore } from "@/stores/use-asset-store";
+import { catalogTextAsset, type CatalogLanguage } from "../catalog-asset";
 import { useCopyText } from "@/hooks/use-copy-text";
 import type { CatalogMedia, OverseasPromptEntry } from "@/types/prompt-catalog";
 
@@ -24,7 +26,7 @@ export function CatalogDetailDialog({ entry, related, onOpenRelated, onClose }: 
             {entry.referenceMedia.length > 0 && <MediaSection title="Reference media" items={entry.referenceMedia} />}
             <section className="space-y-5" aria-label="Workflow steps">
                 <h3 className="text-base font-semibold">Step-by-step prompts</h3>
-                {entry.steps.map((step, index) => <PromptStep key={step.id} step={step} index={index} sources={entry.sources} />)}
+                {entry.steps.map((step, index) => <PromptStep key={step.id} step={step} index={index} entry={entry} />)}
             </section>
             {related.length > 0 && <section aria-label="Related templates and cases"><h3 className="mb-3 text-base font-semibold">Related templates & cases</h3><div className="flex flex-wrap gap-2">{related.map((item) => <Button key={item.id} onClick={() => onOpenRelated(item)}>{item.contentKind === "case" ? "Case" : "Template"}: {item.title}</Button>)}</div></section>}
             {entry.notes?.length ? <details className="rounded-lg border border-border p-3"><summary className="cursor-pointer text-sm">Source details & usage notes</summary><ul className="mt-3 list-disc space-y-1 pl-5 text-sm leading-6">{entry.notes.map((note) => <li key={note}>{note}</li>)}</ul></details> : null}
@@ -54,8 +56,20 @@ function CatalogMediaPreview({ media }: { media: CatalogMedia }) {
     </figure>;
 }
 
-function PromptStep({ step, index, sources }: { step: OverseasPromptEntry["steps"][number]; index: number; sources: OverseasPromptEntry["sources"] }) {
+function PromptStep({ step, index, entry }: { step: OverseasPromptEntry["steps"][number]; index: number; entry: OverseasPromptEntry }) {
     const copyText = useCopyText();
+    const { message } = App.useApp();
+    const assets = useAssetStore((state) => state.assets);
+    const addAsset = useAssetStore((state) => state.addAsset);
+    const sources = entry.sources;
+    const alreadySaved = (language: CatalogLanguage) => assets.some((asset) => asset.kind === "text" && asset.metadata?.catalogId === entry.id && asset.metadata?.stepId === step.id && asset.metadata?.language === language && asset.data.content === step.prompts[language]);
+    const save = (language: CatalogLanguage) => {
+        if (alreadySaved(language)) return;
+        try {
+            addAsset(catalogTextAsset(entry, step.id, language));
+            message.success("Added to My Assets. Insert it from the canvas Assets panel as a text node.");
+        } catch (error) { message.error(error instanceof Error ? error.message : "Unable to add prompt to assets."); }
+    };
     return <article className="rounded-xl border border-border p-4 sm:p-5">
         <div className="mb-3 text-xs font-medium uppercase tracking-widest text-muted-foreground">Step {index + 1}</div>
         <h4 className="text-base font-semibold">{step.title}</h4>
@@ -65,6 +79,7 @@ function PromptStep({ step, index, sources }: { step: OverseasPromptEntry["steps
             const kindLabel = language === "original" ? step.originalKind === "full" ? "Licensed template" : "Original excerpt" : step.textKind === "licensed-template" ? "Licensed template" : "Adapted example";
             return { key: language, label, children: <div>
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><span className="text-xs font-medium">{kindLabel}{language === "original" && step.originalLanguage ? ` · ${step.originalLanguage}` : ""}</span><Button size="small" type="text" icon={<Copy className="size-3.5" />} aria-label={`Copy step ${index + 1} ${label} ${kindLabel}`} onClick={() => copyText(step.prompts[language]!, `${kindLabel} copied`)}>Copy {label} · {kindLabel}</Button></div>
+                <div className="mb-3 flex flex-wrap items-center gap-2"><Button size="small" type="text" icon={<FolderPlus className="size-3.5" />} disabled={alreadySaved(language)} aria-label={`Add step ${index + 1} ${label} to assets`} onClick={() => save(language)}>{alreadySaved(language) ? "Added to My Assets" : "Add to My Assets"}</Button></div>
                 <pre className="max-h-72 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-muted/40 p-3 font-mono text-xs leading-6" lang={language === "original" ? undefined : language}>{step.prompts[language]}</pre>
                 {language === "original" && <div className="mt-3 space-y-3">{step.originalZh && <div><span className="text-xs text-muted-foreground">Chinese translation of original {step.originalKind === "full" ? "template" : "excerpt"}</span><p lang="zh" className="mt-2 whitespace-pre-wrap text-sm leading-6">{step.originalZh}</p><Button type="text" size="small" onClick={() => copyText(step.originalZh!, "Original translation copied")}>Copy original translation</Button></div>}{sources.filter((source) => source.role === "original").map((source) => <a key={source.url} href={source.url} target="_blank" rel="noopener noreferrer" className="block text-sm underline underline-offset-4">Read original: {source.label} ↗</a>)}</div>}
             </div> };
