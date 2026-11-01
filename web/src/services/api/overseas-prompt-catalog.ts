@@ -61,7 +61,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     "contentKind": "case",
     "title": "Meilin · Elemental kung fu",
     "titleZh": "梅林元素功夫表演",
-    "summary": "An action performance guided by character and storyboard references.",
+    "summary": "An action performance guided by character and storyboard references. Read the original creator’s prompt alongside the external result.",
     "summaryZh": "角色参考与分镜驱动的动作表演案例。",
     "category": "Action and performance",
     "tags": [
@@ -72,8 +72,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "sourceModel": "GPT Image 2 + Seedance 2.0 (curator-reported)",
     "notes": [
-      "The sample result belongs to the original creator. It was not generated from the adapted prompts below, and has not been tested on this platform.",
-      "Original post URLs are recorded by the curator; we could not independently inspect X posts. Original text is excerpted only; English and Chinese practice prompts are our adaptations, not translations of the full original.",
+      "The previous practice prompts were independently written and have been removed. Existing copies in personal assets are not changed. This case does not contain a complete source transcript.",
       "External media remains on its source host; availability and reuse rights are not guaranteed. No media is mirrored or stored in your assets."
     ],
     "relatedIds": [
@@ -99,27 +98,17 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "steps": [
       {
-        "id": "storyboard",
-        "title": "1 · Create a storyboard",
-        "instruction": "Adapted practice example. Supply your own character reference where required.",
-        "textKind": "adaptation",
+        "id": "source-excerpt",
+        "title": "Original prompt excerpt",
+        "instruction": "Only a short excerpt is included here. Read the original post for the complete prompt; this excerpt alone is not the prompt that produced the sample.",
+        "textKind": "source-excerpt",
         "originalKind": "excerpt",
         "originalLanguage": "en",
         "originalZh": "创作一份以高强度肢体动作为重点的功夫表演分镜。",
         "prompts": {
-          "en": "Draw a six-panel action rehearsal sheet for an original martial artist. Use an uploaded character image only for identity. Show a leap, landing, turn, low sweep, recovery and final pose. Number the panels; emphasize motion and readable silhouettes.",
-          "zh": "为原创武术角色绘制六格动作预演分镜。上传的人物图仅用于保持身份。依次展示跃起、落地、转身、低位扫腿、恢复和收势。标出格号，强调运动与清晰轮廓。",
+          "en": "Create a raw kung fu performance storyboard focused on extreme physical action.",
+          "zh": "创作一份以高强度肢体动作为重点的功夫表演分镜。",
           "original": "Create a raw kung fu performance storyboard focused on extreme physical action."
-        }
-      },
-      {
-        "id": "video",
-        "title": "2 · Animate the storyboard",
-        "instruction": "Adapted practice example. Supply your own storyboard; select supported reference settings and runtime before generating.",
-        "textKind": "adaptation",
-        "prompts": {
-          "en": "Animate the numbered rehearsal sheet in order. Keep the performer recognizable and connect movements naturally. Use the character image for identity and the storyboard for choreography. Choose a supported duration before submission. Exclude diagram labels from the final video.",
-          "zh": "按编号顺序将预演分镜转成视频。保持角色一致，让动作自然衔接。人物图决定身份，分镜决定动作。提交前选择模型支持的时长，成片不显示分镜标注。"
         }
       }
     ],
@@ -129,7 +118,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "kind": "video",
         "url": "https://goodcase.ai/media/goodcase/aimikoda-2054460932068200517-01.mp4",
         "poster": "https://goodcase.ai/media/goodcase/aimikoda-2054460932068200517-01.jpg",
-        "caption": "Original creator's external sample · @aimikoda · Not generated from the adapted prompts"
+        "caption": "Original creator's external sample · @aimikoda"
       }
     ],
     "sourceCompleteness": "excerpt",
@@ -140,8 +129,8 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     "contentKind": "case",
     "title": "French croissant-making process",
     "titleZh": "法式牛角包制作过程",
-    "summary": "A storyboard-led baking sequence with a bilingual practice example.",
-    "summaryZh": "以分镜组织烘焙过程，附中英文练习示例。",
+    "summary": "A storyboard-led baking sequence. Full source prompt available through the original post.",
+    "summaryZh": "以分镜组织烘焙过程；完整提示词请通过原帖查看。",
     "category": "Food and process",
     "tags": [
       "Storyboard",
@@ -151,8 +140,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "sourceModel": "GPT Image 2 + Seedance 2.0 (curator-reported)",
     "notes": [
-      "The sample result belongs to the original creator. It was not generated from the adapted prompts below, and has not been tested on this platform.",
-      "Original post URLs are recorded by the curator; we could not independently inspect X posts. Original text is excerpted only; English and Chinese practice prompts are our adaptations, not translations of the full original.",
+      "The previous practice prompts were independently written and have been removed. Existing copies in personal assets are not changed. This case does not contain a complete source transcript.",
       "External media remains on its source host; availability and reuse rights are not guaranteed. No media is mirrored or stored in your assets."
     ],
     "relatedIds": [
@@ -178,28 +166,18 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "steps": [
       {
-        "id": "storyboard",
-        "title": "1 · Create a storyboard",
-        "instruction": "Adapted practice example. Supply your own character reference where required.",
-        "textKind": "adaptation",
-        "prompts": {
-          "en": "Design a six-panel storyboard for a bakery demonstration: prepare ingredients, fold dough, roll it, shape pastries, bake, and serve. Use one baker and one kitchen. Give each panel an action and a distinct camera distance; number the sequence clearly.",
-          "zh": "为烘焙演示设计六格分镜：准备材料、折叠面团、擀开、塑形、烘烤、装盘。保持同一位烘焙师与厨房。每格写清动作，使用不同景别，并清楚编号。"
-        }
-      },
-      {
-        "id": "video",
-        "title": "2 · Animate the storyboard",
-        "instruction": "Adapted practice example. Supply your own storyboard; select supported reference settings and runtime before generating.",
-        "textKind": "adaptation",
-        "prompts": {
-          "en": "Create a short baking video following the storyboard order. Preserve the baker, kitchen and pastry design. Connect hand movements and show baking progress clearly. Use the duration supported by the selected model, adjusting the storyboard first if needed. Do not render panel numbers.",
-          "zh": "按分镜顺序制作烘焙短片，保持烘焙师、厨房和糕点设计一致。衔接手部动作，清楚展示烘烤变化。采用所选模型支持的时长，必要时先调整分镜。画面不显示格号。",
-          "original": "Use the attached THE CROISSANT BAKER storyboard image as the exact reference."
-        },
+        "id": "source-excerpt",
+        "title": "Original prompt excerpt",
+        "instruction": "Only a short excerpt is included here. Read the original post for the complete prompt; this excerpt alone is not the prompt that produced the sample.",
+        "textKind": "source-excerpt",
         "originalKind": "excerpt",
         "originalLanguage": "en",
-        "originalZh": "使用附上的 THE CROISSANT BAKER 分镜图作为精确参考。"
+        "originalZh": "使用附上的 THE CROISSANT BAKER 分镜图作为精确参考。",
+        "prompts": {
+          "en": "Use the attached THE CROISSANT BAKER storyboard image as the exact reference.",
+          "zh": "使用附上的 THE CROISSANT BAKER 分镜图作为精确参考。",
+          "original": "Use the attached THE CROISSANT BAKER storyboard image as the exact reference."
+        }
       }
     ],
     "referenceMedia": [],
@@ -208,7 +186,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "kind": "video",
         "url": "https://media.goodcase.ai/media/video/real-case-07-techiebysa.mp4",
         "poster": "https://media.goodcase.ai/media/poster/real-case-07-techiebysa.jpg",
-        "caption": "Original creator's external sample · @TechieBySA · Not generated from the adapted prompts"
+        "caption": "Original creator's external sample · @TechieBySA"
       }
     ],
     "sourceCompleteness": "excerpt",
@@ -219,7 +197,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     "contentKind": "case",
     "title": "Apartment arrival storyboard",
     "titleZh": "公寓归家分镜动画",
-    "summary": "A homecoming sequence illustrating prop and location continuity. The curator's transcript is incomplete.",
+    "summary": "A homecoming sequence illustrating prop and location continuity. The curator’s transcript is incomplete.",
     "summaryZh": "展示道具与场景连续性的归家案例；整理站收录原文存在截断。",
     "category": "Narrative and continuity",
     "tags": [
@@ -230,8 +208,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "sourceModel": "Seedance 2.0 (curator-reported)",
     "notes": [
-      "The sample result belongs to the original creator. It was not generated from the adapted prompts below, and has not been tested on this platform.",
-      "Original post URLs are recorded by the curator; we could not independently inspect X posts. Original text is excerpted only; English and Chinese practice prompts are our adaptations, not translations of the full original.",
+      "The previous practice prompts were independently written and have been removed. Existing copies in personal assets are not changed. This case does not contain a complete source transcript.",
       "External media remains on its source host; availability and reuse rights are not guaranteed. No media is mirrored or stored in your assets.",
       "The upstream transcript is truncated. We do not present it as a complete original prompt."
     ],
@@ -258,28 +235,18 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "steps": [
       {
-        "id": "storyboard",
-        "title": "1 · Create a storyboard",
-        "instruction": "Adapted practice example. Supply your own character reference where required.",
-        "textKind": "adaptation",
-        "prompts": {
-          "en": "Plan a four-panel homecoming scene: enter carrying a bag, place it on a chair, walk to the window, and relax. Keep the apartment layout fixed. Mark where the bag remains after placement. Use an original character reference for consistent appearance.",
-          "zh": "规划四格归家场景：提包进门、把包放在椅子上、走向窗边、放松下来。固定公寓布局，标明包放下后留在何处。用原创人物参考图保持外观一致。"
-        }
-      },
-      {
-        "id": "video",
-        "title": "2 · Animate the storyboard",
-        "instruction": "Adapted practice example. Supply your own storyboard; select supported reference settings and runtime before generating.",
-        "textKind": "adaptation",
-        "prompts": {
-          "en": "Animate the four panels as a coherent homecoming scene. Preserve room geography and character appearance. Once placed, the bag stays on the chair. Use natural steps and subtle expressions. Choose a supported runtime; omit storyboard borders and labels.",
-          "zh": "将四格分镜转为连贯的归家片段。保持房间空间关系和角色外观。包放下后始终留在椅子上。步伐自然，表情细微。选择支持的时长，去掉分镜边框与标注。",
-          "original": "Maintain the apartment as one fixed physical environment."
-        },
+        "id": "source-excerpt",
+        "title": "Original prompt excerpt",
+        "instruction": "Only a short excerpt is included here. Read the original post for the complete prompt; this excerpt alone is not the prompt that produced the sample.",
+        "textKind": "source-excerpt",
         "originalKind": "excerpt",
         "originalLanguage": "en",
-        "originalZh": "将公寓保持为一个固定且一致的物理环境。"
+        "originalZh": "将公寓保持为一个固定且一致的物理环境。",
+        "prompts": {
+          "en": "Maintain the apartment as one fixed physical environment.",
+          "zh": "将公寓保持为一个固定且一致的物理环境。",
+          "original": "Maintain the apartment as one fixed physical environment."
+        }
       }
     ],
     "referenceMedia": [],
@@ -288,7 +255,7 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "kind": "video",
         "url": "https://media.goodcase.ai/media/video/apartment-arrival-storyboard-animation.mp4",
         "poster": "https://media.goodcase.ai/media/poster/apartment-arrival-storyboard-animation.jpg",
-        "caption": "Original creator's external sample · @Just_sharon7 · Not generated from the adapted prompts"
+        "caption": "Original creator's external sample · @Just_sharon7"
       }
     ],
     "sourceCompleteness": "truncated",

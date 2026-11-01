@@ -14,7 +14,7 @@ export type OverseasPromptEntry = {
     sourceCompleteness?: "complete" | "excerpt" | "truncated";
     mediaRights?: "pending" | "licensed";
     sources: { role: "original" | "curation"; label: string; url: string; author?: string; license?: string }[];
-    steps: { id: string; title: string; instruction: string; prompts: { en?: string; zh?: string; original?: string }; originalLanguage?: string; textKind?: "licensed-template" | "adaptation"; originalKind?: "excerpt" | "full"; originalZh?: string }[];
+    steps: { id: string; title: string; instruction: string; prompts: { en?: string; zh?: string; original?: string }; originalLanguage?: string; textKind?: "licensed-template" | "adaptation" | "source-excerpt"; originalKind?: "excerpt" | "full"; originalZh?: string }[];
     referenceMedia: CatalogMedia[];
     outputMedia: CatalogMedia[];
 };

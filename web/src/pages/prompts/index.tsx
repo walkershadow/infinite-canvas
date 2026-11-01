@@ -22,7 +22,7 @@ export default function PromptsPage() {
     const { message, modal } = App.useApp();
     const [searchParams, setSearchParams] = useSearchParams();
     const collection = searchParams.get("collection");
-    const library = isOverseas && (collection === "template" || collection === "case") ? collection : "prompts";
+    const library = isOverseas ? (collection === "template" || collection === "prompts" ? collection : "case") : "prompts";
     const setLibrary = (value: string) => setSearchParams((previous) => { const next = new URLSearchParams(previous); next.set("collection", value); next.delete("id"); return next; });
     const client = useQueryClient();
     const [editing, setEditing] = useState<{ prompt?: Prompt } | null>(null);
