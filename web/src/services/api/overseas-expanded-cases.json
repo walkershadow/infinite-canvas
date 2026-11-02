@@ -153,7 +153,7 @@
         "caption": "Original creator's external sample"
       }
     ],
-    "availabilityNote": "Required original reference images were not found in the published post or visible author replies. The full prompt is editable, but the reference inputs must be supplied before generation."
+    "availabilityNote": "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later."
   },
   {
     "id": "seedance:seedance-25-minidv-coffee-asmr-vlog",
@@ -313,7 +313,7 @@
         "caption": "Original creator's external sample"
       }
     ],
-    "availabilityNote": "Required original reference images were not found in the published post or visible author replies. The full prompt is editable, but the reference inputs must be supplied before generation."
+    "availabilityNote": "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later."
   },
   {
     "id": "seedance:vlog-c8171f712492",
@@ -762,7 +762,7 @@
         "caption": "Original creator's external sample"
       }
     ],
-    "availabilityNote": "Required original reference images were not found in the published post or visible author replies. The full prompt is editable, but the reference inputs must be supplied before generation."
+    "availabilityNote": "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later."
   },
   {
     "id": "seedance:seedance-i-came-like-a-storm-d30f955b4248",
@@ -843,7 +843,7 @@
         "caption": "Original creator's external sample"
       }
     ],
-    "availabilityNote": "Required original reference images were not found in the published post or visible author replies. The full prompt is editable, but the reference inputs must be supplied before generation."
+    "availabilityNote": "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later."
   },
   {
     "id": "seedance:seedance-create-a-30-second-fast-paced-cinematic-japanese-anime-cooking-video-showing-th-236ad940a8f1",
@@ -1380,7 +1380,7 @@
         "caption": "Original creator's external sample"
       }
     ],
-    "availabilityNote": "Required original reference images were not found in the published post or visible author replies. The full prompt is editable, but the reference inputs must be supplied before generation."
+    "availabilityNote": "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later."
   },
   {
     "id": "seedance:seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4",
@@ -2052,6 +2052,6 @@
         "caption": "Original creator's external sample"
       }
     ],
-    "availabilityNote": "Required original reference images were not found in the published post or visible author replies. The full prompt is editable, but the reference inputs must be supplied before generation."
+    "availabilityNote": "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later."
   }
 ]

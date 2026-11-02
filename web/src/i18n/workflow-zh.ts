@@ -1,7 +1,7 @@
 export default {
     "Source limitation · see details": "来源尚有缺项 · 查看详情",
     "Seedance (archived source)": "Seedance（归档来源）",
-    "Required original reference images were not found in the published post or visible author replies. The full prompt is editable, but the reference inputs must be supplied before generation.": "原帖及可见作者续帖未找到所需原始参考图。完整提示词可编辑，但须补齐参考输入后才能生成；本案例的参考图片尚未补齐。",
+    "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later.": "原始来源未提供参考图，可使用自己的图片：保存到 Assets 后在画布打开，向各个必需参考节点上传图片即可继续生成。作者原图可在后续补充。",
     "The author’s portrait and product photo are supplied. The earlier identity photo used to make the portrait was not published; the editable copy uses the supplied portrait itself as its image-editing reference.": "已提供作者的角色成图和产品图。生成角色图所用的更早人物照片未公开；编辑副本将已提供的角色成图作为重新编辑时的参考。",
     "The author attached a six-panel overview but did not instruct the model to consume it. It is preserved as an unconnected source image, not invented as a required generation input.": "作者附有六格场景总览，但提示词没有要求以它作为输入。该图独立保留，不擅自连成必需生成输入。",
     "The original author account is suspended. This is the full archived transcript from GoodCase, not a newly verified live post.": "原作者账号已被冻结。本条保存 GoodCase 的完整归档文本，不宣称已重新核实当前原帖。",

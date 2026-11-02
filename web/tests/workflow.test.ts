@@ -200,6 +200,10 @@ test("all 27 linked cases are covered without losing existing cases or filling s
             const graph = instantiateWorkflow(catalogWorkflow(entry));
             const video = graph.nodes.find(n => n.type === "video")!;
             expect(workflowGenerationError(video, graph.nodes, video.metadata!.prompt!, graph.connections)).toContain("required");
+            for (const node of graph.nodes.filter(n => n.metadata?.workflowReference)) {
+                node.metadata = { ...node.metadata, status: "success", content: "blob:user-uploaded-reference" };
+            }
+            expect(workflowGenerationError(video, graph.nodes, video.metadata!.prompt!, graph.connections)).toBeUndefined();
         }
     }
     const seoul = cases.find(e => e.id.endsWith("c8171f712492"))!;
