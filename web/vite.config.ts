@@ -7,6 +7,8 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import { rawOverseasPromptCatalog } from "./src/services/api/overseas-prompt-catalog";
 import { validateCatalogMediaMap, type CatalogMediaMap } from "./src/lib/catalog-media";
 
+import { overseasPublicAssets } from "./scripts/overseas-public-assets";
+
 import { parseChangelog } from "./src/lib/release";
 
 const webDir = dirname(fileURLToPath(import.meta.url));
@@ -58,8 +60,9 @@ export default defineConfig(({ mode, command }) => {
     const base = overseas ? "/canvas/" : env.VITE_BASE || "/";
     return {
         base,
+        build: { copyPublicDir: !overseas },
         server: overseas ? { proxy: { "/api": { target: env.WORKBENCH_DEV_ORIGIN || "http://localhost:3100", changeOrigin: true, xfwd: true } } } : undefined,
-        plugins: [react(), localPluginsManifest(base), ...(overseas ? [{
+        plugins: [react(), localPluginsManifest(base), ...(overseas ? [overseasPublicAssets(), {
             name: "overseas-html",
             transformIndexHtml: (html: string) => html
                 .replace('lang="zh-CN"', 'lang="en-US"')

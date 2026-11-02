@@ -23,3 +23,5 @@
 海外构建指定 `VITE_APP_MODE=overseas CATALOG_MEDIA_MAP_FILE=/absolute/path/to/map.json`，路径由构建端读取，只有地址数据进入前端。海外生产构建缺映射或漏key会拒绝继续。独立构建忽略该变量。原始来源链接保留作署名，不作为媒体加载fallback。个人素材上传和账号归属保持原链路。
 
 本会话不构建、不部署；待转存端交付映射后再核对真实地址及媒体覆盖。原图暂缺的6例继续支持用户自行上传。
+
+海外构建关闭 Vite 默认 public 全量复制，仅复制除 `public/case-references` 外的公共资源，并清除输出目录中遗留的 `case-references`。源码原图保留，独立构建仍使用 Vite 默认复制行为。发布端仍应在最终产物确认不存在 `case-references`；本地定向回归只使用临时目录，未执行完整构建。
