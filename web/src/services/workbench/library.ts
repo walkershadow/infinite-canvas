@@ -1,3 +1,4 @@
+import { validateWorkflow } from "@/lib/workflow-validation";
 import { useAssetStore, type Asset } from "@/stores/use-asset-store";
 import { localForageStorage } from "@/lib/localforage-storage";
 import { workbenchRequest } from "@/services/api/workbench";
@@ -43,6 +44,7 @@ async function loadCloudLibrary() {
             useWorkbenchStore.setState({ libraryRecovery: snapshot });
         }
         const { items } = await workbenchRequest<{ items: Envelope[] }>("/library");
+        for (const item of items) if (item.document.kind === "workflow") validateWorkflow(item.document.data);
         const local = useAssetStore.getState().assets;
         if (local !== beforeLoad) {
             raw = JSON.stringify(local);

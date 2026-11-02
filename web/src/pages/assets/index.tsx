@@ -1,3 +1,7 @@
+import i18n from "@/i18n";
+import { catalogSummary } from "@/lib/prompt-catalog-locale";
+import { isOverseas } from "@/constant/integration";
+import { WorkflowEditor } from "@/components/prompts/workflow-editor";
 import { Copy, Download, PencilLine, Search, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { App, Button, Card, Drawer, Empty, Form, Image, Input, Modal, Pagination, Select, Space, Tag, Typography } from "antd";
@@ -25,7 +29,7 @@ type AssetFormValues = {
 
 type ImageDraft = ImageAsset["data"] | null;
 
-const kindOptions = ["all", "text", "image", "video"] as const;
+const kindOptions: (AssetKind | "all")[] = ["all", "text", "image", "video", ...(isOverseas ? ["workflow" as const] : [])];
 
 export default function AssetsPage() {
     const { message } = App.useApp();
@@ -53,7 +57,7 @@ export default function AssetsPage() {
     const title = Form.useWatch("title", form) || "";
     const tags = Form.useWatch("tags", form) || [];
     const content = Form.useWatch("content", form) || "";
-    const validAssets = useMemo(() => assets.filter((asset) => asset.kind === "text" || asset.kind === "image" || asset.kind === "video"), [assets]);
+    const validAssets = useMemo(() => assets.filter((asset) => asset.kind === "text" || asset.kind === "image" || asset.kind === "video" || (isOverseas && asset.kind === "workflow")), [assets]);
 
     const filteredAssets = useMemo(() => {
         const query = keyword.trim().toLowerCase();
@@ -83,6 +87,7 @@ export default function AssetsPage() {
     };
 
     const openEdit = (asset: Asset) => {
+        if (asset.kind === "workflow") { setPreviewAsset(asset); return; }
         setEditingAsset(asset);
         setFormKind(asset.kind);
         setImageDraft(asset.kind === "image" ? asset.data : null);
@@ -237,7 +242,7 @@ export default function AssetsPage() {
                                                 setKindFilter(option);
                                             }}
                                         >
-                                            {option === "all" ? t("common.all") : t(`assets.kinds.${option}`)}
+                                            {option === "all" ? t("common.all") : option === "workflow" ? t("workflow.name") : t(`assets.kinds.${option}`)}
                                         </Tag.CheckableTag>
                                     ))}
                                 </div>
@@ -294,6 +299,7 @@ export default function AssetsPage() {
                 </div>
             </main>
 
+            {previewAsset?.kind === "workflow" && isOverseas && <WorkflowEditor key={previewAsset.id} document={previewAsset.data} asset={previewAsset} onClose={() => setPreviewAsset(null)} />}
             <Modal title={editingAsset ? t("assets.edit") : t("assets.add")} open={isAssetOpen} width={980} onCancel={() => setIsAssetOpen(false)} onOk={() => void saveAsset()} okText={t("common.save")} cancelText={t("common.cancel")} destroyOnHidden>
                 <div className="grid gap-6 pt-1 lg:grid-cols-[minmax(0,1fr)_320px]">
                     <Form form={form} layout="vertical" requiredMark={false} initialValues={{ kind: "text", tags: [] }}>
@@ -400,7 +406,7 @@ export default function AssetsPage() {
                 />
             </Modal>
 
-            <AssetDrawer asset={previewAsset} onClose={() => setPreviewAsset(null)} onCopy={copyAssetText} onDownload={downloadImage} />
+            <AssetDrawer asset={previewAsset?.kind === "workflow" ? null : previewAsset} onClose={() => setPreviewAsset(null)} onCopy={copyAssetText} onDownload={downloadImage} />
 
             <input ref={assetInputRef} type="file" accept="application/zip,.zip" className="hidden" onChange={(event) => void importAssetZip(event.target.files?.[0])} />
 
@@ -425,7 +431,7 @@ function AssetCard({ asset, onOpen, onEdit, onCopy, onDownload, onDelete }: { as
                     {cover ? (
                         <img src={cover} alt={asset.title} className="aspect-[4/3] w-full object-cover" />
                     ) : (
-                        <div className="flex aspect-[4/3] items-center justify-center bg-stone-100 p-5 text-center text-sm leading-6 text-stone-600 dark:bg-stone-900 dark:text-stone-300">{asset.kind === "text" ? asset.data.content : asset.kind === "video" ? t(failed ? "assets.coverUnavailable" : "assets.coverLoading") : t("assets.noCover")}</div>
+                        <div className={`flex aspect-[4/3] items-center justify-center bg-stone-100 p-5 text-center text-sm leading-6 text-stone-600 dark:bg-stone-900 dark:text-stone-300 ${isOverseas ? "relative overflow-hidden" : ""}`}><span className={isOverseas ? "line-clamp-6 min-w-0 break-words [overflow-wrap:anywhere]" : undefined}>{asset.kind === "workflow" ? `${t("workflow.name")} · ${t("workflow.count", { count: asset.data.stages.length })}` : asset.kind === "text" ? asset.data.content : asset.kind === "video" ? t(failed ? "assets.coverUnavailable" : "assets.coverLoading") : t("assets.noCover")}</span></div>
                     )}
                 </button>
             }
@@ -439,7 +445,7 @@ function AssetCard({ asset, onOpen, onEdit, onCopy, onDownload, onDelete }: { as
                                 {asset.source || t("assets.unknownSource")}
                             </Typography.Text>
                         </div>
-                        <Tag className="m-0 shrink-0 text-[11px]">{t(`assets.kinds.${asset.kind}`)}</Tag>
+                        <Tag className="m-0 shrink-0 text-[11px]">{asset.kind === "workflow" ? t("workflow.name") : t(`assets.kinds.${asset.kind}`)}</Tag>
                     </div>
                     <Typography.Paragraph type="secondary" ellipsis={{ rows: 3 }} className="!mb-0 !mt-2 !text-xs !leading-5">
                         {summary}
@@ -501,7 +507,7 @@ function AssetDrawer({ asset, onClose, onCopy, onDownload }: { asset: Asset | nu
                             {asset.title}
                         </Typography.Title>
                         <Space size={[4, 4]} wrap>
-                            <Tag>{t(`assets.kinds.${asset.kind}`)}</Tag>
+                            <Tag>{asset.kind === "workflow" ? t("workflow.name") : t(`assets.kinds.${asset.kind}`)}</Tag>
                             {(asset.tags || []).map((tag) => (
                                 <Tag key={tag}>{tag}</Tag>
                             ))}
@@ -515,7 +521,7 @@ function AssetDrawer({ asset, onClose, onCopy, onDownload }: { asset: Asset | nu
                             <Typography.Paragraph className="mt-2 whitespace-pre-wrap">{asset.data.content}</Typography.Paragraph>
                         ) : (
                             <Typography.Text className="mt-2 block">
-                                {asset.data.width}x{asset.data.height} · {formatBytes(asset.data.bytes)} · {asset.data.mimeType}
+                                {assetSummary(asset)}
                             </Typography.Text>
                         )}
                     </div>
@@ -556,10 +562,11 @@ async function readAssetMediaBlob(asset: Extract<Asset, { kind: "image" | "video
 }
 
 function assetSummary(asset: Asset) {
+    if (asset.kind === "workflow") return `${i18n.t("workflow.count", { count: asset.data.stages.length })} · ${catalogSummary(asset.data.source, i18n.language)}`;
     if (asset.kind === "text") return asset.data.content;
     return `${asset.data.width}x${asset.data.height} · ${formatBytes(asset.data.bytes)} · ${asset.data.mimeType}`;
 }
 
 function assetSearchText(asset: Asset) {
-    return [asset.title, asset.source || "", asset.note || "", (asset.tags || []).join(" "), asset.kind === "text" ? asset.data.content : asset.data.mimeType].join(" ").toLowerCase();
+    return [asset.title, asset.source || "", asset.note || "", (asset.tags || []).join(" "), asset.kind === "workflow" ? JSON.stringify(asset.data) : asset.kind === "text" ? asset.data.content : asset.data.mimeType].join(" ").toLowerCase();
 }

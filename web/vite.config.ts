@@ -44,7 +44,7 @@ export default defineConfig(({ mode }) => {
     const base = overseas ? "/canvas/" : env.VITE_BASE || "/";
     return {
         base,
-        server: overseas ? { proxy: { "/api": { target: env.WORKBENCH_DEV_ORIGIN || "http://localhost:3100", changeOrigin: true } } } : undefined,
+        server: overseas ? { proxy: { "/api": { target: env.WORKBENCH_DEV_ORIGIN || "http://localhost:3100", changeOrigin: true, xfwd: true } } } : undefined,
         plugins: [react(), localPluginsManifest(base), ...(overseas ? [{
             name: "overseas-html",
             transformIndexHtml: (html: string) => html

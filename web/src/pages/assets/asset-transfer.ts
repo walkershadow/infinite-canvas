@@ -1,8 +1,11 @@
+import { resolveWorkflowImages } from "@/services/workflow-images";
+import { validateWorkflow } from "@/lib/workflow-validation";
+import { isOverseas } from "@/constant/integration";
 import { saveAs } from "file-saver";
 
 import { createZip, readZip } from "@/lib/zip";
 import { getMediaBlob, setMediaBlob } from "@/services/file-storage";
-import { getImageBlob, resolveImageUrl, setImageBlob } from "@/services/image-storage";
+import { collectImageStorageKeys, getImageBlob, resolveImageUrl, setImageBlob } from "@/services/image-storage";
 import type { Asset } from "@/stores/use-asset-store";
 
 type AssetExportFile = {
@@ -23,6 +26,7 @@ type AssetExportItem = {
 export async function exportAssets(assets: Asset[], filename: string) {
     const files: AssetExportItem[] = [];
     const zipFiles: { name: string; data: BlobPart }[] = [];
+    const workflowImageKeys = new Set<string>();
 
     await Promise.all(
         assets.map(async (asset) => {
@@ -31,6 +35,17 @@ export async function exportAssets(assets: Asset[], filename: string) {
                 if (blob) {
                     const path = `files/${safeFileName(asset.videoCover.storageKey)}.${fileExtension(blob.type, "image")}`;
                     files.push({ storageKey: asset.videoCover.storageKey, path, mimeType: blob.type, bytes: blob.size });
+                    zipFiles.push({ name: path, data: blob });
+                }
+            }
+            if (asset.kind === "workflow") {
+                for (const storageKey of collectImageStorageKeys(asset.data)) {
+                    if (workflowImageKeys.has(storageKey)) continue;
+                    workflowImageKeys.add(storageKey);
+                    const blob = await getImageBlob(storageKey);
+                    if (!blob) throw new Error("Missing workflow reference image. Re-import the original image before exporting.");
+                    const path = `files/${safeFileName(storageKey)}.${fileExtension(blob.type, "image")}`;
+                    files.push({ storageKey, path, mimeType: blob.type, bytes: blob.size });
                     zipFiles.push({ name: path, data: blob });
                 }
             }
@@ -55,6 +70,13 @@ export async function readAssetPackage(file: File) {
     const assetFile = zip.get("assets.json");
     if (!assetFile) throw new Error("missing assets.json");
     const data = JSON.parse(await assetFile.text()) as AssetExportFile;
+    for (const asset of data.assets) if (asset.kind === "workflow") { if (!isOverseas) throw new Error("Workflow packages require Workbench."); validateWorkflow(asset.data); }
+    for (const asset of data.assets) if (asset.kind === "workflow") {
+        for (const key of collectImageStorageKeys(asset.data)) {
+            const file = data.files.find(item => item.storageKey === key);
+            if (!file || !zip.has(file.path)) throw new Error("Workflow package is missing a reference image file.");
+        }
+    }
     await Promise.all(
         data.files.map(async (item) => {
             const blob = zip.get(item.path);
@@ -63,7 +85,7 @@ export async function readAssetPackage(file: File) {
             await (item.storageKey.startsWith("image:") ? setImageBlob(item.storageKey, typedBlob) : setMediaBlob(item.storageKey, typedBlob));
         }),
     );
-    return Promise.all(data.assets.map(async (asset) => asset.videoCover ? { ...asset, videoCover: { ...asset.videoCover, url: await resolveImageUrl(asset.videoCover.storageKey, asset.videoCover.url) } } : asset));
+    return Promise.all(data.assets.map(async (asset) => asset.kind === "workflow" ? { ...asset, data: await resolveWorkflowImages(asset.data) } : asset.videoCover ? { ...asset, videoCover: { ...asset.videoCover, url: await resolveImageUrl(asset.videoCover.storageKey, asset.videoCover.url) } } : asset));
 }
 
 function safeFileName(value: string) {

@@ -1,3 +1,4 @@
+import { validateWorkflow } from "@/lib/workflow-validation";
 import { isOverseas } from "@/constant/integration";
 import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
@@ -7,11 +8,13 @@ import { localForageStorage } from "@/lib/localforage-storage";
 import { cleanupUnusedImages, ensureImagePreview, previewUrlFor, resolveImageUrl, uploadImage } from "@/services/image-storage";
 import { cleanupUnusedMedia, resolveMediaUrl } from "@/services/file-storage";
 
-export type AssetKind = "text" | "image" | "video";
+import type { WorkflowDocument } from "@/types/workflow";
+export type AssetKind = "text" | "image" | "video" | "workflow";
+export type WorkflowAsset = AssetBase<"workflow"> & { data: WorkflowDocument };
 export type TextAsset = AssetBase<"text"> & { data: { content: string } };
 export type ImageAsset = AssetBase<"image"> & { data: { dataUrl: string; storageKey?: string; width: number; height: number; bytes: number; mimeType: string } };
 export type VideoAsset = AssetBase<"video"> & { data: { url: string; storageKey?: string; width: number; height: number; bytes: number; mimeType: string } };
-export type Asset = TextAsset | ImageAsset | VideoAsset;
+export type Asset = TextAsset | ImageAsset | VideoAsset | WorkflowAsset;
 
 type AssetBase<T extends AssetKind> = {
     id: string;
@@ -53,6 +56,7 @@ const assetStorage: PersistStorage<AssetStore> = {
         const parsed = JSON.parse(value) as StorageValue<AssetStore>;
         parsed.state.assets = await Promise.all(
             parsed.state.assets.map(async (asset) => {
+                if (asset.kind === "workflow") { validateWorkflow(asset.data); const { resolveWorkflowImages } = await import("@/services/workflow-images"); return { ...asset, data: await resolveWorkflowImages(asset.data) }; }
                 if (asset.kind === "video") return { ...asset, ...(asset.videoCover ? { videoCover: { ...asset.videoCover, url: await resolveImageUrl(asset.videoCover.storageKey, asset.videoCover.url) } } : {}), data: { ...asset.data, url: await resolveMediaUrl(asset.data.storageKey, asset.data.url) } };
                 if (asset.kind !== "image") return asset;
                 if (asset.data.storageKey) {

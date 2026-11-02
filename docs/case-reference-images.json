@@ -1,0 +1,56 @@
+[
+  {
+    "file": "web/public/case-references/meilin-character.jpg",
+    "source": "https://x.com/aimikoda/status/2054582032454295963",
+    "url": "https://pbs.twimg.com/media/HINXRi_W0AAdKMV?format=jpg&name=orig",
+    "width": 1672,
+    "height": 941,
+    "sha256": "15dcefc8c6fe3cd33d8f6a89ca1aa8660a041ad8f48689761e7282f3430be27a",
+    "bytes": 218016
+  },
+  {
+    "file": "web/public/case-references/meilin-storyboard.jpg",
+    "source": "https://x.com/aimikoda/status/2054460996119314453",
+    "url": "https://pbs.twimg.com/media/HILpYZZWwAA41ul?format=jpg&name=orig",
+    "width": 1672,
+    "height": 941,
+    "sha256": "4c9a57f05548e5478dd70319e3929646981855a912aa37b754acd5115dee538a",
+    "bytes": 462203
+  },
+  {
+    "file": "web/public/case-references/croissant-storyboard.jpg",
+    "source": "https://x.com/TechieBySA/status/2053523784481554759",
+    "url": "https://pbs.twimg.com/media/HH-U_z7XkAAUii6?format=jpg&name=orig",
+    "width": 1248,
+    "height": 832,
+    "sha256": "b5b83e4423af8550ed50bc9251e3fe3e397822f8b5936162ef1a1ff11c92777f",
+    "bytes": 234689
+  },
+  {
+    "file": "web/public/case-references/apartment-character.jpg",
+    "source": "https://x.com/Just_sharon7/status/2083912931419582465",
+    "url": "https://pbs.twimg.com/media/HOuLu5obgAABQ-y?format=jpg&name=orig",
+    "width": 2688,
+    "height": 1520,
+    "sha256": "39dc23d7939a375949f5f340175b428120336486104cc0526874bd85450eca37",
+    "bytes": 480337
+  },
+  {
+    "file": "web/public/case-references/apartment-environment.jpg",
+    "source": "https://x.com/Just_sharon7/status/2083912931419582465",
+    "url": "https://pbs.twimg.com/media/HOuLtcSbIAAZ6QE?format=jpg&name=orig",
+    "width": 2688,
+    "height": 1520,
+    "sha256": "d1f29aaf8171370b7585187b148232492925668b8e518e9e92c5b6ab6d23ad43",
+    "bytes": 597156
+  },
+  {
+    "file": "web/public/case-references/apartment-overview.jpg",
+    "source": "https://x.com/Just_sharon7/status/2083912751647498379",
+    "url": "https://pbs.twimg.com/media/HOuLl9gaoAAMsgk?format=jpg&name=orig",
+    "width": 2688,
+    "height": 1520,
+    "sha256": "439cec0f7406653f497bd362219c9cd2501514a0b8695754218df56af2567364",
+    "bytes": 594786
+  }
+]

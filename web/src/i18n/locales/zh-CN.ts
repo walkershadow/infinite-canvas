@@ -1,4 +1,5 @@
 export default {
+    workflow: { name: "流程", count: "{{count}} 个步骤", source: "流程来源与样例" },
     meta: {
         title: "无限画布",
         description: "一个无限画布创作工具",

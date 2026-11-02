@@ -1,68 +1,16 @@
+import templates from "./overseas-workflow-templates.json";
 import type { OverseasPromptEntry } from "@/types/prompt-catalog";
 
 // Curated seed only. Original creators retain rights; do not mirror external media.
-// Case practice prompts are adaptations, not the creator's full text.
-export const overseasPromptCatalog: OverseasPromptEntry[] = [
-  {
-    "id": "seedance:storyboard-grid-to-video",
-    "contentKind": "template",
-    "title": "Storyboard grid to video",
-    "titleZh": "分镜网格转视频",
-    "summary": "Plan the shots as a storyboard sheet, then animate the sheet. Start here and explore three independently searchable examples.",
-    "summaryZh": "先生成分镜网格图，再按分镜生成视频；下方关联三个可独立检索的案例。",
-    "category": "Structural foundations",
-    "tags": [
-      "Storyboard",
-      "Video",
-      "Multi-step workflow",
-      "Character consistency"
-    ],
-    "sourceModel": "Image model + Seedance (check platform availability)",
-    "notes": [
-      "This is a planning template for a text model, not a ready-to-submit video prompt. Replace the bracketed story, style and duration before use.",
-      "Reference roles are not first/last-frame roles. Choose a model that supports the required references and duration; no generation or billing is triggered here."
-    ],
-    "sources": [
-      {
-        "role": "original",
-        "label": "Awesome Seedance · template",
-        "author": "LearnPrompt / awesome-seedance",
-        "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/docs/templates/zh/storyboard-grid-to-video.md",
-        "license": "CC BY 4.0 · curated template; bilingual text assembled from copyPrompt, structure and pitfalls."
-      }
-    ],
-    "relatedIds": [
-      "seedance:real-case-06-aimikoda",
-      "seedance:real-case-07-techiebysa",
-      "seedance:apartment-arrival-storyboard-animation"
-    ],
-    "steps": [
-      {
-        "id": "plan",
-        "title": "Plan the image and video prompts",
-        "instruction": "Copy into your text assistant, fill in your story and desired runtime, then review both generated prompts before using them.",
-        "textKind": "licensed-template",
-        "originalKind": "full",
-        "originalLanguage": "en",
-        "prompts": {
-          "en": "I want to make the storyboard sheet first and then turn it into video. [The story: a stray cat finding its way home through a rainy night, in 9 panels.] [Pixar-style 3D look, 15 seconds total.] Using the prompt template below, write both prompts for me: first the one that generates the storyboard sheet, then the Seedance prompt that turns that sheet into video:\n\n- Image prompt header: single-page sheet, aspect ratio, panel count, and the drawing style stated as premium storyboard, infographic poster or rough pencil previs\n- Information cards: title, total runtime, number of shots, audio direction, so timing and panel count agree\n- Panel list, one line each: shot size, the action happening in it, and what that panel is for\n- Image prompt tail: the annotation system, and the exclusions such as no timestamps, no extra characters, no watermark\n- Video prompt opening: name which image is the character reference and which is the storyboard, and what each one controls\n- Rule list: follow 1 to N in order, one shot per panel, seconds per shot, no skipped or added steps, character and set stay identical\n- Overall look and close: lighting, camera movement, audio, and the no-subtitle no-watermark tail\n\nAvoid:\n- Baking timecodes into the sheet. Panel timestamps get drawn as artwork and carried into the video; the kung-fu sheet writes `No timestamps` and leaves timing to the rules in step two.\n- More panels than the runtime can hold. Work backwards at 1.5 to 3 seconds per panel — the croissant sheet pairs 8 panels with a 12-second video.\n- Letting the character sheet and the storyboard fight. The model copies poses off the character sheet; state that the storyboard controls locations, actions, compositions and sequence, and the character sheet only controls the face.\n- Panels that describe a picture and no movement. The video comes out as a slideshow; give every panel something already in motion.",
-          "zh": "我要先出一张分镜图再把它转成视频，【故事是一只流浪猫在雨夜一路找到家，分成 9 格】，【画风像皮克斯 3D，总时长 15 秒】。请根据下面这个提示语模板，分两步把提示语写好：先写生成分镜图的提示语，再写把这张分镜图转成视频的 Seedance 提示语：\n\n- 出图提示语开头：单页分镜、画幅、格数，画风写成高级分镜、信息图海报或者铅笔草稿预览\n- 信息卡：片名、总时长、镜头数、音频方向，让时长和格数对得上\n- 逐格清单，一格一行：景别、这一格里正在发生的动作、这一格是干什么用的\n- 出图提示语收尾：标注系统，以及排除项，比如不要时间码、不要多余角色、不要水印\n- 视频提示语开头：点名哪张是角色参考、哪张是分镜参考，各自管什么\n- 规则清单：按 1 到 N 走、一格一镜、每镜多少秒、不跳步不加戏、人物和场景全程一致\n- 整体质感与收尾：光线、镜头运动、音频，最后写上不要字幕水印\n\n注意事项：\n- 把时间码画进分镜图里。格子上的时间戳会被当成画面内容一起带进视频，功夫那条在出图段直接写 `No timestamps`，时长交给第二步的规则清单。\n- 格数超出时长能装下的量。按每格 1.5 到 3 秒倒推格数，牛角包那条是 8 格配 12 秒。\n- 角色图和分镜图打架。模型会照抄角色图上的姿势，要写明分镜图管地点、动作、构图和顺序，角色图只管长相。\n- 格子里只写画面不写动作。片子动起来就是几张静止图轮播，每一格都要给一个正在发生的动作。",
-          "original": "I want to make the storyboard sheet first and then turn it into video. [The story: a stray cat finding its way home through a rainy night, in 9 panels.] [Pixar-style 3D look, 15 seconds total.] Using the prompt template below, write both prompts for me: first the one that generates the storyboard sheet, then the Seedance prompt that turns that sheet into video:\n\n- Image prompt header: single-page sheet, aspect ratio, panel count, and the drawing style stated as premium storyboard, infographic poster or rough pencil previs\n- Information cards: title, total runtime, number of shots, audio direction, so timing and panel count agree\n- Panel list, one line each: shot size, the action happening in it, and what that panel is for\n- Image prompt tail: the annotation system, and the exclusions such as no timestamps, no extra characters, no watermark\n- Video prompt opening: name which image is the character reference and which is the storyboard, and what each one controls\n- Rule list: follow 1 to N in order, one shot per panel, seconds per shot, no skipped or added steps, character and set stay identical\n- Overall look and close: lighting, camera movement, audio, and the no-subtitle no-watermark tail\n\nAvoid:\n- Baking timecodes into the sheet. Panel timestamps get drawn as artwork and carried into the video; the kung-fu sheet writes `No timestamps` and leaves timing to the rules in step two.\n- More panels than the runtime can hold. Work backwards at 1.5 to 3 seconds per panel — the croissant sheet pairs 8 panels with a 12-second video.\n- Letting the character sheet and the storyboard fight. The model copies poses off the character sheet; state that the storyboard controls locations, actions, compositions and sequence, and the character sheet only controls the face.\n- Panels that describe a picture and no movement. The video comes out as a slideshow; give every panel something already in motion."
-        }
-      }
-    ],
-    "referenceMedia": [],
-    "outputMedia": [],
-    "sourceCompleteness": "complete",
-    "mediaRights": "licensed"
-  },
+// User-authorized prompt transcripts. Steps follow source headings; incomplete continuations stay separate.
+const seedCatalog: OverseasPromptEntry[] = [
   {
     "id": "seedance:real-case-06-aimikoda",
     "contentKind": "case",
     "title": "Meilin · Elemental kung fu",
     "titleZh": "梅林元素功夫表演",
-    "summary": "An action performance guided by character and storyboard references. Read the original creator’s prompt alongside the external result.",
-    "summaryZh": "角色参考与分镜驱动的动作表演案例。",
+    "summary": "Generate a 12-panel storyboard with your character reference, then animate it into a 15-second kung fu performance.",
+    "summaryZh": "使用角色参考生成 12 格分镜，再按分镜生成 15 秒功夫表演视频。",
     "category": "Action and performance",
     "tags": [
       "Storyboard",
@@ -72,8 +20,8 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "sourceModel": "GPT Image 2 + Seedance 2.0 (curator-reported)",
     "notes": [
-      "The previous practice prompts were independently written and have been removed. Existing copies in personal assets are not changed. This case does not contain a complete source transcript.",
-      "External media remains on its source host; availability and reuse rights are not guaranteed. No media is mirrored or stored in your assets."
+      "Full prompt use authorized by the user. Complete prompt text verified against the original X posts; Chinese translations are provided separately.",
+      "Source reference images are included in the saved workflow. External sample videos remain links and are not generation inputs."
     ],
     "relatedIds": [
       "seedance:storyboard-grid-to-video"
@@ -83,7 +31,8 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "role": "original",
         "label": "Original post on X",
         "author": "@aimikoda",
-        "url": "https://x.com/aimikoda/status/2054460932068200517"
+        "url": "https://x.com/aimikoda/status/2054460932068200517",
+        "license": "Full prompt use authorized by the user"
       },
       {
         "role": "curation",
@@ -94,25 +43,87 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "role": "curation",
         "label": "Awesome Seedance · case index",
         "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+      },
+      {
+        "role": "original",
+        "label": "Image prompt · original reply",
+        "url": "https://x.com/aimikoda/status/2054460996119314453",
+        "author": "@aimikoda",
+        "license": "Full prompt use authorized by the user"
+      },
+      {
+        "role": "original",
+        "label": "Video prompt · original reply",
+        "url": "https://x.com/aimikoda/status/2054461166022214117",
+        "author": "@aimikoda",
+        "license": "Full prompt use authorized by the user"
+      },
+      {
+        "role": "original",
+        "label": "Character sheet and author permission",
+        "url": "https://x.com/aimikoda/status/2054582032454295963",
+        "author": "@aimikoda",
+        "license": "Author permits personal and commercial use"
       }
     ],
     "steps": [
       {
-        "id": "source-excerpt",
-        "title": "Original prompt excerpt",
-        "instruction": "Only a short excerpt is included here. Read the original post for the complete prompt; this excerpt alone is not the prompt that produced the sample.",
-        "textKind": "source-excerpt",
-        "originalKind": "excerpt",
-        "originalLanguage": "en",
-        "originalZh": "创作一份以高强度肢体动作为重点的功夫表演分镜。",
+        "id": "storyboard",
+        "title": "Generate the 12-panel storyboard",
+        "instruction": "Use your character reference to generate the storyboard.",
+        "mode": "image",
+        "dependsOn": [],
         "prompts": {
-          "en": "Create a raw kung fu performance storyboard focused on extreme physical action.",
-          "zh": "创作一份以高强度肢体动作为重点的功夫表演分镜。",
-          "original": "Create a raw kung fu performance storyboard focused on extreme physical action."
+          "en": "GPT Image 2 Prompt for Storyboard:\n\nCreate a raw kung fu performance storyboard focused on extreme physical action. Use reference image for the character.\n\n16:9 storyboard sheet, 12 cinematic panels. The actual storyboard drawings must be black and white only: rough pencil lines, minimal detail, fast gesture drawing energy, simple anatomy construction and strong silhouette readability. Keep the artwork lightweight, dynamic and unfinished like early fight choreography previs.\n\nStart directly in action. Do not begin with a calm stance, preparation shot or slow introduction.\n\nA solitary female performer executes an aggressive Tibetan kung fu master-style routine inside a vast ancient temple. The choreography is exaggerated, explosive and constantly escalating: flying diagonal kicks, monk-style low stances, rapid palm strikes, spinning cloth-like body turns, animal-form hand shapes, deep lunges, aerial twists, floor-level sweeps, sudden drops, claw-like blocks, back-arched jumps, sliding recoveries and violent sculptural impact poses.\n\nEvery panel must contain visible motion and strong body momentum. Avoid static standing poses. The performer should feel like a ritual warrior moving with discipline, fury, spiritual pressure and total body control.\n\nAction progression:\n1. begin mid-air with a flying diagonal kick already in motion\n2. handheld close-up palm sweep cutting through air\n3. orbiting wide shot of a full-body spin\n4. low-angle impact palm strike with shockwave\n5. long-lens side profile spinning kick\n6. top-down aerial turn with body, hair and fabric flaring outward\n7. hard floor stomp cracking the temple stone\n8. sliding low sweep across the floor\n9. aggressive close-up flurry of elbows, palms and backfist strikes\n10. extreme low monk-style beast stance with energy rising\n11. spinning elemental vortex around the body\n12. final airborne action pose, suspended above the temple floor, body twisted in a powerful kung fu strike, all elements converging around her before impact\n\nAdd selective elemental energy effects as VFX-style storyboard accents. The effects should feel spiritual, ritualistic and cinematic, not superhero-like:\nair bursts around spins and flying kicks,\ndust and stone fragments lifting from stomps,\nwater-like floor ripples during slides,\nfire-like trails around explosive strikes,\nheat distortion around high-intensity movement,\nelemental vortex near the climax.\n\nElement progression:\nearly panels: subtle wind, dust and pressure lines\nmiddle panels: stronger stone fragments, floor ripples and air shockwaves\nlate panels: controlled fire trails and energy spirals\nfinal panel: the strongest combined elemental surge while the performer is still airborne\n\nUse cinematic arthouse action camerawork:\nhandheld energy,\nwhip-pan feeling,\norbiting camera moves,\noverhead shots,\nside silhouettes,\naggressive close-ups,\nlong-lens compression,\nextreme low angles,\nwide negative space,\nstrong parallax.\n\nKeep the temple environment minimal and atmospheric:\ntowering stone columns,\nworn temple floor,\ndrifting incense smoke,\nhanging fabric,\nharsh light shafts,\nfaint dust in the air,\nsubtle wet floor reflections.\nDo not overcrowd the frames.\n\nAnnotation color system:\nred arrows = body movement\nblue arrows = camera movement\ngreen marks = framing / composition notes\norange marks = lighting direction\nyellow marks = elemental VFX / energy effects\nblack text = short lens notes and panel labels\n\nNo timestamps. No dialogue. No singing. No extra characters. No enemies. No logos. No watermark.",
+          "original": "GPT Image 2 Prompt for Storyboard:\n\nCreate a raw kung fu performance storyboard focused on extreme physical action. Use reference image for the character.\n\n16:9 storyboard sheet, 12 cinematic panels. The actual storyboard drawings must be black and white only: rough pencil lines, minimal detail, fast gesture drawing energy, simple anatomy construction and strong silhouette readability. Keep the artwork lightweight, dynamic and unfinished like early fight choreography previs.\n\nStart directly in action. Do not begin with a calm stance, preparation shot or slow introduction.\n\nA solitary female performer executes an aggressive Tibetan kung fu master-style routine inside a vast ancient temple. The choreography is exaggerated, explosive and constantly escalating: flying diagonal kicks, monk-style low stances, rapid palm strikes, spinning cloth-like body turns, animal-form hand shapes, deep lunges, aerial twists, floor-level sweeps, sudden drops, claw-like blocks, back-arched jumps, sliding recoveries and violent sculptural impact poses.\n\nEvery panel must contain visible motion and strong body momentum. Avoid static standing poses. The performer should feel like a ritual warrior moving with discipline, fury, spiritual pressure and total body control.\n\nAction progression:\n1. begin mid-air with a flying diagonal kick already in motion\n2. handheld close-up palm sweep cutting through air\n3. orbiting wide shot of a full-body spin\n4. low-angle impact palm strike with shockwave\n5. long-lens side profile spinning kick\n6. top-down aerial turn with body, hair and fabric flaring outward\n7. hard floor stomp cracking the temple stone\n8. sliding low sweep across the floor\n9. aggressive close-up flurry of elbows, palms and backfist strikes\n10. extreme low monk-style beast stance with energy rising\n11. spinning elemental vortex around the body\n12. final airborne action pose, suspended above the temple floor, body twisted in a powerful kung fu strike, all elements converging around her before impact\n\nAdd selective elemental energy effects as VFX-style storyboard accents. The effects should feel spiritual, ritualistic and cinematic, not superhero-like:\nair bursts around spins and flying kicks,\ndust and stone fragments lifting from stomps,\nwater-like floor ripples during slides,\nfire-like trails around explosive strikes,\nheat distortion around high-intensity movement,\nelemental vortex near the climax.\n\nElement progression:\nearly panels: subtle wind, dust and pressure lines\nmiddle panels: stronger stone fragments, floor ripples and air shockwaves\nlate panels: controlled fire trails and energy spirals\nfinal panel: the strongest combined elemental surge while the performer is still airborne\n\nUse cinematic arthouse action camerawork:\nhandheld energy,\nwhip-pan feeling,\norbiting camera moves,\noverhead shots,\nside silhouettes,\naggressive close-ups,\nlong-lens compression,\nextreme low angles,\nwide negative space,\nstrong parallax.\n\nKeep the temple environment minimal and atmospheric:\ntowering stone columns,\nworn temple floor,\ndrifting incense smoke,\nhanging fabric,\nharsh light shafts,\nfaint dust in the air,\nsubtle wet floor reflections.\nDo not overcrowd the frames.\n\nAnnotation color system:\nred arrows = body movement\nblue arrows = camera movement\ngreen marks = framing / composition notes\norange marks = lighting direction\nyellow marks = elemental VFX / energy effects\nblack text = short lens notes and panel labels\n\nNo timestamps. No dialogue. No singing. No extra characters. No enemies. No logos. No watermark.",
+          "zh": "GPT Image 2 提示语：\n\n创作一套聚焦极限肢体动作的原始功夫表演分镜。角色使用参考图。\n\n16:9 分镜表，共 12 个电影感画格。实际分镜只使用黑白：粗糙铅笔线、最少细节、快速动态速写感、简单人体结构，以及清晰有力的剪影。画面要轻量、动态、未完成，像早期打斗编排预演。\n\n直接从动作开始，不要以平静站姿、准备镜头或缓慢开场起步。\n\n一名独自表演的女性在宏大的古代寺庙中完成侵略性极强的藏式功夫宗师套路。编排夸张、爆发，并持续升级：飞跃对角踢、僧侣式低姿态、快速掌击、布料般旋转的身体转身、动物形手势、深弓步、空中扭转、贴地扫腿、突然下坠、爪形格挡、后弓跳跃、滑步恢复和猛烈的雕塑式冲击姿势。\n\n每格都必须有明显运动与强烈身体动量，避免静态站姿。表演者应像一名仪式战士，兼具纪律、愤怒、精神压力与完整身体控制。\n\n动作顺序：\n1. 从已经在空中进行的飞跃对角踢开始\n2. 手持镜头特写：横扫掌风切开空气\n3. 环绕广角：完整全身旋转\n4. 低机位冲击掌，伴随冲击波\n5. 长焦侧面旋踢\n6. 俯拍空中转体，身体、头发和布料向外甩开\n7. 重踏地面，使寺庙石板开裂\n8. 贴地滑行扫腿\n9. 激进特写：肘击、掌击和反背拳连续爆发\n10. 极低僧侣式兽形姿态，能量升起\n11. 元素漩涡环绕身体旋转\n12. 最终空中动作：人物悬在寺庙地面上方，身体扭转完成强力功夫击打，所有元素在落地前汇聚\n\n用 VFX 分镜标记方式选择性加入元素能量。效果应具有精神性、仪式感和电影感，不要像超级英雄：旋转与飞踢周围的气流爆发；重踏带起尘土和碎石；滑行动作产生水波般地面涟漪；爆发攻击留下火焰般轨迹；高强度运动周围出现热变形；高潮附近形成元素漩涡。\n\n元素推进：前段只用轻微风、尘土和压力线；中段增强碎石、地面涟漪和空气冲击波；后段加入受控火焰轨迹与能量螺旋；最终画格在人物仍悬空时出现最强的组合元素冲击。\n\n使用电影作者式动作摄影：手持能量、甩镜感、环绕运镜、俯拍、侧面剪影、激进特写、长焦压缩、极低机位、宽阔负空间和强视差。\n\n寺庙环境保持克制而有氛围：高耸石柱、磨损地面、飘散香烟、悬挂布料、锐利光束、空气中的细尘和轻微湿地反射。不要让画面过度拥挤。\n\n标注颜色系统：红色箭头=身体运动；蓝色箭头=镜头运动；绿色标记=取景/构图；橙色标记=光线方向；黄色标记=元素 VFX/能量效果；黑色文字=简短镜头说明和画格标签。\n\n不要时间码、对白、歌唱、额外角色、敌人、Logo 或水印。"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en",
+        "image": {
+          "url": "https://pbs.twimg.com/media/HILpYZZWwAA41ul?format=jpg&name=orig",
+          "localPath": "case-references/meilin-storyboard.jpg",
+          "width": 1672,
+          "height": 941
         }
+      },
+      {
+        "id": "video",
+        "title": "Animate the storyboard",
+        "instruction": "Use character reference as image1 and the generated storyboard as image2.",
+        "mode": "video",
+        "dependsOn": [
+          "storyboard"
+        ],
+        "prompts": {
+          "en": "Seedance 2.0 Prompt:\n\nCreate a 15-second cinematic kung fu performance video.\n\nUse @[image1]  as the fixed character sheet reference. The character must strictly match the character sheet.\nUse @[image2]  as the storyboard reference.\n\nFollow the storyboard shot by shot as the main source for action order, camera rhythm, body movement, framing, movement direction, camera angles and visual progression. Treat each storyboard panel as a sequential keyframe. Preserve the shot order and make the video feel like the storyboard has been translated into continuous live-action motion. The sequence must end on a frozen final frame while the performer is still airborne.\n\nDo not add text, captions, storyboard labels, arrows, UI, logos or watermarks. Do not treat the storyboard as a single image. Do not redesign the character, change the costume or alter the face. Do not begin with a calm stance, preparation pose or slow introduction. Do not make the elemental effects look like superhero powers or excessive fantasy glow.\n\nVisual style:\nstylized cinematic realism, high-end 3D painterly animation quality, dynamic cloth simulation, expressive silhouette design, rich cinematic lighting, controlled color palette, natural motion blur, dramatic scale, beautiful but aggressive physicality, premium feature-animation aesthetic.\n\nEnvironment:\nvast ancient temple, towering stone columns, worn temple floor, drifting incense smoke, hanging fabric, harsh light shafts, faint dust in the air, subtle wet floor reflections, high contrast shadows.\n\nThe performance is a solitary female kung fu routine inside a vast ancient temple. The routine starts immediately in action, with no calm stance, no preparation pose and no slow introduction. The movement should feel aggressive, ritualistic, disciplined, physically extreme and spiritually charged.\n\nThis is not a fight against an enemy. It is a solo performance of force, control, exhaustion, fury and release.\n\nFollow story board for choreography direction.\n\nElement progression:\nearly sequence: subtle wind, dust and pressure lines responding to movement.\nmiddle sequence: stronger air shockwaves, stone fragments, floor cracks and water-like ripples across the temple floor.\nlate sequence: controlled fire trails, heat distortion and energy spirals around explosive strikes and kicks.\nclimax: wind, dust, stone, water ripple and fire accents combine into a stronger elemental vortex.\nfinal beat: the performer is airborne above the temple floor in a powerful kung fu strike, body twisted mid-air, hair and fabric flaring outward, with all elements converging around her before impact.\n\nElemental VFX must feel spiritual, ritualistic and cinematic. The effects should be integrated with the choreography and motivated by physical movement. Keep the energy raw, elemental, atmospheric and grounded in the temple environment.\n\nUse Laban movement logic throughout:\nweight: strong, heavy, grounded during impacts, with brief lightness during jumps and aerial twists\ntime: quick during strikes, kicks, drops and turns, sustained during suspended holds and recovery transitions\nspace: direct during attacks, blocks and lunges, indirect during spinning turns and elemental vortex moments\nflow: bound during rooted stances and precise strikes, free during aerial motion, spinning fabric movement and elemental release",
+          "original": "Seedance 2.0 Prompt:\n\nCreate a 15-second cinematic kung fu performance video.\n\nUse @[image1]  as the fixed character sheet reference. The character must strictly match the character sheet.\nUse @[image2]  as the storyboard reference.\n\nFollow the storyboard shot by shot as the main source for action order, camera rhythm, body movement, framing, movement direction, camera angles and visual progression. Treat each storyboard panel as a sequential keyframe. Preserve the shot order and make the video feel like the storyboard has been translated into continuous live-action motion. The sequence must end on a frozen final frame while the performer is still airborne.\n\nDo not add text, captions, storyboard labels, arrows, UI, logos or watermarks. Do not treat the storyboard as a single image. Do not redesign the character, change the costume or alter the face. Do not begin with a calm stance, preparation pose or slow introduction. Do not make the elemental effects look like superhero powers or excessive fantasy glow.\n\nVisual style:\nstylized cinematic realism, high-end 3D painterly animation quality, dynamic cloth simulation, expressive silhouette design, rich cinematic lighting, controlled color palette, natural motion blur, dramatic scale, beautiful but aggressive physicality, premium feature-animation aesthetic.\n\nEnvironment:\nvast ancient temple, towering stone columns, worn temple floor, drifting incense smoke, hanging fabric, harsh light shafts, faint dust in the air, subtle wet floor reflections, high contrast shadows.\n\nThe performance is a solitary female kung fu routine inside a vast ancient temple. The routine starts immediately in action, with no calm stance, no preparation pose and no slow introduction. The movement should feel aggressive, ritualistic, disciplined, physically extreme and spiritually charged.\n\nThis is not a fight against an enemy. It is a solo performance of force, control, exhaustion, fury and release.\n\nFollow story board for choreography direction.\n\nElement progression:\nearly sequence: subtle wind, dust and pressure lines responding to movement.\nmiddle sequence: stronger air shockwaves, stone fragments, floor cracks and water-like ripples across the temple floor.\nlate sequence: controlled fire trails, heat distortion and energy spirals around explosive strikes and kicks.\nclimax: wind, dust, stone, water ripple and fire accents combine into a stronger elemental vortex.\nfinal beat: the performer is airborne above the temple floor in a powerful kung fu strike, body twisted mid-air, hair and fabric flaring outward, with all elements converging around her before impact.\n\nElemental VFX must feel spiritual, ritualistic and cinematic. The effects should be integrated with the choreography and motivated by physical movement. Keep the energy raw, elemental, atmospheric and grounded in the temple environment.\n\nUse Laban movement logic throughout:\nweight: strong, heavy, grounded during impacts, with brief lightness during jumps and aerial twists\ntime: quick during strikes, kicks, drops and turns, sustained during suspended holds and recovery transitions\nspace: direct during attacks, blocks and lunges, indirect during spinning turns and elemental vortex moments\nflow: bound during rooted stances and precise strikes, free during aerial motion, spinning fabric movement and elemental release",
+          "zh": "Seedance 2.0 提示语：\n\n创作一段 15 秒电影感功夫表演视频。\n\n使用 @[image1] 作为固定角色设定图，角色必须严格匹配；使用 @[image2] 作为分镜参考。\n\n以分镜为动作顺序、镜头节奏、身体运动、取景、运动方向、机位与视觉推进的主要依据，逐镜跟随。把每个画格视为连续关键帧，让成片像分镜被转译成连贯真人动作。结尾必须冻结在表演者仍悬空的最终画面。\n\n不要添加文字、字幕、分镜标签、箭头、UI、Logo 或水印；不要把分镜当成一张静态图片；不要重新设计角色、改变服装或脸；不要从平静站姿、准备动作或缓慢开场开始；元素效果不要像超级英雄能力，也不要出现过量幻想光效。\n\n视觉风格：风格化电影写实、高端 3D 绘画动画品质、动态布料模拟、有表现力的剪影、丰富电影灯光、受控色盘、自然运动模糊、戏剧尺度、优美但侵略性强的肢体表现，以及高级长片动画质感。\n\n环境：宏大古代寺庙、高耸石柱、磨损地面、飘散香烟、悬挂布料、锐利光束、细微浮尘、湿地反射和高对比阴影。\n\n这是一名女性在宏大寺庙中的独舞式功夫套路。立即进入动作，没有平静站姿、准备姿势或缓慢开场。运动应具侵略性、仪式性、纪律性、极端身体强度和精神能量。\n\n这不是与敌人战斗，而是力量、控制、疲惫、愤怒与释放的独人表演。编排方向遵循分镜。\n\n元素推进：前段为响应动作的轻微风、尘土与压力线；中段增强空气冲击波、碎石、地裂与水波般涟漪；后段在爆发掌击和踢击周围加入受控火焰轨迹、热变形与能量螺旋；高潮把风、尘、石、水波和火焰汇成更强元素漩涡；最终人物悬在地面上方，以强力功夫击打姿势扭转身体，头发与布料向外飞扬，所有元素在落地前汇聚。\n\n元素 VFX 必须具有精神性、仪式感与电影感，并由身体运动驱动、融入编排；能量保持原始、元素化、有空气感，并扎根于寺庙环境。\n\n全程遵循拉班动作逻辑：重量——冲击时强、重、扎根，跳跃和空中扭转时短暂轻盈；时间——攻击、踢击、下坠和转身快速，悬停与恢复过渡持续；空间——攻击、格挡和弓步直接，旋转和元素漩涡间接；流动——扎根姿势和精准打击时受控，空中运动、布料旋转和元素释放时自由。"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en",
+        "inputOrder": [
+          "character",
+          "storyboard"
+        ]
       }
     ],
-    "referenceMedia": [],
+    "referenceMedia": [
+      {
+        "kind": "image",
+        "url": "https://pbs.twimg.com/media/HINXRi_W0AAdKMV?format=jpg&name=orig",
+        "caption": "Original character sheet · @aimikoda",
+        "localPath": "case-references/meilin-character.jpg"
+      },
+      {
+        "kind": "image",
+        "url": "https://pbs.twimg.com/media/HILpYZZWwAA41ul?format=jpg&name=orig",
+        "caption": "Original 12-panel storyboard · @aimikoda",
+        "localPath": "case-references/meilin-storyboard.jpg"
+      }
+    ],
     "outputMedia": [
       {
         "kind": "video",
@@ -121,16 +132,35 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "caption": "Original creator's external sample · @aimikoda"
       }
     ],
-    "sourceCompleteness": "excerpt",
-    "mediaRights": "pending"
+    "sourceCompleteness": "complete",
+    "mediaRights": "licensed",
+    "referenceInputs": [
+      {
+        "id": "character",
+        "title": "Character reference",
+        "kind": "image",
+        "role": "@[image1] · character identity",
+        "stageIds": [
+          "storyboard",
+          "video"
+        ],
+        "required": true,
+        "image": {
+          "url": "https://pbs.twimg.com/media/HINXRi_W0AAdKMV?format=jpg&name=orig",
+          "localPath": "case-references/meilin-character.jpg",
+          "width": 1672,
+          "height": 941
+        }
+      }
+    ]
   },
   {
     "id": "seedance:real-case-07-techiebysa",
     "contentKind": "case",
     "title": "French croissant-making process",
     "titleZh": "法式牛角包制作过程",
-    "summary": "A storyboard-led baking sequence. Full source prompt available through the original post.",
-    "summaryZh": "以分镜组织烘焙过程；完整提示词请通过原帖查看。",
+    "summary": "Generate an 8-panel croissant-making storyboard, then animate it into one 12-second video.",
+    "summaryZh": "先生成 8 格牛角包制作分镜，再生成一段 12 秒视频。",
     "category": "Food and process",
     "tags": [
       "Storyboard",
@@ -140,8 +170,8 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "sourceModel": "GPT Image 2 + Seedance 2.0 (curator-reported)",
     "notes": [
-      "The previous practice prompts were independently written and have been removed. Existing copies in personal assets are not changed. This case does not contain a complete source transcript.",
-      "External media remains on its source host; availability and reuse rights are not guaranteed. No media is mirrored or stored in your assets."
+      "Full prompt use authorized by the user. Complete prompt text verified against the original X posts; Chinese translations are provided separately.",
+      "Source reference images are included in the saved workflow. External sample videos remain links and are not generation inputs."
     ],
     "relatedIds": [
       "seedance:storyboard-grid-to-video"
@@ -151,7 +181,8 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "role": "original",
         "label": "Original post on X",
         "author": "@TechieBySA",
-        "url": "https://x.com/TechieBySA/status/2053523775702925768"
+        "url": "https://x.com/TechieBySA/status/2053523775702925768",
+        "license": "Full prompt use authorized by the user"
       },
       {
         "role": "curation",
@@ -162,25 +193,70 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "role": "curation",
         "label": "Awesome Seedance · case index",
         "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+      },
+      {
+        "role": "original",
+        "label": "Image prompt · original reply",
+        "url": "https://x.com/TechieBySA/status/2053523784481554759",
+        "author": "@TechieBySA",
+        "license": "Full prompt use authorized by the user"
+      },
+      {
+        "role": "original",
+        "label": "Video prompt · original reply",
+        "url": "https://x.com/TechieBySA/status/2053523788336087071",
+        "author": "@TechieBySA",
+        "license": "Full prompt use authorized by the user"
       }
     ],
     "steps": [
       {
-        "id": "source-excerpt",
-        "title": "Original prompt excerpt",
-        "instruction": "Only a short excerpt is included here. Read the original post for the complete prompt; this excerpt alone is not the prompt that produced the sample.",
-        "textKind": "source-excerpt",
-        "originalKind": "excerpt",
-        "originalLanguage": "en",
-        "originalZh": "使用附上的 THE CROISSANT BAKER 分镜图作为精确参考。",
+        "id": "storyboard",
+        "title": "Generate the 8-panel storyboard",
+        "instruction": "Generate the complete storyboard sheet; all eight panels belong to one image.",
+        "mode": "image",
+        "dependsOn": [],
         "prompts": {
-          "en": "Use the attached THE CROISSANT BAKER storyboard image as the exact reference.",
-          "zh": "使用附上的 THE CROISSANT BAKER 分镜图作为精确参考。",
-          "original": "Use the attached THE CROISSANT BAKER storyboard image as the exact reference."
+          "en": "GPT Image 2 Storyboard prompt:\n\n“Create a crisp, clean infographic storyboard poster for THE CROISSANT BAKER. Wide 16:9 layout, white background, black borders, bold black typography, premium Pixar 3D stylized rendering, bright vivid colors — warm golden yellows, rich buttery creams, flaky browns, soft pastry whites, warm French bakery morning light.\nTop header:\n\nTHE CROISSANT BAKER\nTOTAL VIDEO TIME: 12 SECONDS\n8 SHOTS · WARM · FLAKY · IRRESISTIBLE\nLegend icons: ACTION, HEAT, TIME HINT, INGREDIENT\nThin warm golden accent line running full width beneath header\n\nSame Pixar-style young French male baker throughout: white baker's jacket, flour-dusted hands, warm authentic French boulangerie setting, marble countertop, warm morning light streaming through windows, bread racks in background. Bright, warm, delicious. Every panel a completely different composition and color.\n8 panels:\n\nTHE OPENER — Wide shot of baker arriving at the boulangerie before dawn, tying apron, switching on the warm kitchen lights, marble counter visible, bread racks behind, flour dusting the air, full world established, bright and cinematic\nTHE BUTTER BLOCK — Baker slams a massive cold block of European butter onto the marble counter with both hands, dramatic impact, flour cloud puffing up, close-up on hands, this is the bones moment — the start of everything\nTHE LAMINATION — Baker folding the dough over the butter block precisely, rolling pin pressing down hard, layers building, side angle shot showing the beautiful layering beginning, confident and skilled\nTHE ROLL — Dough rolled out into a large thin sheet, baker leaning into the rolling pin with full body weight, marble counter, flour dusting everywhere, wide shot showing the scale of the dough\nTHE SHAPE — Triangles cut from the dough, baker rolling each one from the wide end into a tight crescent, hands moving fast and confident, close-up on the shaping, beautiful and precise\nTHE EGG WASH — Baker brushing golden egg wash over each shaped croissant with a pastry brush, each one glistening beautifully, close-up overhead angle, warm golden color, stunning composition\nTHE OVEN — Croissants slid into the blazing hot oven on a tray, oven door closed, through the oven glass croissants visibly puffing and turning deep golden, layers separating dramatically, warm orange glow\nTHE TEAR — Baker pulls a perfect golden croissant from the rack, holds it up, tears it open slowly revealing hundreds of impossibly flaky buttery layers inside, steam escaping, butter glistening — this is the cheese pull moment, the hero shot of the entire video\n\nFooter:\n\nVIDEO FLOW: 8 shots × 1.5s = 12 seconds. Butter block to the tear.\nCAMERA TIPS: wide on opener, close-up on butter slam and shaping, side angle on lamination, overhead on egg wash, oven glass for panel 7, extreme close-up on the tear reveal\nLIGHT & STYLE: warm golden French bakery morning light, buttery cream tones, flour dust in the air, bright vivid Pixar colors, shallow depth of field on close-ups\nBAKER NOTES: one baker, one perfect croissant, one irresistible tear. The lamination layers and the final tear are everything — make them stunning.”",
+          "original": "GPT Image 2 Storyboard prompt:\n\n“Create a crisp, clean infographic storyboard poster for THE CROISSANT BAKER. Wide 16:9 layout, white background, black borders, bold black typography, premium Pixar 3D stylized rendering, bright vivid colors — warm golden yellows, rich buttery creams, flaky browns, soft pastry whites, warm French bakery morning light.\nTop header:\n\nTHE CROISSANT BAKER\nTOTAL VIDEO TIME: 12 SECONDS\n8 SHOTS · WARM · FLAKY · IRRESISTIBLE\nLegend icons: ACTION, HEAT, TIME HINT, INGREDIENT\nThin warm golden accent line running full width beneath header\n\nSame Pixar-style young French male baker throughout: white baker's jacket, flour-dusted hands, warm authentic French boulangerie setting, marble countertop, warm morning light streaming through windows, bread racks in background. Bright, warm, delicious. Every panel a completely different composition and color.\n8 panels:\n\nTHE OPENER — Wide shot of baker arriving at the boulangerie before dawn, tying apron, switching on the warm kitchen lights, marble counter visible, bread racks behind, flour dusting the air, full world established, bright and cinematic\nTHE BUTTER BLOCK — Baker slams a massive cold block of European butter onto the marble counter with both hands, dramatic impact, flour cloud puffing up, close-up on hands, this is the bones moment — the start of everything\nTHE LAMINATION — Baker folding the dough over the butter block precisely, rolling pin pressing down hard, layers building, side angle shot showing the beautiful layering beginning, confident and skilled\nTHE ROLL — Dough rolled out into a large thin sheet, baker leaning into the rolling pin with full body weight, marble counter, flour dusting everywhere, wide shot showing the scale of the dough\nTHE SHAPE — Triangles cut from the dough, baker rolling each one from the wide end into a tight crescent, hands moving fast and confident, close-up on the shaping, beautiful and precise\nTHE EGG WASH — Baker brushing golden egg wash over each shaped croissant with a pastry brush, each one glistening beautifully, close-up overhead angle, warm golden color, stunning composition\nTHE OVEN — Croissants slid into the blazing hot oven on a tray, oven door closed, through the oven glass croissants visibly puffing and turning deep golden, layers separating dramatically, warm orange glow\nTHE TEAR — Baker pulls a perfect golden croissant from the rack, holds it up, tears it open slowly revealing hundreds of impossibly flaky buttery layers inside, steam escaping, butter glistening — this is the cheese pull moment, the hero shot of the entire video\n\nFooter:\n\nVIDEO FLOW: 8 shots × 1.5s = 12 seconds. Butter block to the tear.\nCAMERA TIPS: wide on opener, close-up on butter slam and shaping, side angle on lamination, overhead on egg wash, oven glass for panel 7, extreme close-up on the tear reveal\nLIGHT & STYLE: warm golden French bakery morning light, buttery cream tones, flour dust in the air, bright vivid Pixar colors, shallow depth of field on close-ups\nBAKER NOTES: one baker, one perfect croissant, one irresistible tear. The lamination layers and the final tear are everything — make them stunning.”",
+          "zh": "GPT Image 2 分镜提示语：\n\n“为 THE CROISSANT BAKER 创作一张清晰、干净的信息图式分镜海报。宽幅 16:9，白色背景、黑色边框、粗体黑字、高级皮克斯式 3D 风格渲染，以及明亮鲜艳的颜色——温暖金黄、浓郁黄油奶油色、酥脆棕色、柔和糕点白和法式面包店晨光。\n\n顶部标题：\nTHE CROISSANT BAKER\nTOTAL VIDEO TIME: 12 SECONDS\n8 SHOTS · WARM · FLAKY · IRRESISTIBLE\n图例图标：ACTION、HEAT、TIME HINT、INGREDIENT\n标题下方贯穿全宽的一条细金色强调线。\n\n全程保持同一名皮克斯风年轻法国男面包师：白色厨师服、沾面粉的双手、真实温暖的法式面包房、铺有大理石台面，晨光从窗户照入，背景有面包架。画面明亮、温暖、诱人。每个画格的构图和色彩都必须明显不同。\n\n8 个画格：\n1. 开场——广角展示面包师黎明前到店、系围裙、打开温暖厨房灯。可见大理石台面与面包架，面粉漂浮在空气中，完整建立明亮、电影感世界。\n2. 黄油块——面包师双手把一大块冰冷欧洲黄油猛砸到大理石台面，产生强烈冲击和面粉云；手部特写。这是整个过程的骨架，也是全部制作的起点。\n3. 开酥——面包师精准地把面团折叠包住黄油，擀面杖用力压下，层次开始建立。侧面机位展示漂亮的层叠，动作熟练、自信。\n4. 擀开——面团擀成大而薄的面片，面包师用全身重量压向擀面杖；大理石台面上面粉四散。广角展示面片规模。\n5. 塑形——把面片切成三角形，从宽端快速、熟练地卷成紧致新月；手部塑形特写，漂亮且精准。\n6. 刷蛋液——用糕点刷给每只牛角包刷上金色蛋液，使其闪亮；近距离俯拍，暖金色，构图精美。\n7. 烘烤——托盘送入炽热烤箱并关门。透过烤箱玻璃可见牛角包明显膨胀、转成深金色，层次戏剧性分离，充满暖橙光。\n8. 撕开——面包师从烤架拿起完美的金色牛角包，慢慢撕开，露出数百层夸张酥脆的黄油层；蒸汽逸出、黄油闪光。这是奶酪拉丝式的高潮，也是整段视频的英雄镜头。\n\n页脚：\nVIDEO FLOW：8 镜 × 1.5 秒 = 12 秒，从黄油块到撕开。\nCAMERA TIPS：开场广角；砸黄油与塑形特写；开酥侧面；擀面广角；刷蛋液俯拍；第 7 格透过烤箱玻璃；最终撕开使用极近英雄特写。\nLIGHT & STYLE：持续使用温暖金色法式面包店晨光、黄油奶油色、空气中的面粉微粒；近景使用浅景深。\nBAKER NOTES：一个面包师、一只完美牛角包、一次令人无法抗拒的撕开。开酥层次与最终撕开是全部重点，必须惊艳。”"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en",
+        "image": {
+          "url": "https://pbs.twimg.com/media/HH-U_z7XkAAUii6?format=jpg&name=orig",
+          "localPath": "case-references/croissant-storyboard.jpg",
+          "width": 1248,
+          "height": 832
         }
+      },
+      {
+        "id": "video",
+        "title": "Animate the storyboard",
+        "instruction": "Use the generated storyboard as the video reference. Preserve the original 12-second timing.",
+        "mode": "video",
+        "dependsOn": [
+          "storyboard"
+        ],
+        "prompts": {
+          "en": "Seedance 2.0 prompt:\n\n“Use the attached THE CROISSANT BAKER storyboard image as the exact reference.\nCreate a 12-second 16:9 animated croissant-making sequence that follows the 8-shot storyboard exactly. Preserve the same Pixar-style young French male baker, white jacket, flour-dusted hands, warm authentic French boulangerie, marble counter, and bright golden color aesthetic throughout.\nRules:\n•Follow the sequence exactly from 1 to 8\n•One shot per panel, approximately 1.5 seconds each\n•No skipped steps, no extra steps beyond the storyboard\n•Maintain character and bakery continuity throughout\n•Emphasize the butter slam, lamination layers, crescent shaping, egg wash glisten, oven puff, and final flaky tear reveal\nShot sequence:\n1.Baker arrives before dawn, ties apron, switches on warm kitchen lights — wide establishing shot, full boulangerie world visible\n2.Massive cold butter block slammed onto marble counter — dramatic impact, flour cloud explosion, close-up hands only\n3.Dough folded precisely over butter, rolling pin pressing down hard — side angle, beautiful layers building\n4.Dough rolled into large thin sheet — baker leaning into rolling pin with full body weight, flour dusting everywhere\n5.Triangles cut and rolled into tight crescents — hands moving fast and confident, close-up on shaping\n6.Golden egg wash brushed over each croissant — pastry brush close-up, each one glistening, overhead angle\n7.Croissants in blazing oven — through oven glass puffing dramatically, turning deep golden, layers separating, warm orange glow\n8.Baker tears open a perfect golden croissant — hundreds of flaky buttery layers revealed, steam escaping, butter glistening, pure satisfaction\nCamera:\n•Wide establishing shot for the opener\n•Close-up hands only for butter slam and crescent shaping\n•Side angle for the lamination\n•Wide shot for the dough roll\n•Overhead for the egg wash\n•Oven glass shot for panel 7\n•Extreme close-up hero shot for the final tear\nStyle:\n•Warm golden French bakery morning light throughout\n•Buttery cream tones, flour dust particles in the air, marble counter\n•Pixar CGI vivid expressive animation\n•Shallow depth of field on close-up shots\n•Smooth satisfying cuts, warm and joyful energy throughout\nGoal: A mouth-watering 12-second croissant journey from butter block to flaky tear — warm, golden, layered, and impossible to scroll past.​​​​​​​​​​​​​​​​“",
+          "original": "Seedance 2.0 prompt:\n\n“Use the attached THE CROISSANT BAKER storyboard image as the exact reference.\nCreate a 12-second 16:9 animated croissant-making sequence that follows the 8-shot storyboard exactly. Preserve the same Pixar-style young French male baker, white jacket, flour-dusted hands, warm authentic French boulangerie, marble counter, and bright golden color aesthetic throughout.\nRules:\n•Follow the sequence exactly from 1 to 8\n•One shot per panel, approximately 1.5 seconds each\n•No skipped steps, no extra steps beyond the storyboard\n•Maintain character and bakery continuity throughout\n•Emphasize the butter slam, lamination layers, crescent shaping, egg wash glisten, oven puff, and final flaky tear reveal\nShot sequence:\n1.Baker arrives before dawn, ties apron, switches on warm kitchen lights — wide establishing shot, full boulangerie world visible\n2.Massive cold butter block slammed onto marble counter — dramatic impact, flour cloud explosion, close-up hands only\n3.Dough folded precisely over butter, rolling pin pressing down hard — side angle, beautiful layers building\n4.Dough rolled into large thin sheet — baker leaning into rolling pin with full body weight, flour dusting everywhere\n5.Triangles cut and rolled into tight crescents — hands moving fast and confident, close-up on shaping\n6.Golden egg wash brushed over each croissant — pastry brush close-up, each one glistening, overhead angle\n7.Croissants in blazing oven — through oven glass puffing dramatically, turning deep golden, layers separating, warm orange glow\n8.Baker tears open a perfect golden croissant — hundreds of flaky buttery layers revealed, steam escaping, butter glistening, pure satisfaction\nCamera:\n•Wide establishing shot for the opener\n•Close-up hands only for butter slam and crescent shaping\n•Side angle for the lamination\n•Wide shot for the dough roll\n•Overhead for the egg wash\n•Oven glass shot for panel 7\n•Extreme close-up hero shot for the final tear\nStyle:\n•Warm golden French bakery morning light throughout\n•Buttery cream tones, flour dust particles in the air, marble counter\n•Pixar CGI vivid expressive animation\n•Shallow depth of field on close-up shots\n•Smooth satisfying cuts, warm and joyful energy throughout\nGoal: A mouth-watering 12-second croissant journey from butter block to flaky tear — warm, golden, layered, and impossible to scroll past.​​​​​​​​​​​​​​​​“",
+          "zh": "Seedance 2.0 提示语：\n\n“严格使用所附 THE CROISSANT BAKER 分镜图作为参考。\n创作一段 12 秒、16:9 的牛角包制作动画，严格遵循 8 镜分镜。全程保持同一名皮克斯风年轻法国男面包师、白色厨师服、沾面粉双手、温暖真实的法式面包店、大理石台面和明亮金色美学。\n\n规则：\n• 严格按 1 到 8 的顺序\n• 每格一个镜头，每镜约 1.5 秒\n• 不跳步骤，不增加分镜之外的步骤\n• 保持角色与面包店连续性\n• 强调砸黄油、开酥层次、新月塑形、蛋液光泽、烤箱膨胀和最终酥层撕开\n\n镜头顺序：\n1. 面包师黎明前到店、系围裙、打开暖色厨房灯——广角建立镜头，完整展示面包房。\n2. 巨大冰冷黄油块猛砸大理石台面——戏剧冲击、面粉云爆开，只拍双手特写。\n3. 面团精准包住黄油，擀面杖用力下压——侧面机位，漂亮层次形成。\n4. 面团擀成大片薄面——面包师以全身重量压擀面杖，面粉四散。\n5. 三角面片切好并卷成紧致新月——双手快速、自信，塑形特写。\n6. 给每只牛角包刷金色蛋液——糕点刷近景，每只都闪亮，俯拍。\n7. 牛角包在炽热烤箱中——透过玻璃明显膨胀、变深金色，层次分离，暖橙光。\n8. 面包师撕开完美金色牛角包——数百层黄油酥层显露，蒸汽逸出、黄油闪亮，纯粹满足感。\n\n摄影：开场广角；砸黄油和新月塑形只拍双手特写；开酥侧面；擀面广角；刷蛋液俯拍；第 7 格透过烤箱玻璃；最终撕开使用极近英雄特写。\n\n风格：全程温暖金色法式面包店晨光；黄油奶油色、空气中的面粉颗粒、大理石台面；皮克斯 CGI 鲜艳有表现力的动画；特写使用浅景深；剪辑顺滑满足，始终保持温暖、愉快的能量。\n\n目标：完成一段从黄油块到酥层撕开的 12 秒诱人旅程——温暖、金黄、层次丰富，让人无法滑走。”"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en"
       }
     ],
-    "referenceMedia": [],
+    "referenceMedia": [
+      {
+        "kind": "image",
+        "url": "https://pbs.twimg.com/media/HH-U_z7XkAAUii6?format=jpg&name=orig",
+        "caption": "Original croissant storyboard · @TechieBySA",
+        "localPath": "case-references/croissant-storyboard.jpg"
+      }
+    ],
     "outputMedia": [
       {
         "kind": "video",
@@ -189,16 +265,17 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "caption": "Original creator's external sample · @TechieBySA"
       }
     ],
-    "sourceCompleteness": "excerpt",
-    "mediaRights": "pending"
+    "sourceCompleteness": "complete",
+    "mediaRights": "licensed",
+    "referenceInputs": []
   },
   {
     "id": "seedance:apartment-arrival-storyboard-animation",
     "contentKind": "case",
     "title": "Apartment arrival storyboard",
     "titleZh": "公寓归家分镜动画",
-    "summary": "A homecoming sequence illustrating prop and location continuity. The curator’s transcript is incomplete.",
-    "summaryZh": "展示道具与场景连续性的归家案例；整理站收录原文存在截断。",
+    "summary": "Create two six-panel storyboards from the supplied character and apartment sheets, then animate each into a 15-second video.",
+    "summaryZh": "使用随附的角色与公寓设定图生成两组六格分镜，再分别生成 15 秒视频。",
     "category": "Narrative and continuity",
     "tags": [
       "Storyboard",
@@ -208,9 +285,9 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
     ],
     "sourceModel": "Seedance 2.0 (curator-reported)",
     "notes": [
-      "The previous practice prompts were independently written and have been removed. Existing copies in personal assets are not changed. This case does not contain a complete source transcript.",
-      "External media remains on its source host; availability and reuse rights are not guaranteed. No media is mirrored or stored in your assets.",
-      "The upstream transcript is truncated. We do not present it as a complete original prompt."
+      "Full prompt use authorized by the user. Complete prompt text verified against the original X posts; Chinese translations are provided separately.",
+      "Source reference images are included in the saved workflow. External sample videos remain links and are not generation inputs.",
+      "The author published one nine-panel overview, not two six-panel grids. It is included as separate source material. Generate Grid 1 and Grid 2 with the complete original image prompts before their video steps. The same published apartment and handbag sheet is used in both sequences; the first video prompt calls it exterior, while the sheet and image prompts show the interior."
     ],
     "relatedIds": [
       "seedance:storyboard-grid-to-video"
@@ -220,7 +297,8 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "role": "original",
         "label": "Original post on X",
         "author": "@Just_sharon7",
-        "url": "https://x.com/Just_sharon7/status/2083912532692001128"
+        "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+        "license": "Full prompt use authorized by the user"
       },
       {
         "role": "curation",
@@ -231,25 +309,118 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "role": "curation",
         "label": "Awesome Seedance · case index",
         "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+      },
+      {
+        "role": "original",
+        "label": "Original storyboard prompts and overview",
+        "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+        "author": "@Just_sharon7",
+        "license": "Use authorized by the user"
+      },
+      {
+        "role": "original",
+        "label": "Original character and apartment sheets",
+        "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+        "author": "@Just_sharon7",
+        "license": "Use authorized by the user"
       }
     ],
     "steps": [
       {
-        "id": "source-excerpt",
-        "title": "Original prompt excerpt",
-        "instruction": "Only a short excerpt is included here. Read the original post for the complete prompt; this excerpt alone is not the prompt that produced the sample.",
-        "textKind": "source-excerpt",
-        "originalKind": "excerpt",
-        "originalLanguage": "en",
-        "originalZh": "将公寓保持为一个固定且一致的物理环境。",
+        "id": "grid-1-image",
+        "title": "Generate Grid 1 · 6-panel storyboard",
+        "instruction": "Use the original character and apartment sheets to generate this six-panel grid. The published nine-panel overview is separate source material.",
+        "mode": "image",
+        "dependsOn": [],
         "prompts": {
-          "en": "Maintain the apartment as one fixed physical environment.",
-          "zh": "将公寓保持为一个固定且一致的物理环境。",
-          "original": "Maintain the apartment as one fixed physical environment."
-        }
+          "en": "GRID 1 — 0:00–0:15\nPROMPT:\nCreate a detailed cinematic 6-panel storyboard grid arranged 3 columns × 2 rows, covering the first 15 seconds of an animated short film. Overall canvas aspect ratio 16:9.\nUse the attached Jema character sheet as the exact character reference and the attached Jema’s Apartment interior sheet as the exact environment and handbag reference.\nREFERENCE LOCK\nJema: Reproduce the exact character from the attached character sheet. Maintain her face, warm tan skin, brown eyes, platinum-blonde messy bun with loose front strands, body proportions, black button-up blouse, high-waisted black corporate trousers, black belt with gold buckle, black heels and gold jewelry.\nApartment: Treat the apartment reference as a fixed physical set, not inspiration. Maintain the exact floor plan, entryway, kitchen geometry, cabinetry, island, living room, sofa, TV wall, furniture, doors, lighting fixtures, décor and spatial relationships shown in the reference.\nThe apartment must not be redesigned between panels. Only Jema, the camera and movable props change position.\nHandbag: Use the exact black Hermès Birkin 25 shown in the apartment reference: structured black leather, two short top handles and gold hardware. No shoulder strap or long strap.\nMaintain visual continuity from one panel to the next.\n⸻\nPANEL 1 — ARRIVAL | 0:00–0:02.5\nWide establishing shot from inside the apartment facing the exact entryway shown in the reference.\nThe front door is open and Jema is walking through it, arriving home from work.\nShe carries the black Hermès Birkin, naturally by its short top handles in one hand while her other hand is with car keys.\nShow enough of the established entryway to immediately identify the apartment: dark wood door, console table, round mirror and surrounding architecture in their reference positions.\nJema looks slightly tired after work. Relaxed shoulders, calm face, natural walking posture.\nCamera: Wide, eye-level cinematic shot.\n⸻\nPANEL 2 — KEYS | 0:02.5–0:04.5\nMedium side-angle shot at the same entry console.\nJema casually drops her car keys onto the wooden console.\nThe black Hermès Birkin is still in her other hand, held by its short handles.\nCapture the keys at the moment they touch the table.\nHer expression is relaxed and habitual.\nCamera: Medium shot with the keys, Jema and handbag clearly readable.\nThe apartment layout and entryway remain exactly unchanged from Panel 1.\n⸻\nPANEL 3 — HANDBAG + JARVIS | 0:04.5–0:07\nWide shot showing Jema moving from the entry/living area toward the kitchen.\nAs she passes behind the exact cream sofa from the apartment reference, she casually tosses the black Hermès Birkin onto the sofa.\nCapture the handbag either leaving her hand or just landing on the cushion, while continuing toward the kitchen.\nHer expression is calm and confident.\nCamera: Wide cinematic shot that preserves the established relationship between the living room, entry and kitchen.\n⸻\nPANEL 4 — JARVIS ANSWERS | 0:07–0:09.5\nMedium shot at the exact kitchen island from the apartment reference.\nJema has reached the counter.\nA clear drinking glass is sitting in front of her and she reaches for it.\nThe glass is completely empty. No water inside it. She has not started pouring yet.\nA clear water bottle/carafe is nearby.\nCamera: Medium shot showing Jema, the empty glass and enough of the kitchen to maintain continuity.\n⸻\nPANEL 5 — 50 UGC VIDEOS | 0:09.5–0:12.5\nClose-up at the same kitchen counter.\nJema now pours water from the clear bottle/carafe into the same previously empty glass.\nShow the water stream visibly entering the glass.\nJema is still calm.\nCamera: Cinematic close-up focused on the bottle, water stream, glass and Jema’s hands, with the established kitchen softly visible behind.\n⸻\nPANEL 6 — SUBTLE REACTION | 0:12.5–0:15\nMedium close-up of Jema at the kitchen island.\nShe now holds the glass containing the water she just poured.\nShe briefly glances upward.\nHer eyebrows lift subtly and a tiny impressed smile forms.\nKeep the reaction restrained and natural—not exaggerated shock.\nCamera: Cinematic medium close-up with Jema’s face in sharp focus and the same kitchen softly blurred behind her.\nSTYLE & CONTINUITY\nPolished 3D Pixar-inspired animated-film aesthetic, cinematic framing, expressive but natural facial animation, soft evening interior lighting and shallow depth of field.\nTreat all six panels as consecutive shots filmed inside one unchanged apartment set.\nKeys remain on the entry console after Panel 2. The Birkin remains on the sofa after Panel 3. The glass is empty in Panel 4, being filled in Panel 5, and contains water in Panel 6.\nNo speech bubbles, captions, timestamps, panel titles or written text inside the storyboard. Visuals only.\n16:9 ratio for both the grid and the frames",
+          "original": "GRID 1 — 0:00–0:15\nPROMPT:\nCreate a detailed cinematic 6-panel storyboard grid arranged 3 columns × 2 rows, covering the first 15 seconds of an animated short film. Overall canvas aspect ratio 16:9.\nUse the attached Jema character sheet as the exact character reference and the attached Jema’s Apartment interior sheet as the exact environment and handbag reference.\nREFERENCE LOCK\nJema: Reproduce the exact character from the attached character sheet. Maintain her face, warm tan skin, brown eyes, platinum-blonde messy bun with loose front strands, body proportions, black button-up blouse, high-waisted black corporate trousers, black belt with gold buckle, black heels and gold jewelry.\nApartment: Treat the apartment reference as a fixed physical set, not inspiration. Maintain the exact floor plan, entryway, kitchen geometry, cabinetry, island, living room, sofa, TV wall, furniture, doors, lighting fixtures, décor and spatial relationships shown in the reference.\nThe apartment must not be redesigned between panels. Only Jema, the camera and movable props change position.\nHandbag: Use the exact black Hermès Birkin 25 shown in the apartment reference: structured black leather, two short top handles and gold hardware. No shoulder strap or long strap.\nMaintain visual continuity from one panel to the next.\n⸻\nPANEL 1 — ARRIVAL | 0:00–0:02.5\nWide establishing shot from inside the apartment facing the exact entryway shown in the reference.\nThe front door is open and Jema is walking through it, arriving home from work.\nShe carries the black Hermès Birkin, naturally by its short top handles in one hand while her other hand is with car keys.\nShow enough of the established entryway to immediately identify the apartment: dark wood door, console table, round mirror and surrounding architecture in their reference positions.\nJema looks slightly tired after work. Relaxed shoulders, calm face, natural walking posture.\nCamera: Wide, eye-level cinematic shot.\n⸻\nPANEL 2 — KEYS | 0:02.5–0:04.5\nMedium side-angle shot at the same entry console.\nJema casually drops her car keys onto the wooden console.\nThe black Hermès Birkin is still in her other hand, held by its short handles.\nCapture the keys at the moment they touch the table.\nHer expression is relaxed and habitual.\nCamera: Medium shot with the keys, Jema and handbag clearly readable.\nThe apartment layout and entryway remain exactly unchanged from Panel 1.\n⸻\nPANEL 3 — HANDBAG + JARVIS | 0:04.5–0:07\nWide shot showing Jema moving from the entry/living area toward the kitchen.\nAs she passes behind the exact cream sofa from the apartment reference, she casually tosses the black Hermès Birkin onto the sofa.\nCapture the handbag either leaving her hand or just landing on the cushion, while continuing toward the kitchen.\nHer expression is calm and confident.\nCamera: Wide cinematic shot that preserves the established relationship between the living room, entry and kitchen.\n⸻\nPANEL 4 — JARVIS ANSWERS | 0:07–0:09.5\nMedium shot at the exact kitchen island from the apartment reference.\nJema has reached the counter.\nA clear drinking glass is sitting in front of her and she reaches for it.\nThe glass is completely empty. No water inside it. She has not started pouring yet.\nA clear water bottle/carafe is nearby.\nCamera: Medium shot showing Jema, the empty glass and enough of the kitchen to maintain continuity.\n⸻\nPANEL 5 — 50 UGC VIDEOS | 0:09.5–0:12.5\nClose-up at the same kitchen counter.\nJema now pours water from the clear bottle/carafe into the same previously empty glass.\nShow the water stream visibly entering the glass.\nJema is still calm.\nCamera: Cinematic close-up focused on the bottle, water stream, glass and Jema’s hands, with the established kitchen softly visible behind.\n⸻\nPANEL 6 — SUBTLE REACTION | 0:12.5–0:15\nMedium close-up of Jema at the kitchen island.\nShe now holds the glass containing the water she just poured.\nShe briefly glances upward.\nHer eyebrows lift subtly and a tiny impressed smile forms.\nKeep the reaction restrained and natural—not exaggerated shock.\nCamera: Cinematic medium close-up with Jema’s face in sharp focus and the same kitchen softly blurred behind her.\nSTYLE & CONTINUITY\nPolished 3D Pixar-inspired animated-film aesthetic, cinematic framing, expressive but natural facial animation, soft evening interior lighting and shallow depth of field.\nTreat all six panels as consecutive shots filmed inside one unchanged apartment set.\nKeys remain on the entry console after Panel 2. The Birkin remains on the sofa after Panel 3. The glass is empty in Panel 4, being filled in Panel 5, and contains water in Panel 6.\nNo speech bubbles, captions, timestamps, panel titles or written text inside the storyboard. Visuals only.\n16:9 ratio for both the grid and the frames",
+          "zh": "GRID 1 — 0:00–0:15\n提示词：\n创建精细的电影感六格分镜网格，按三列两行排列，涵盖动画短片的前 15 秒。整体画布比例为 16:9。\n将附带的 Jema 角色设定图作为精确角色参考，将附带的 Jema 公寓内景设定图作为精确环境与手提包参考。\n参考锁定\nJema：精确复现附图中的角色。保持她的脸、暖棕色皮肤、棕色眼睛、带松散前发的铂金色凌乱发髻、身体比例、黑色纽扣衬衫、高腰黑色职业长裤、金扣黑腰带、黑色高跟鞋和金色首饰。\n公寓：把参考图视为固定的实体布景，而非灵感。保持参考中的精确平面布局、入口、厨房结构、橱柜、中岛、客厅、沙发、电视墙、家具、门、灯具、装饰与空间关系。\n各画格之间不得重新设计公寓。只有 Jema、摄影机和可移动道具改变位置。\n手提包：使用公寓参考图中完全相同的黑色 Hermès Birkin 25：挺括黑皮革、两只短顶部提手、金色五金。不得有肩带或长带。\n保持画格之间的视觉连续性。\n⸻\n画格 1 — 归家 | 0:00–0:02.5\n从公寓内部面向参考图中完全相同的入口拍摄广角建立镜头。\n前门打开，Jema 下班回家，正穿过门口。\n她一手自然地握着短顶部提手提黑色 Hermès Birkin，另一手拿车钥匙。\n展示足够多既定入口特征，使人立即认出公寓：深色木门、玄关桌、圆镜和周围建筑结构均位于参考位置。\nJema 下班后略显疲惫，肩膀放松、表情平静、走姿自然。\n摄影：平视的电影感广角镜头。\n⸻\n画格 2 — 钥匙 | 0:02.5–0:04.5\n同一玄关桌旁的侧面中景。\nJema 随手把车钥匙放落在木质玄关桌上。\n另一手仍握着短提手提黑色 Hermès Birkin。\n捕捉钥匙接触桌面的瞬间。\n她的表情放松，动作熟练。\n摄影：中景，钥匙、Jema 和手提包清楚可辨。\n公寓布局和入口与画格 1 完全一致。\n⸻\n画格 3 — 手提包与 JARVIS | 0:04.5–0:07\n广角镜头表现 Jema 从入口／客厅区域走向厨房。\n经过公寓参考图中那张奶油色沙发后方时，她随手把黑色 Hermès Birkin 扔到沙发上。\n捕捉手提包刚离手或刚落到坐垫上的瞬间，她同时继续走向厨房。\n她神情平静而自信。\n摄影：电影感广角，保持客厅、入口与厨房的既定空间关系。\n⸻\n画格 4 — JARVIS 回答 | 0:07–0:09.5\n在公寓参考图中完全相同的厨房中岛处拍摄中景。\nJema 已来到台面前。\n她面前放着透明饮水杯，她伸手去拿。\n杯子完全为空，里面没有水，她还没有开始倒水。\n附近放着透明水瓶／水壶。\n摄影：中景，展示 Jema、空杯子和足够多的厨房环境以维持连续性。\n⸻\n画格 5 — 50 条 UGC 视频 | 0:09.5–0:12.5\n同一厨房台面的特写。\nJema 此时从透明水瓶／水壶向同一个此前为空的杯子倒水。\n清楚展示进入杯中的水流。\nJema 仍然平静。\n摄影：电影感特写，聚焦水瓶、水流、玻璃杯和 Jema 的双手，既定厨房在后方柔和可见。\n⸻\n画格 6 — 细微反应 | 0:12.5–0:15\nJema 在厨房中岛处的中近景。\n她此时拿着装有刚倒入的水的杯子。\n她短暂地向上瞥一眼。\n眉毛轻轻抬起，浮现一丝赞叹的微笑。\n反应保持克制自然，不要夸张震惊。\n摄影：电影感中近景，脸部清晰聚焦，同一厨房在后方柔和虚化。\n风格与连续性\n精致的 Pixar 风格 3D 动画电影美学、电影感构图、富有表现力但自然的面部动画、柔和的傍晚室内灯光与浅景深。\n六个画格均视为在同一个未改变的公寓布景内拍摄的连续镜头。\n画格 2 后钥匙留在玄关桌上；画格 3 后 Birkin 留在沙发上；画格 4 中杯子为空，画格 5 正在注水，画格 6 中已有水。\n分镜内不要对话气泡、字幕、时间戳、画格标题或任何文字。只要视觉画面。\n网格和各画格均为 16:9 比例。"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en"
+      },
+      {
+        "id": "grid-1-video",
+        "title": "Animate Grid 1 · 15-second video",
+        "instruction": "Use the supplied storyboard, character sheet, and apartment/bag reference. Six shots belong to one video generation.",
+        "mode": "video",
+        "dependsOn": [
+          "grid-1-image"
+        ],
+        "prompts": {
+          "en": "Use the storyboard grid Image1 as the exact visual reference for character design, apartment layout, clothing, handbag, props, lighting, and composition. Animate the six storyboard frames as one continuous 15-second cinematic sequence.\n\nMaintain the character’s exact appearance throughout. Maintain the apartment as one fixed physical environment. Do not alter furniture, architecture, kitchen layout, décor, handbag design, clothing, hairstyle, or character proportions.\n\nMovement should feel like polished feature-film 3D character animation: natural body weight, realistic walking rhythm, subtle secondary movement in hair and clothing, expressive facial animation, believable hand interaction with objects, and smooth cinematic camera movement.\n\nJarvis is an AI voice only. He is never physically shown.\n\nCharacter sheet is Image2\n\nApartment exterior and bag is Image3\n\n⸻\n\nSHOT 1 — 0:00–0:02.5 — 2.5 SECONDS\n\nBegin from inside the apartment facing the entrance.\n\nThe front door opens and the character walks naturally into the apartment after returning from work.\n\nShe carries the black Hermès Birkin 25 by its two short top handles in one hand and her car keys in the other.\n\nHer walk communicates end-of-workday fatigue: slightly lowered shoulders, relaxed pace, calm face. She looks tired but comfortable now that she is home.\n\nAs she crosses the doorway, she reaches back naturally and begins pulling the door closed behind her.\n\nThe handbag responds naturally to her walking motion with subtle weight and momentum. No long strap appears.\n\nCamera: Wide eye-level establishing shot. Very subtle cinematic push-in as she enters. Keep the established entry architecture visible.\n\nAudio: Door opening, soft heel footsteps, subtle handbag leather movement, quiet apartment ambience.\n\nDialogue: None.\n\n⸻\n\nSHOT 2 — 0:02.5–0:04.5 — 2 SECONDS\n\nCut to the entry console.\n\nthe character walks up to the console without fully stopping.\n\nShe extends the hand holding her car keys and casually releases them onto the wooden surface.\n\nThe keys fall naturally and land with a distinct metallic clink.\n\nHer other hand continues holding the black Birkin by its short handles.\n\nShe barely looks at the keys. The action is automatic and habitual.\n\nImmediately after releasing them, her attention shifts toward the living room and kitchen.\n\nCamera: Medium side-angle shot. Keep Jema, the Birkin and the console visible. A subtle focus shift can follow the keys as they land before returning to the character.\n\nAudio: Footsteps followed by a crisp key CLINK.\n\nDialogue: None.\n\n⸻\n\nSHOT 3 — 0:04.5–0:07 — 2.5 SECONDS\n\nthe character continues from the entry area into the living room, passing behind the cream sofa on her way toward the kitchen.\n\nWithout stopping, she swings the Birkin slightly forward and casually tosses it onto the cream sofa.\n\nThe handbag leaves her hand with believable weight, travels a short distance and lands on the cushion. The cushion compresses slightly beneath it. The bag settles naturally and remains there.\n\nAs she releases the handbag and continues toward the kitchen, the character speaks casually:\n\nthe character:\n\n“Jarvis, update me on my work today.”\n\nHer delivery is relaxed and familiar. She does not call loudly and does not look for a speaker or device. She talks to Jarvis as naturally as she would speak to someone already in the room.\n\nHer lips must synchronize accurately with the dialogue.\n\nCamera: Wide tracking shot. Follow Jema smoothly from the living room toward the kitchen while keeping the established apartment geography readable.\n\nAudio: Soft heel footsteps, subtle handbag landing on sofa.\n\nthe character voice: Young adult woman, confident, slightly tired after work, natural conversational delivery.\n\n⸻\n\nSHOT 4 — 0:07–0:09.5 — 2.5 SECONDS\n\nthe character reaches the kitchen and moves behind the island onto the kitchen side of the counter.\n\nShe reaches toward the completely empty clear drinking glass on the countertop.\n\nThe glass must remain completely empty throughout this shot. She has not poured water yet.\n\nHer eyes briefly settle on the glass as she picks it up or positions it naturally for pouring. She listens to Jarvis without interrupting her routine.\n\nJarvis begins responding through the apartment:\n\nJARVIS (O.S.):\n\n“Miss Jema, today Claude connected to PayBox Agent by MoonPay…”\n\nJarvis should sound like a sophisticated male AI assistant: calm, polished, articulate, composed and subtly warm. Not robotic and not overly emotional.\n\nthe character does not speak. Her expression remains neutral and attentive.\n\nCamera: Medium shot from the living-room side of the island looking toward Jema behind the counter. Gentle cinematic push-in.\n\nAudio: Jarvis voice integrated naturally into the room ambience. Very subtle glass contact with countertop.\n\n⸻\n\nSHOT 5 — 0:09.5–0:12.5 — 3 SECONDS\n\nCut to a cinematic close-up of the character’s hands at the same kitchen counter.\n\nThere is a clear water bottle and empty glass on the counter, She picks up the clear water bottle and begins pouring water into the same previously empty glass.\n\nShow a natural continuous stream entering the glass and the water level gradually rising.\n\nJarvis continues seamlessly:\n\nJARVIS (O.S.):\n\n“…and traded. Your portfolio is up by 17 percent…”\n\nJema continues pouring normally.\n\nThen Jarvis finishes:\n\nJARVIS (O.S.):\n\n“… that was under ten minutes.”\n\nAs he says “under ten minutes,” Jema’s pouring motion hesitates very slightly.\n\nDo not make her freeze dramatically. It should be a tiny physical reaction showing that the number caught her attention.\n\nCamera: Tight close-up of bottle, hands, water stream and glass. Very subtle camera drift. Shallow depth of field.\n\nAudio: Clear natural water-pouring sound underneath Jarvis’s voice.\n\n⸻\n\nSHOT 6 — 0:12.5–0:15 — 2.5 SECONDS\n\nCut to the character‘s face and upper body behind the kitchen island.\n\nShe stops pouring and holds the now-filled glass naturally.\n\nFor a brief beat, she processes what Jarvis just said.\n\nHer eyes glance slightly upward.\n\nHer eyebrows rise subtly.\n\nThen the smallest impressed smile forms at the corner of her mouth.\n\nKeep the reaction understated. No huge eyes, dramatic gasp, head jerk, or exaggerated cartoon reaction. She is impressed, but AI automation like this is already part of her life.\n\nEnd on this subtle expression, setting up Grid 2.\n\nCamera: Medium close-up with a slow, almost imperceptible push toward her face. Shallow depth of field with the established kitchen softly blurred behind her.\n\nAudio: Water pouring stops. Brief room ambience after Jarvis finishes. No dialogue from Jema.\n\n⸻\n\nANIMATION CONTINUITY\n\nThe six shots are one continuous sequence. the character enters with keys + Birkin → keys stay on console → Birkin lands and stays on sofa → the character reaches kitchen → glass is empty before pouring → water is poured → the character ends holding the glass.\n\nKeep her movement restrained and natural. No unnecessary gestures, no duplicates, random head turns, excessive blinking, floating objects, hand deformation, prop morphing, wardrobe changes, hairstyle changes, or apartment changes.\n\nTotal duration: exactly 15 seconds. 16:9 landscape.",
+          "original": "Use the storyboard grid Image1 as the exact visual reference for character design, apartment layout, clothing, handbag, props, lighting, and composition. Animate the six storyboard frames as one continuous 15-second cinematic sequence.\n\nMaintain the character’s exact appearance throughout. Maintain the apartment as one fixed physical environment. Do not alter furniture, architecture, kitchen layout, décor, handbag design, clothing, hairstyle, or character proportions.\n\nMovement should feel like polished feature-film 3D character animation: natural body weight, realistic walking rhythm, subtle secondary movement in hair and clothing, expressive facial animation, believable hand interaction with objects, and smooth cinematic camera movement.\n\nJarvis is an AI voice only. He is never physically shown.\n\nCharacter sheet is Image2\n\nApartment exterior and bag is Image3\n\n⸻\n\nSHOT 1 — 0:00–0:02.5 — 2.5 SECONDS\n\nBegin from inside the apartment facing the entrance.\n\nThe front door opens and the character walks naturally into the apartment after returning from work.\n\nShe carries the black Hermès Birkin 25 by its two short top handles in one hand and her car keys in the other.\n\nHer walk communicates end-of-workday fatigue: slightly lowered shoulders, relaxed pace, calm face. She looks tired but comfortable now that she is home.\n\nAs she crosses the doorway, she reaches back naturally and begins pulling the door closed behind her.\n\nThe handbag responds naturally to her walking motion with subtle weight and momentum. No long strap appears.\n\nCamera: Wide eye-level establishing shot. Very subtle cinematic push-in as she enters. Keep the established entry architecture visible.\n\nAudio: Door opening, soft heel footsteps, subtle handbag leather movement, quiet apartment ambience.\n\nDialogue: None.\n\n⸻\n\nSHOT 2 — 0:02.5–0:04.5 — 2 SECONDS\n\nCut to the entry console.\n\nthe character walks up to the console without fully stopping.\n\nShe extends the hand holding her car keys and casually releases them onto the wooden surface.\n\nThe keys fall naturally and land with a distinct metallic clink.\n\nHer other hand continues holding the black Birkin by its short handles.\n\nShe barely looks at the keys. The action is automatic and habitual.\n\nImmediately after releasing them, her attention shifts toward the living room and kitchen.\n\nCamera: Medium side-angle shot. Keep Jema, the Birkin and the console visible. A subtle focus shift can follow the keys as they land before returning to the character.\n\nAudio: Footsteps followed by a crisp key CLINK.\n\nDialogue: None.\n\n⸻\n\nSHOT 3 — 0:04.5–0:07 — 2.5 SECONDS\n\nthe character continues from the entry area into the living room, passing behind the cream sofa on her way toward the kitchen.\n\nWithout stopping, she swings the Birkin slightly forward and casually tosses it onto the cream sofa.\n\nThe handbag leaves her hand with believable weight, travels a short distance and lands on the cushion. The cushion compresses slightly beneath it. The bag settles naturally and remains there.\n\nAs she releases the handbag and continues toward the kitchen, the character speaks casually:\n\nthe character:\n\n“Jarvis, update me on my work today.”\n\nHer delivery is relaxed and familiar. She does not call loudly and does not look for a speaker or device. She talks to Jarvis as naturally as she would speak to someone already in the room.\n\nHer lips must synchronize accurately with the dialogue.\n\nCamera: Wide tracking shot. Follow Jema smoothly from the living room toward the kitchen while keeping the established apartment geography readable.\n\nAudio: Soft heel footsteps, subtle handbag landing on sofa.\n\nthe character voice: Young adult woman, confident, slightly tired after work, natural conversational delivery.\n\n⸻\n\nSHOT 4 — 0:07–0:09.5 — 2.5 SECONDS\n\nthe character reaches the kitchen and moves behind the island onto the kitchen side of the counter.\n\nShe reaches toward the completely empty clear drinking glass on the countertop.\n\nThe glass must remain completely empty throughout this shot. She has not poured water yet.\n\nHer eyes briefly settle on the glass as she picks it up or positions it naturally for pouring. She listens to Jarvis without interrupting her routine.\n\nJarvis begins responding through the apartment:\n\nJARVIS (O.S.):\n\n“Miss Jema, today Claude connected to PayBox Agent by MoonPay…”\n\nJarvis should sound like a sophisticated male AI assistant: calm, polished, articulate, composed and subtly warm. Not robotic and not overly emotional.\n\nthe character does not speak. Her expression remains neutral and attentive.\n\nCamera: Medium shot from the living-room side of the island looking toward Jema behind the counter. Gentle cinematic push-in.\n\nAudio: Jarvis voice integrated naturally into the room ambience. Very subtle glass contact with countertop.\n\n⸻\n\nSHOT 5 — 0:09.5–0:12.5 — 3 SECONDS\n\nCut to a cinematic close-up of the character’s hands at the same kitchen counter.\n\nThere is a clear water bottle and empty glass on the counter, She picks up the clear water bottle and begins pouring water into the same previously empty glass.\n\nShow a natural continuous stream entering the glass and the water level gradually rising.\n\nJarvis continues seamlessly:\n\nJARVIS (O.S.):\n\n“…and traded. Your portfolio is up by 17 percent…”\n\nJema continues pouring normally.\n\nThen Jarvis finishes:\n\nJARVIS (O.S.):\n\n“… that was under ten minutes.”\n\nAs he says “under ten minutes,” Jema’s pouring motion hesitates very slightly.\n\nDo not make her freeze dramatically. It should be a tiny physical reaction showing that the number caught her attention.\n\nCamera: Tight close-up of bottle, hands, water stream and glass. Very subtle camera drift. Shallow depth of field.\n\nAudio: Clear natural water-pouring sound underneath Jarvis’s voice.\n\n⸻\n\nSHOT 6 — 0:12.5–0:15 — 2.5 SECONDS\n\nCut to the character‘s face and upper body behind the kitchen island.\n\nShe stops pouring and holds the now-filled glass naturally.\n\nFor a brief beat, she processes what Jarvis just said.\n\nHer eyes glance slightly upward.\n\nHer eyebrows rise subtly.\n\nThen the smallest impressed smile forms at the corner of her mouth.\n\nKeep the reaction understated. No huge eyes, dramatic gasp, head jerk, or exaggerated cartoon reaction. She is impressed, but AI automation like this is already part of her life.\n\nEnd on this subtle expression, setting up Grid 2.\n\nCamera: Medium close-up with a slow, almost imperceptible push toward her face. Shallow depth of field with the established kitchen softly blurred behind her.\n\nAudio: Water pouring stops. Brief room ambience after Jarvis finishes. No dialogue from Jema.\n\n⸻\n\nANIMATION CONTINUITY\n\nThe six shots are one continuous sequence. the character enters with keys + Birkin → keys stay on console → Birkin lands and stays on sofa → the character reaches kitchen → glass is empty before pouring → water is poured → the character ends holding the glass.\n\nKeep her movement restrained and natural. No unnecessary gestures, no duplicates, random head turns, excessive blinking, floating objects, hand deformation, prop morphing, wardrobe changes, hairstyle changes, or apartment changes.\n\nTotal duration: exactly 15 seconds. 16:9 landscape.",
+          "zh": "使用分镜网格 Image1 作为角色设计、公寓布局、服装、手提包、道具、灯光和构图的精确视觉参考。将六个分镜帧制作成一个连续的 15 秒电影感序列。始终保持角色外观完全一致。保持公寓为同一个固定的物理环境。不得改变家具、建筑结构、厨房布局、装饰、手提包设计、服装、发型或角色比例。动作应呈现精致的电影级 3D 角色动画质感：自然的身体重量、逼真的行走节奏、头发和服装细微的次级运动、富有表现力的面部动画、可信的手部物体交互，以及流畅的电影感 运镜。Jarvis 仅为 AI 语音。他绝不会以实体形象出现。角色设定表为 Image2，公寓外观和包为 Image3\n\n⸻\n\n镜头 1 — 0:00–0:02.5 — 2.5 秒 从公寓内部面向入口开始。前门打开，角色下班回来后自然地走进公寓。她一只手通过两个短 顶部提手 提着黑色 Hermès Birkin 25，另一只手拿着车钥匙。她的步态传达出一天工作结束后的疲惫：肩膀略微下沉、步伐放松、神情平静。她看起来很累，但回到家后感到自在。当她跨过门口时，自然地向后伸手，开始拉上身后的门。手提包随着她的行走动作产生自然反应，带有细微的重量感和惯性。不得出现长肩带。摄影：平视广角建立镜头。 她进入时使用非常轻微的电影感 推进。保持既定的入口建筑结构可见。声音： 开门声、轻柔的高跟鞋脚步声、细微的手提包皮革摩擦声、安静的公寓环境声。对白： 无。\n\n⸻\n\n镜头 2 — 0:02.5–0:04.5 — 2 秒 切到 入口玄关桌。角色走向玄关桌，没有完全停下。她伸出拿着车钥匙的手，随意地将钥匙放落在木质表面上。钥匙自然落下，并伴随清晰的金属碰撞声落在桌面。她的另一只手继续通过短 提手 提着黑色 Birkin。她几乎不看钥匙。这个动作自然而熟练。放下钥匙后，她的注意力立即转向客厅和厨房。摄影：侧面角度中景。 保持 Jema、Birkin 和玄关桌可见。钥匙落下时，可以用细微的 焦点转移 跟随钥匙，随后重新回到角色身上。声音： 脚步声，随后是一声清脆的钥匙 金属碰撞声。对白： 无。\n\n⸻\n\n镜头 3 — 0:04.5–0:07 — 2.5 秒 角色从入口区域继续走进客厅，在前往厨房的途中经过奶油色沙发后方。她没有停下，而是将 Birkin 略微向前摆动，随手把它扔到奶油色沙发上。手提包以可信的重量感脱离她的手，经过一小段距离后落在坐垫上。坐垫在其下方轻微凹陷。包自然地稳定下来并留在那里。当她放开手提包并继续走向厨房时，角色随口说道：角色：“Jarvis，向我汇报一下今天的工作。”她的语气放松而熟悉。她不会大声呼唤，也不会寻找扬声器或设备。她和 Jarvis 说话时，就像自然地与一个已经在房间里的人交谈。她的口型必须与对白准确同步。摄影：广角跟拍镜头。 从客厅到厨房流畅地跟随 Jema，同时保持既定的公寓空间关系清晰可读。声音： 轻柔的高跟鞋脚步声，手提包落在沙发上的细微声响。角色声音：年轻成年女性，自信，下班后略显疲惫，采用自然的对话式表达。\n\n⸻\n\n镜头 4 — 0:07–0:09.5 — 2.5 秒 角色到达厨房，绕到 中岛 后方，来到 台面 的厨房一侧。她伸手去拿 台面 上完全空的透明饮水杯。在整个镜头中，杯子必须始终完全为空。她还没有倒水。她拿起杯子或自然地调整杯子位置以准备倒水时，目光短暂落在杯子上。她一边听 Jarvis 说话，一边继续自己的日常动作，没有被打断。Jarvis 开始通过公寓内的音响回应：JARVIS（画外音）： “Jema 小姐，今天 Claude 连接到了 MoonPay 的 PayBox Agent……”Jarvis 的声音应像一位成熟的男性 AI 助手：冷静、精致、口齿清晰、沉着，并带有细微的温暖感。不要像机器人，也不要过度情绪化。角色不说话。她的表情保持中性且专注。摄影：从中岛客厅一侧朝台面后方的 Jema 拍摄中景。轻柔的电影感推进。 声音： Jarvis 的声音自然融入房间环境声中。杯子与 台面 接触时发出非常细微的声响。\n\n⸻\n\n镜头 5 — 0:09.5–0:12.5 — 3 秒 切到 角色双手在同一个厨房 台面 前的 电影感特写。台面 上有一个透明水瓶和空杯子。她拿起透明水瓶，开始向同一个此前为空的杯子里倒水。展示自然连续的水流进入杯中，以及水位逐渐上升。Jarvis 无缝地继续说道：JARVIS（画外音）： “……并完成了交易。你的投资组合上涨了 17%……”Jema 继续正常倒水。随后 Jarvis 说完：JARVIS（画外音）： “……整个过程不到十分钟。”当他说到“不到十分钟”时，Jema 的倒水动作出现极其轻微的迟疑。不要让她戏剧性地僵住。这应当只是一个微小的身体反应，表明这个数字引起了她的注意。摄影：水瓶、双手、水流和玻璃杯的紧凑特写。极轻微的镜头移动。浅景深。 声音： Jarvis 的声音下方有清晰自然的倒水声。\n\n⸻\n\n镜头 6 — 0:12.5–0:15 — 2.5 秒 切到 角色在厨房 中岛 后方的面部和上半身。她停止倒水，自然地拿着现在已经装满水的杯子。短暂片刻，她消化着 Jarvis 刚才所说的话。她的目光微微向上。眉毛轻轻扬起。随后，嘴角浮现出最轻微的赞叹笑意。反应要克制。不要睁大双眼、夸张倒吸气、猛然甩头或做出夸张的卡通式反应。她感到印象深刻，但这类 AI 自动化已经是她生活的一部分。以这个细微表情结束，为 Grid 2 做铺垫。摄影：中近景，以缓慢、几乎察觉不到的速度推向她的脸。采用浅景深，已建立的厨房在她身后柔和虚化。 声音： 倒水声停止。Jarvis 说完后，短暂保留房间环境声。Jema 没有对白。\n\n⸻\n\n动画连续性 六个镜头组成一个连续序列。角色带着钥匙 + Birkin 进入 → 钥匙留在玄关桌上 → Birkin 落在沙发上并留在那里 → 角色到达厨房 → 倒水前杯子为空 → 倒入水 → 结尾时角色手持杯子。保持她的动作克制而自然。不得出现不必要的手势、重复物体、随意转头、过度眨眼、悬浮物体、手部变形、道具变形、服装变化、发型变化或公寓变化。总时长：恰好 15 秒。16:9 横屏。"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en",
+        "inputOrder": [
+          "grid-1-image",
+          "character",
+          "environment"
+        ]
+      },
+      {
+        "id": "grid-2-image",
+        "title": "Generate Grid 2 · 6-panel storyboard",
+        "instruction": "Use the original character and apartment sheets to generate this six-panel grid. The published nine-panel overview is separate source material.",
+        "mode": "image",
+        "dependsOn": [],
+        "prompts": {
+          "en": "Storyboard Grid 2 - Image Prompt\nGRID 2 — 0:15–0:30\nPROMPT:\nCreate a detailed cinematic 6-panel storyboard grid arranged 3 columns × 2 rows, covering the next 15 seconds of an animated short film. Overall canvas aspect ratio 16:9.\nUse the attached Jema character sheet as the exact character reference and the attached Jema’s Apartment interior sheet as the exact environment and handbag reference.\nREFERENCE LOCK\nJema: Reproduce the exact character from the attached character sheet. Maintain her face, warm tan skin, brown eyes, platinum-blonde messy bun with loose front strands, body proportions, black button-up blouse, high-waisted black corporate trousers, black belt with gold buckle, black heels and gold jewelry.\nApartment: Treat the apartment reference as a fixed physical set, not inspiration. Maintain the exact floor plan, entryway, kitchen geometry, cabinetry, island, refrigerator, living room, sofa, TV wall, furniture, doors, lighting fixtures, décor and spatial relationships shown in the reference.\nThe apartment must not be redesigned between panels. Only Jema, the camera and movable props change position.\nHandbag: The exact black Hermès Birkin 25 remains on the cream sofa where Jema threw it in Grid 1. Structured black leather, two short top handles and gold hardware. No shoulder strap or long strap.\nMaintain visual continuity from Grid 1 and from one panel to the next.\n⸻\nPANEL 1 — DRINKING WATER | 0:15–0:17.5\nMedium shot of Jema standing behind the kitchen island/counter, on the kitchen side of the counter.\nThe kitchen island is physically between Jema and the camera.\nShe raises the same clear glass of water from Grid 1 to her lips and drinks from it.\nHer posture is relaxed. Her expression is calm and satisfied.\nThe water level inside the glass is visible.\nJema must remain behind the counter. Do not place her beside, in front of, or outside the kitchen island.\nCamera: Medium cinematic shot from the living-room side of the island, looking across the countertop toward Jema in the kitchen.\n⸻\nPANEL 2 — SATISFIED | 0:17.5–0:20\nMedium close-up of Jema still standing behind the same kitchen counter.\nShe has finished taking a sip and lowers the glass away from her lips.\nHer expression is quietly satisfied and relaxed.\nThe glass remains in her hand and contains some water.\nThe countertop remains visibly between Jema and the camera to establish that she is still standing inside the kitchen behind the island.\nCamera: Medium close-up from across the kitchen island, focused on Jema’s face and upper body with the kitchen behind her.\n⸻\nPANEL 3 — LEAVING THE KITCHEN | 0:20–0:22\nWide shot showing the exact kitchen and its relationship to the living room.\nThe clear drinking glass has now been placed on the kitchen counter.\nJema is behind the kitchen island on the kitchen side, walking toward the opening at the refrigerator side of the counter.\nCapture her as she is coming around the end of the island beside the refrigerator, leaving the enclosed kitchen-counter area and heading toward the living room.\nHer posture is casual and relaxed.\nThe kitchen island, refrigerator and living room must remain in their exact reference positions so her path around the refrigerator side of the counter is visually clear.\nCamera: Wide cinematic shot showing Jema’s full body, the kitchen island, refrigerator and her route out toward the living room.\n⸻\nPANEL 4 — SUDDEN PAUSE | 0:22–0:24\nMedium-wide shot in the living room.\nJema has now reached the living area and is standing directly behind the cream sofa.\nThe sofa is between Jema and the camera.\nShe suddenly stops mid-step behind the couch.\nHer body is still positioned as though she was walking away from the kitchen, but her head tilts slightly as something catches her attention.\nHer expression is mildly curious and attentive. No shock yet.\nThe black Hermès Birkin remains on the sofa cushion.\nCamera: Medium-wide cinematic shot from the living-room side of the sofa, with the cream sofa in the foreground and Jema standing directly behind it.\n⸻\nPANEL 5 — REALIZATION | 0:24–0:27.5\nMedium shot of Jema after partially turning back.\nHer relaxed expression has disappeared.\nHer eyes are noticeably wider, eyebrows raised and lips slightly parted.\nShe looks stunned and confused, as though she has just heard something completely unexpected.\nThe reaction should feel genuine and comedic, but not yet angry.\nCamera: Medium frontal three-quarter shot focused on Jema’s changing expression, with the established apartment softly visible behind her.\n⸻\nPANEL 6 — SHOCKED AND OFFENDED | 0:27.5–0:30\nTight cinematic close-up of Jema’s face.\nHer expression has escalated from surprise into shocked, offended disbelief.\nHer brown eyes are wide open, eyebrows raised, mouth open, with visible facial tension as the shock begins turning into anger.\nShe looks completely appalled by what she has just heard.\nThe expression should be highly expressive and comedic while preserving Jema’s exact facial design.\nCamera: Tight cinematic close-up centered on Jema’s face with very shallow depth of field and the apartment heavily softened behind her.\nSTYLE & CONTINUITY\nPolished 3D Pixar-inspired animated-film aesthetic, cinematic framing, expressive but natural facial animation, soft evening interior lighting and shallow depth of field.\nTreat all six panels as consecutive shots filmed inside one unchanged apartment set.\nPanels 1 and 2: Jema is behind the kitchen counter.\nPanel 3: Jema walks out from behind the kitchen counter specifically from the refrigerator side.\nPanel 4: Jema is directly behind the cream sofa.\nPanels 5 and 6 continue her emotional reaction.\nThe keys remain on the entry console. The black Hermès Birkin remains on the cream sofa. The drinking glass remains on the kitchen counter after Jema leaves the kitchen.\nNo speech bubbles, captions, timestamps, panel titles or written text inside the storyboard. Visuals only.\n16:9 ratio for both the grid and the frames.",
+          "original": "Storyboard Grid 2 - Image Prompt\nGRID 2 — 0:15–0:30\nPROMPT:\nCreate a detailed cinematic 6-panel storyboard grid arranged 3 columns × 2 rows, covering the next 15 seconds of an animated short film. Overall canvas aspect ratio 16:9.\nUse the attached Jema character sheet as the exact character reference and the attached Jema’s Apartment interior sheet as the exact environment and handbag reference.\nREFERENCE LOCK\nJema: Reproduce the exact character from the attached character sheet. Maintain her face, warm tan skin, brown eyes, platinum-blonde messy bun with loose front strands, body proportions, black button-up blouse, high-waisted black corporate trousers, black belt with gold buckle, black heels and gold jewelry.\nApartment: Treat the apartment reference as a fixed physical set, not inspiration. Maintain the exact floor plan, entryway, kitchen geometry, cabinetry, island, refrigerator, living room, sofa, TV wall, furniture, doors, lighting fixtures, décor and spatial relationships shown in the reference.\nThe apartment must not be redesigned between panels. Only Jema, the camera and movable props change position.\nHandbag: The exact black Hermès Birkin 25 remains on the cream sofa where Jema threw it in Grid 1. Structured black leather, two short top handles and gold hardware. No shoulder strap or long strap.\nMaintain visual continuity from Grid 1 and from one panel to the next.\n⸻\nPANEL 1 — DRINKING WATER | 0:15–0:17.5\nMedium shot of Jema standing behind the kitchen island/counter, on the kitchen side of the counter.\nThe kitchen island is physically between Jema and the camera.\nShe raises the same clear glass of water from Grid 1 to her lips and drinks from it.\nHer posture is relaxed. Her expression is calm and satisfied.\nThe water level inside the glass is visible.\nJema must remain behind the counter. Do not place her beside, in front of, or outside the kitchen island.\nCamera: Medium cinematic shot from the living-room side of the island, looking across the countertop toward Jema in the kitchen.\n⸻\nPANEL 2 — SATISFIED | 0:17.5–0:20\nMedium close-up of Jema still standing behind the same kitchen counter.\nShe has finished taking a sip and lowers the glass away from her lips.\nHer expression is quietly satisfied and relaxed.\nThe glass remains in her hand and contains some water.\nThe countertop remains visibly between Jema and the camera to establish that she is still standing inside the kitchen behind the island.\nCamera: Medium close-up from across the kitchen island, focused on Jema’s face and upper body with the kitchen behind her.\n⸻\nPANEL 3 — LEAVING THE KITCHEN | 0:20–0:22\nWide shot showing the exact kitchen and its relationship to the living room.\nThe clear drinking glass has now been placed on the kitchen counter.\nJema is behind the kitchen island on the kitchen side, walking toward the opening at the refrigerator side of the counter.\nCapture her as she is coming around the end of the island beside the refrigerator, leaving the enclosed kitchen-counter area and heading toward the living room.\nHer posture is casual and relaxed.\nThe kitchen island, refrigerator and living room must remain in their exact reference positions so her path around the refrigerator side of the counter is visually clear.\nCamera: Wide cinematic shot showing Jema’s full body, the kitchen island, refrigerator and her route out toward the living room.\n⸻\nPANEL 4 — SUDDEN PAUSE | 0:22–0:24\nMedium-wide shot in the living room.\nJema has now reached the living area and is standing directly behind the cream sofa.\nThe sofa is between Jema and the camera.\nShe suddenly stops mid-step behind the couch.\nHer body is still positioned as though she was walking away from the kitchen, but her head tilts slightly as something catches her attention.\nHer expression is mildly curious and attentive. No shock yet.\nThe black Hermès Birkin remains on the sofa cushion.\nCamera: Medium-wide cinematic shot from the living-room side of the sofa, with the cream sofa in the foreground and Jema standing directly behind it.\n⸻\nPANEL 5 — REALIZATION | 0:24–0:27.5\nMedium shot of Jema after partially turning back.\nHer relaxed expression has disappeared.\nHer eyes are noticeably wider, eyebrows raised and lips slightly parted.\nShe looks stunned and confused, as though she has just heard something completely unexpected.\nThe reaction should feel genuine and comedic, but not yet angry.\nCamera: Medium frontal three-quarter shot focused on Jema’s changing expression, with the established apartment softly visible behind her.\n⸻\nPANEL 6 — SHOCKED AND OFFENDED | 0:27.5–0:30\nTight cinematic close-up of Jema’s face.\nHer expression has escalated from surprise into shocked, offended disbelief.\nHer brown eyes are wide open, eyebrows raised, mouth open, with visible facial tension as the shock begins turning into anger.\nShe looks completely appalled by what she has just heard.\nThe expression should be highly expressive and comedic while preserving Jema’s exact facial design.\nCamera: Tight cinematic close-up centered on Jema’s face with very shallow depth of field and the apartment heavily softened behind her.\nSTYLE & CONTINUITY\nPolished 3D Pixar-inspired animated-film aesthetic, cinematic framing, expressive but natural facial animation, soft evening interior lighting and shallow depth of field.\nTreat all six panels as consecutive shots filmed inside one unchanged apartment set.\nPanels 1 and 2: Jema is behind the kitchen counter.\nPanel 3: Jema walks out from behind the kitchen counter specifically from the refrigerator side.\nPanel 4: Jema is directly behind the cream sofa.\nPanels 5 and 6 continue her emotional reaction.\nThe keys remain on the entry console. The black Hermès Birkin remains on the cream sofa. The drinking glass remains on the kitchen counter after Jema leaves the kitchen.\nNo speech bubbles, captions, timestamps, panel titles or written text inside the storyboard. Visuals only.\n16:9 ratio for both the grid and the frames.",
+          "zh": "分镜 Grid 2 — 生图提示词\nGRID 2 — 0:15–0:30\n提示词：\n创建精细的电影感六格分镜网格，按三列两行排列，涵盖动画短片接下来的 15 秒。整体画布比例为 16:9。\n将附带的 Jema 角色设定图作为精确角色参考，将附带的 Jema 公寓内景设定图作为精确环境与手提包参考。\n参考锁定\nJema：精确复现附图中的角色。保持她的脸、暖棕色皮肤、棕色眼睛、带松散前发的铂金色凌乱发髻、身体比例、黑色纽扣衬衫、高腰黑色职业长裤、金扣黑腰带、黑色高跟鞋和金色首饰。\n公寓：把参考图视为固定的实体布景，而非灵感。保持参考中的精确平面布局、入口、厨房结构、橱柜、中岛、冰箱、客厅、沙发、电视墙、家具、门、灯具、装饰与空间关系。\n各画格之间不得重新设计公寓。只有 Jema、摄影机和可移动道具改变位置。\n手提包：完全相同的黑色 Hermès Birkin 25 仍在 Grid 1 中 Jema 扔下它的奶油色沙发上。挺括黑皮革、两只短顶部提手、金色五金。不得有肩带或长带。\n保持与 Grid 1 以及各画格之间的视觉连续性。\n⸻\n画格 1 — 喝水 | 0:15–0:17.5\n中景，Jema 站在厨房中岛／台面后方，位于台面的厨房一侧。\n厨房中岛实际位于 Jema 与摄影机之间。\n她把 Grid 1 中同一只装水的透明杯举到唇边喝水。\n姿态放松，神情平静而满足。\n杯内水位清晰可见。\nJema 必须留在台面后方。不要把她放在厨房中岛旁边、前方或外侧。\n摄影：从中岛客厅一侧拍摄的电影感中景，越过台面望向厨房里的 Jema。\n⸻\n画格 2 — 满意 | 0:17.5–0:20\n中近景，Jema 仍站在同一厨房台面后方。\n她刚喝完一口，把杯子从唇边放低。\n神情安静、满足、放松。\n杯子仍在手中，里面还有一些水。\n台面仍清楚地位于 Jema 与摄影机之间，明确她仍在厨房中岛后方。\n摄影：隔着中岛拍摄中近景，聚焦 Jema 的脸与上半身，厨房在她身后。\n⸻\n画格 3 — 离开厨房 | 0:20–0:22\n广角镜头，展示精确的厨房以及它与客厅的关系。\n透明饮水杯此时已放在厨房台面上。\nJema 位于厨房中岛后方的厨房一侧，正走向台面冰箱一侧的出口。\n捕捉她从冰箱旁绕过中岛端部，离开围合的厨房台面区域、朝客厅走去的瞬间。\n姿态随意放松。\n中岛、冰箱和客厅必须保持精确参考位置，让她从台面冰箱一侧绕行的路线清晰可辨。\n摄影：电影感广角，展示 Jema 全身、中岛、冰箱及走向客厅的路线。\n⸻\n画格 4 — 突然停顿 | 0:22–0:24\n客厅中的中广景。\nJema 此时已来到起居区域，站在奶油色沙发正后方。\n沙发位于 Jema 与摄影机之间。\n她在沙发后方行走途中突然停住。\n身体仍保持离开厨房时的朝向，但由于有什么引起她的注意，头部轻轻倾斜。\n表情略微好奇而专注，还没有震惊。\n黑色 Hermès Birkin 仍在沙发坐垫上。\n摄影：从沙发客厅一侧拍摄电影感中广景，奶油色沙发在前景，Jema 就在其正后方。\n⸻\n画格 5 — 意识到 | 0:24–0:27.5\nJema 部分转身后的中景。\n放松的表情已经消失。\n双眼明显睁大，眉毛抬起，嘴唇微微张开。\n她震惊而困惑，仿佛刚听到完全意想不到的事情。\n反应要真实且有喜剧感，但还没有愤怒。\n摄影：从正面四分之三角度拍摄中景，聚焦变化中的表情，既定公寓在身后柔和可见。\n⸻\n画格 6 — 震惊而被冒犯 | 0:27.5–0:30\nJema 面部的紧凑电影感特写。\n她的表情从惊讶升级为震惊、受冒犯的难以置信。\n棕色眼睛睁得很大，眉毛抬起、嘴巴张开，震惊开始转为愤怒时，面部紧绷清楚可见。\n她对刚听到的事情完全无法接受。\n表情要极富表现力和喜剧感，同时保持 Jema 精确的面部设计。\n摄影：以 Jema 的脸为中心的紧凑电影感特写，极浅景深，后方公寓高度柔化。\n风格与连续性\n精致的 Pixar 风格 3D 动画电影美学、电影感构图、富有表现力但自然的面部动画、柔和的傍晚室内灯光与浅景深。\n六个画格均视为在同一个未改变的公寓布景内拍摄的连续镜头。\n画格 1、2：Jema 位于厨房台面后方。\n画格 3：Jema 明确从冰箱一侧走出厨房台面后方。\n画格 4：Jema 位于奶油色沙发正后方。\n画格 5、6 延续她的情绪反应。\n钥匙留在玄关桌上，黑色 Hermès Birkin 留在奶油色沙发上，Jema 离开厨房后饮水杯留在厨房台面上。\n分镜内不要对话气泡、字幕、时间戳、画格标题或任何文字。只要视觉画面。\n网格和各画格均为 16:9 比例。"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en"
+      },
+      {
+        "id": "grid-2-video",
+        "title": "Animate Grid 2 · 15-second video",
+        "instruction": "Continue the story with Grid 2 and the apartment interior reference. Six shots belong to one video generation; the Grid 1 video is not an input reference.",
+        "mode": "video",
+        "dependsOn": [
+          "grid-2-image"
+        ],
+        "prompts": {
+          "en": "Storyboard Grid 2 - Video Prompt (15 seconds)\n\nUse the storyboard grid \n@Image1\n as the exact visual reference for character design, apartment layout, clothing, handbag, props, lighting, and composition. Animate the six storyboard frames as one continuous 15-second cinematic sequence.\n\nMaintain the character’s exact appearance throughout. Maintain the apartment as one fixed physical environment. Do not alter furniture, architecture, kitchen layout, décor, handbag design, clothing, hairstyle, or character proportions.\n\nMovement should feel like polished feature-film 3D character animation: natural body weight, realistic walking rhythm, subtle secondary movement in hair and clothing, expressive facial animation, believable interaction with the glass, and smooth cinematic camera movement.\n\nJarvis is an AI voice only. He is never physically shown.\n\nCharacter sheet is \n@Image2\n\n\nApartment interior and bag is \n@Image3\n\n\n⸻\n\nSHOT 1 — 0:00–0:02.5 — 2.5 SECONDS\n\nBegin with the character behind the kitchen counter, matching Panel 1.\n\nShe raises the clear glass to her lips and takes a natural sip of water.\n\nHer eyes gently close for a moment as she drinks. Her posture is relaxed and casual, with no urgency.\n\nAfter the sip, she begins lowering the glass.\n\nCamera: Medium shot from the living-room side of the counter. Keep the character behind the island. Very subtle cinematic push-in.\n\nAudio: Natural drinking sound, subtle glass movement, quiet apartment ambience.\n\nDialogue: None.\n\n⸻\n\nSHOT 2 — 0:02.5–0:04.5 — 2 SECONDS\n\nCut to a slightly closer shot of the character, still behind the same kitchen counter.\n\nShe lowers the glass from her lips and holds it naturally around chest level.\n\nA small satisfied smile appears. She gives a subtle approving expression as she responds:\n\nTHE CHARACTER:\n\n“Good. I’m going for a bath.”\n\nHer delivery is casual and satisfied, as though everything on her work update has been handled.\n\nHer lips synchronize naturally with the dialogue.\n\nCamera: Medium close-up. Gentle cinematic push-in, keeping the kitchen geometry unchanged.\n\nAudio: Character dialogue and quiet apartment ambience.\n\n⸻\n\nSHOT 3 — 0:04.5–0:07 — 2.5 SECONDS\n\nThe character places the glass down on the kitchen counter, then turns and begins walking out from behind the kitchen island from the refrigerator side, following the exact apartment layout.\n\nShe walks naturally toward the living room, relaxed and ready to leave the room.\n\nThe black Birkin remains on the cream sofa exactly where it was left.\n\nAs she is walking away, Jarvis suddenly speaks:\n\nJARVIS (VOICE ONLY):\n\n“One more thing.”\n\nThe character continues for a beat, then her attention shifts slightly at hearing him.\n\nCamera: Wide shot preserving the kitchen, refrigerator, island, sofa and established apartment geography. Smoothly follow her movement out of the kitchen.\n\nAudio: Soft heels, subtle clothing movement, Jarvis’s voice, apartment ambience.\n\nJarvis remains voice only. Nothing appears when he speaks.\n\n⸻\n\nSHOT 4 — 0:07–0:09 — 2 SECONDS\n\nCut to the character now directly behind the cream sofa, matching Panel 4.\n\nShe stops walking.\n\nHer body remains oriented in the direction she was heading, but she turns her head slightly back toward the apartment with mild curiosity.\n\nShe responds:\n\nTHE CHARACTER:\n\n“Yeah?”\n\nHer delivery is casual and slightly questioning. She has no idea what Jarvis is about to say.\n\nThe Birkin remains on the sofa in front of her.\n\nCamera: Medium-wide shot with the sofa in the foreground and the character directly behind it.\n\nAudio: Character dialogue, then a brief natural pause.\n\n⸻\n\nSHOT 5 — 0:09–0:12.5 — 3.5 SECONDS\n\nCut to a medium shot of the character as Jarvis responds.\n\nJARVIS (VOICE ONLY):\n\n“I booked a blind date for you. You’ve been single for too long.”\n\nAs Jarvis speaks, her expression changes progressively.\n\nAt first she listens normally.\n\nThen her eyebrows rise.\n\nHer eyes widen.\n\nHer lips slowly part as she realizes what Jarvis has done.\n\nBy “too long,” she is staring in stunned disbelief.\n\nKeep the reaction comedic and expressive, but allow it to build naturally rather than snapping instantly into shock.\n\nCamera: Medium shot with a subtle slow push toward her face as her expression changes.\n\nAudio: Jarvis’s calm male AI voice. Quiet room ambience underneath.\n\n⸻\n\nSHOT 6 — 0:12.5–0:15 — 2.5 SECONDS\n\nCut tighter to the character’s face.\n\nHer stunned disbelief immediately begins turning into offended outrage.\n\nHer eyes remain wide, eyebrows raised and tense, mouth open as she prepares to snap back at Jarvis.\n\nShe starts:\n\nTHE CHARACTER:\n\n“You mother—”\n\nHard cut to black immediately after “mother—,” before she can finish the sentence.\n\nDo not complete the insult. The abrupt blackout is the punchline.\n\nHold the black screen for the remaining beat.\n\nCamera: Tight cinematic close-up with a subtle push-in before the hard cut.\n\nAudio: Accurate lip sync on “You mother—”. Cut the dialogue abruptly with the blackout. Brief silence after the cut.\n\n⸻\n\nANIMATION CONTINUITY\n\nThe six shots are one continuous sequence: the character drinks water behind the counter → responds casually → places the glass down and exits the kitchen from the refrigerator side → reaches directly behind the sofa → pauses when Jarvis speaks → gradually realizes what he has done → shocked outrage → hard cut to black.\n\nThe glass stays on the kitchen counter after Shot 3. The Birkin stays on the sofa throughout the entire sequence.\n\nJarvis is voice only. No Jarvis character, man, robot, hologram, speaker, floating interface, screen, glow, or visual manifestation.\n\nKeep movement natural and restrained. No duplicates, unnecessary gestures, random head turns, excessive blinking, floating objects, deformed hands, prop morphing, handbag movement, wardrobe changes, hairstyle changes, apartment changes, or exaggerated cartoon motion.\n\nTotal duration: exactly 15 seconds. 16:9 landscape.",
+          "original": "Storyboard Grid 2 - Video Prompt (15 seconds)\n\nUse the storyboard grid \n@Image1\n as the exact visual reference for character design, apartment layout, clothing, handbag, props, lighting, and composition. Animate the six storyboard frames as one continuous 15-second cinematic sequence.\n\nMaintain the character’s exact appearance throughout. Maintain the apartment as one fixed physical environment. Do not alter furniture, architecture, kitchen layout, décor, handbag design, clothing, hairstyle, or character proportions.\n\nMovement should feel like polished feature-film 3D character animation: natural body weight, realistic walking rhythm, subtle secondary movement in hair and clothing, expressive facial animation, believable interaction with the glass, and smooth cinematic camera movement.\n\nJarvis is an AI voice only. He is never physically shown.\n\nCharacter sheet is \n@Image2\n\n\nApartment interior and bag is \n@Image3\n\n\n⸻\n\nSHOT 1 — 0:00–0:02.5 — 2.5 SECONDS\n\nBegin with the character behind the kitchen counter, matching Panel 1.\n\nShe raises the clear glass to her lips and takes a natural sip of water.\n\nHer eyes gently close for a moment as she drinks. Her posture is relaxed and casual, with no urgency.\n\nAfter the sip, she begins lowering the glass.\n\nCamera: Medium shot from the living-room side of the counter. Keep the character behind the island. Very subtle cinematic push-in.\n\nAudio: Natural drinking sound, subtle glass movement, quiet apartment ambience.\n\nDialogue: None.\n\n⸻\n\nSHOT 2 — 0:02.5–0:04.5 — 2 SECONDS\n\nCut to a slightly closer shot of the character, still behind the same kitchen counter.\n\nShe lowers the glass from her lips and holds it naturally around chest level.\n\nA small satisfied smile appears. She gives a subtle approving expression as she responds:\n\nTHE CHARACTER:\n\n“Good. I’m going for a bath.”\n\nHer delivery is casual and satisfied, as though everything on her work update has been handled.\n\nHer lips synchronize naturally with the dialogue.\n\nCamera: Medium close-up. Gentle cinematic push-in, keeping the kitchen geometry unchanged.\n\nAudio: Character dialogue and quiet apartment ambience.\n\n⸻\n\nSHOT 3 — 0:04.5–0:07 — 2.5 SECONDS\n\nThe character places the glass down on the kitchen counter, then turns and begins walking out from behind the kitchen island from the refrigerator side, following the exact apartment layout.\n\nShe walks naturally toward the living room, relaxed and ready to leave the room.\n\nThe black Birkin remains on the cream sofa exactly where it was left.\n\nAs she is walking away, Jarvis suddenly speaks:\n\nJARVIS (VOICE ONLY):\n\n“One more thing.”\n\nThe character continues for a beat, then her attention shifts slightly at hearing him.\n\nCamera: Wide shot preserving the kitchen, refrigerator, island, sofa and established apartment geography. Smoothly follow her movement out of the kitchen.\n\nAudio: Soft heels, subtle clothing movement, Jarvis’s voice, apartment ambience.\n\nJarvis remains voice only. Nothing appears when he speaks.\n\n⸻\n\nSHOT 4 — 0:07–0:09 — 2 SECONDS\n\nCut to the character now directly behind the cream sofa, matching Panel 4.\n\nShe stops walking.\n\nHer body remains oriented in the direction she was heading, but she turns her head slightly back toward the apartment with mild curiosity.\n\nShe responds:\n\nTHE CHARACTER:\n\n“Yeah?”\n\nHer delivery is casual and slightly questioning. She has no idea what Jarvis is about to say.\n\nThe Birkin remains on the sofa in front of her.\n\nCamera: Medium-wide shot with the sofa in the foreground and the character directly behind it.\n\nAudio: Character dialogue, then a brief natural pause.\n\n⸻\n\nSHOT 5 — 0:09–0:12.5 — 3.5 SECONDS\n\nCut to a medium shot of the character as Jarvis responds.\n\nJARVIS (VOICE ONLY):\n\n“I booked a blind date for you. You’ve been single for too long.”\n\nAs Jarvis speaks, her expression changes progressively.\n\nAt first she listens normally.\n\nThen her eyebrows rise.\n\nHer eyes widen.\n\nHer lips slowly part as she realizes what Jarvis has done.\n\nBy “too long,” she is staring in stunned disbelief.\n\nKeep the reaction comedic and expressive, but allow it to build naturally rather than snapping instantly into shock.\n\nCamera: Medium shot with a subtle slow push toward her face as her expression changes.\n\nAudio: Jarvis’s calm male AI voice. Quiet room ambience underneath.\n\n⸻\n\nSHOT 6 — 0:12.5–0:15 — 2.5 SECONDS\n\nCut tighter to the character’s face.\n\nHer stunned disbelief immediately begins turning into offended outrage.\n\nHer eyes remain wide, eyebrows raised and tense, mouth open as she prepares to snap back at Jarvis.\n\nShe starts:\n\nTHE CHARACTER:\n\n“You mother—”\n\nHard cut to black immediately after “mother—,” before she can finish the sentence.\n\nDo not complete the insult. The abrupt blackout is the punchline.\n\nHold the black screen for the remaining beat.\n\nCamera: Tight cinematic close-up with a subtle push-in before the hard cut.\n\nAudio: Accurate lip sync on “You mother—”. Cut the dialogue abruptly with the blackout. Brief silence after the cut.\n\n⸻\n\nANIMATION CONTINUITY\n\nThe six shots are one continuous sequence: the character drinks water behind the counter → responds casually → places the glass down and exits the kitchen from the refrigerator side → reaches directly behind the sofa → pauses when Jarvis speaks → gradually realizes what he has done → shocked outrage → hard cut to black.\n\nThe glass stays on the kitchen counter after Shot 3. The Birkin stays on the sofa throughout the entire sequence.\n\nJarvis is voice only. No Jarvis character, man, robot, hologram, speaker, floating interface, screen, glow, or visual manifestation.\n\nKeep movement natural and restrained. No duplicates, unnecessary gestures, random head turns, excessive blinking, floating objects, deformed hands, prop morphing, handbag movement, wardrobe changes, hairstyle changes, apartment changes, or exaggerated cartoon motion.\n\nTotal duration: exactly 15 seconds. 16:9 landscape.",
+          "zh": "分镜 Grid 2——视频提示词（15 秒）\n\n使用分镜网格 @Image1 作为角色设计、公寓布局、服装、手提包、道具、灯光和构图的精确视觉参考。将六个分镜画格制作成一段连续的 15 秒电影感序列。\n\n全程严格保持角色外观一致。保持公寓为同一个固定的物理环境。不得改变家具、建筑结构、厨房布局、装饰、手提包设计、服装、发型或角色比例。\n\n动作应具有精致的电影级 3D 角色动画质感：自然的身体重量、真实的行走节奏、头发与衣物细微的次级运动、富有表现力的面部动画、与玻璃杯可信的交互，以及流畅的电影感运镜。\n\nJarvis 仅为 AI 语音，绝不以实体出现。\n\n角色设定图为 @Image2。\n\n公寓内景与包的参考为 @Image3。\n\n⸻\n\n镜头 1 — 0:00–0:02.5 — 2.5 秒\n\n从角色站在厨房台面后方开始，与画格 1 对应。\n\n她把透明玻璃杯举到嘴边，自然地喝一口水。\n\n喝水时，她的眼睛轻轻闭上一瞬。姿态放松、随意，没有急迫感。\n\n喝完后，她开始放下杯子。\n\n摄影：从客厅一侧朝厨房台面拍摄的中景。保持角色位于中岛后方。使用极轻微的电影感推进。\n\n声音：自然的喝水声、轻微的玻璃杯移动声、安静的公寓环境声。\n\n对白：无。\n\n⸻\n\n镜头 2 — 0:02.5–0:04.5 — 2 秒\n\n切到略近一些的角色镜头，她仍站在同一厨房台面后方。\n\n她把杯子从嘴边放低，自然地拿在胸口附近。\n\n脸上浮现一个小小的满意微笑。她带着轻微赞许的表情回应：\n\n角色：\n\n“很好。我去泡个澡。”\n\n语气随意而满足，仿佛工作汇报中的一切都已处理妥当。\n\n口型应自然、准确地同步对白。\n\n摄影：中近景。轻柔的电影感推进，厨房空间结构保持不变。\n\n声音：角色对白与安静的公寓环境声。\n\n⸻\n\n镜头 3 — 0:04.5–0:07 — 2.5 秒\n\n角色把杯子放到厨房台面上，然后转身，按准确的公寓布局，从冰箱一侧走出厨房中岛后方。\n\n她自然地走向客厅，放松而准备离开房间。\n\n黑色 Birkin 包仍留在奶油色沙发上，位置与之前放下时完全相同。\n\n她走开时，Jarvis 突然说：\n\nJARVIS（仅声音）：\n\n“还有一件事。”\n\n角色继续走了一拍，随后因听到他的话而略微转移注意力。\n\n摄影：保留厨房、冰箱、中岛、沙发和既定公寓空间关系的广角镜头。平滑跟随她走出厨房。\n\n声音：轻柔的高跟鞋脚步声、轻微衣物摩擦声、Jarvis 的声音、公寓环境声。\n\nJarvis 始终只有声音。他说话时，画面中不出现任何东西。\n\n⸻\n\n镜头 4 — 0:07–0:09 — 2 秒\n\n切到角色位于奶油色沙发正后方的画面，与画格 4 对应。\n\n她停下脚步。\n\n身体仍朝着原来行进的方向，但带着轻微好奇，头部略微转回公寓方向。\n\n她回应：\n\n角色：\n\n“嗯？”\n\n语气随意，略带询问。她完全不知道 Jarvis 接下来要说什么。\n\nBirkin 包仍留在她前方的沙发上。\n\n摄影：中广景，沙发在前景，角色就在沙发正后方。\n\n声音：角色对白，然后短暂而自然的停顿。\n\n⸻\n\n镜头 5 — 0:09–0:12.5 — 3.5 秒\n\nJarvis 回答时，切到角色的中景。\n\nJARVIS（仅声音）：\n\n“我给你安排了一次相亲。你单身太久了。”\n\nJarvis 说话时，她的表情逐渐变化。\n\n起初她正常地听着。\n\n然后眉毛抬起。\n\n眼睛睁大。\n\n意识到 Jarvis 做了什么时，她的嘴唇慢慢张开。\n\n说到“太久了”时，她已震惊地瞪着眼睛，难以置信。\n\n反应要有喜剧感和表现力，但应自然累积，而不是瞬间跳变成震惊。\n\n摄影：中景，表情变化时，镜头缓慢且轻微地推向她的脸。\n\n声音：Jarvis 冷静的男性 AI 声音，下方保留安静的室内环境声。\n\n⸻\n\n镜头 6 — 0:12.5–0:15 — 2.5 秒\n\n切到更紧的面部特写。\n\n她震惊、难以置信的表情立即开始转为被冒犯的愤怒。\n\n眼睛依然睁大，眉毛抬起而紧绷，嘴巴张开，准备反击 Jarvis。\n\n她开口：\n\n角色：\n\n“你他妈——”\n\n在“妈——”之后立刻硬切黑屏，不能让她说完这句话。\n\n不要补完辱骂。突然黑屏就是笑点。\n\n剩余节拍保持黑屏。\n\n摄影：紧凑的电影感面部特写，硬切前轻微推进。\n\n声音：“你他妈——”的口型精确同步。黑屏时突然截断对白，切黑后短暂静音。\n\n⸻\n\n动画连续性\n\n六个镜头组成一个连续序列：角色在台面后方喝水 → 随意回应 → 放下杯子，从冰箱一侧走出厨房 → 来到沙发正后方 → Jarvis 说话时停顿 → 逐渐意识到他做了什么 → 震惊而愤怒 → 硬切黑屏。\n\n镜头 3 之后，玻璃杯始终留在厨房台面上。Birkin 包在整个序列中始终留在沙发上。\n\nJarvis 仅有声音。不要出现 Jarvis 人物、男人、机器人、全息影像、扬声器、漂浮界面、屏幕、光芒或任何视觉化实体。\n\n动作保持自然、克制。不得出现重复物体、多余手势、随意转头、过度眨眼、悬浮物体、手部变形、道具变形、手提包移动、服装变化、发型变化、公寓变化或夸张的卡通运动。\n\n总时长：恰好 15 秒。16:9 横屏。"
+        },
+        "textKind": "licensed-case",
+        "originalKind": "full",
+        "originalLanguage": "en",
+        "inputOrder": [
+          "grid-2-image",
+          "character",
+          "environment"
+        ]
       }
     ],
-    "referenceMedia": [],
+    "referenceMedia": [
+      {
+        "kind": "image",
+        "url": "https://pbs.twimg.com/media/HOuLu5obgAABQ-y?format=jpg&name=orig",
+        "caption": "Original character sheet · @Just_sharon7",
+        "localPath": "case-references/apartment-character.jpg"
+      },
+      {
+        "kind": "image",
+        "url": "https://pbs.twimg.com/media/HOuLtcSbIAAZ6QE?format=jpg&name=orig",
+        "caption": "Original apartment and handbag sheet · @Just_sharon7",
+        "localPath": "case-references/apartment-environment.jpg"
+      },
+      {
+        "kind": "image",
+        "url": "https://pbs.twimg.com/media/HOuLl9gaoAAMsgk?format=jpg&name=orig",
+        "caption": "Original nine-panel overview · @Just_sharon7",
+        "localPath": "case-references/apartment-overview.jpg"
+      }
+    ],
     "outputMedia": [
       {
         "kind": "video",
@@ -258,7 +429,63 @@ export const overseasPromptCatalog: OverseasPromptEntry[] = [
         "caption": "Original creator's external sample · @Just_sharon7"
       }
     ],
-    "sourceCompleteness": "truncated",
-    "mediaRights": "pending"
+    "sourceCompleteness": "complete",
+    "mediaRights": "licensed",
+    "referenceInputs": [
+      {
+        "id": "character",
+        "title": "Character reference",
+        "kind": "image",
+        "role": "Image2 in video · character identity",
+        "required": true,
+        "stageIds": [
+          "grid-1-image",
+          "grid-1-video",
+          "grid-2-image",
+          "grid-2-video"
+        ],
+        "image": {
+          "url": "https://pbs.twimg.com/media/HOuLu5obgAABQ-y?format=jpg&name=orig",
+          "localPath": "case-references/apartment-character.jpg",
+          "width": 2688,
+          "height": 1520
+        }
+      },
+      {
+        "id": "environment",
+        "title": "Apartment and handbag reference",
+        "kind": "image",
+        "role": "Image3 in video · apartment and handbag",
+        "required": true,
+        "stageIds": [
+          "grid-1-image",
+          "grid-1-video",
+          "grid-2-image",
+          "grid-2-video"
+        ],
+        "image": {
+          "url": "https://pbs.twimg.com/media/HOuLtcSbIAAZ6QE?format=jpg&name=orig",
+          "localPath": "case-references/apartment-environment.jpg",
+          "width": 2688,
+          "height": 1520
+        }
+      },
+      {
+        "id": "overview",
+        "title": "Original nine-panel overview",
+        "kind": "image",
+        "role": "Source overview · not the six-panel generation input",
+        "required": false,
+        "stageIds": [],
+        "image": {
+          "url": "https://pbs.twimg.com/media/HOuLl9gaoAAMsgk?format=jpg&name=orig",
+          "localPath": "case-references/apartment-overview.jpg",
+          "width": 2688,
+          "height": 1520
+        }
+      }
+    ]
   }
 ];
+
+export const overseasPromptCatalog: OverseasPromptEntry[] = [...templates as OverseasPromptEntry[], ...seedCatalog.filter(entry => entry.contentKind === "case")];

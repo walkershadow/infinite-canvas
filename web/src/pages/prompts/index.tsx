@@ -1,3 +1,4 @@
+import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { useSearchParams } from "react-router-dom";
 import { isOverseas } from "@/constant/integration";
 import { useQueryClient } from "@tanstack/react-query";
@@ -27,6 +28,7 @@ export default function PromptsPage() {
     const client = useQueryClient();
     const [editing, setEditing] = useState<{ prompt?: Prompt } | null>(null);
     const { t } = useTranslation();
+    const { text } = useWorkflowLocale();
     const [titleKeyword, setTitleKeyword] = useState("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [selectedCategory, setSelectedCategory] = useState(ALL_PROMPTS_OPTION);
@@ -66,7 +68,7 @@ export default function PromptsPage() {
 
     return (
         <div className="flex h-full flex-col overflow-hidden bg-background text-stone-800 dark:text-stone-100">
-            {isOverseas && <nav aria-label="Prompt library collections" className="flex shrink-0 flex-wrap gap-2 border-b border-border px-4 py-3 sm:px-6">{([ ["case", "Case studies"], ["template", "Workflow templates"], ["prompts", "Image & personal prompts"] ] as const).map(([value, label]) => <Button key={value} type={library === value ? "primary" : "text"} aria-pressed={library === value} onClick={() => setLibrary(value)}>{label}</Button>)}</nav>}
+            {isOverseas && <nav aria-label={text("Prompt library collections")} className="flex shrink-0 flex-wrap gap-2 border-b border-border px-4 py-3 sm:px-6">{([ ["case", "Case studies"], ["template", "Workflow templates"], ["prompts", "Image & personal prompts"] ] as const).map(([value, label]) => <Button key={value} type={library === value ? "primary" : "text"} aria-pressed={library === value} onClick={() => setLibrary(value)}>{text(label)}</Button>)}</nav>}
             {isOverseas && library !== "prompts" ? <Suspense fallback={<div className="grid flex-1 place-items-center"><Spin /></div>}><OverseasCatalog key={library} contentKind={library} /></Suspense> : <main className="min-h-0 flex-1 overflow-y-auto bg-background bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-4 py-6 [background-size:16px_16px] sm:px-6 lg:py-8 dark:bg-[radial-gradient(rgba(245,245,244,.16)_1px,transparent_1px)]" onScroll={handleListScroll}>
                 <div className="mx-auto max-w-7xl">
                     <div className="text-center">

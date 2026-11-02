@@ -1,3 +1,7 @@
+import { resolveWorkflowImages } from "@/services/workflow-images";
+import { catalogText } from "@/lib/prompt-catalog-locale";
+import { instantiateWorkflow, workflowGenerationError, workflowNodeMetadata } from "@/lib/workflow";
+import { WorkflowSource } from "@/components/prompts/workflow-editor";
 import { runConfirmedRetry } from "@/lib/canvas/confirmed-retry";
 import { loadProjectVideoTasks } from "@/services/workbench/projects";
 import { isVideoRecoveryTarget, recoverVideoNodes } from "@/lib/canvas/workbench-video-recovery";
@@ -176,7 +180,7 @@ function measureFocusFrame(container: HTMLDivElement | null, nodeId: string) {
 
 function InfiniteCanvasPage() {
     const { message, modal } = App.useApp();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     // Subscribe to the registry version so plugin registration changes rerender the canvas.
     const nodeRegistryVersion = useNodeRegistryVersion((state) => state.version);
     const params = useParams<{ id: string }>();
@@ -287,6 +291,7 @@ function InfiniteCanvasPage() {
     const [previewImageId, setPreviewImageId] = useState<string | null>(null);
     const [titleEditing, setTitleEditing] = useState(false);
     const [titleDraft, setTitleDraft] = useState("");
+    const [workflowSourceOpen, setWorkflowSourceOpen] = useState(false);
     const [historyState, setHistoryState] = useState({ canUndo: false, canRedo: false });
     const [expandedBatchNodeIds, setExpandedBatchNodeIds] = useState<Set<string>>(new Set());
     const [isNodeDragging, setIsNodeDragging] = useState(false);
@@ -1147,7 +1152,7 @@ function InfiniteCanvasPage() {
         const pastedNodes = nextNodes.map((node) => {
             const groupId = node.metadata?.groupId;
             if (!groupId) return node;
-            return { ...node, metadata: { ...node.metadata, groupId: idMap.get(groupId) } };
+            return { ...node, metadata: { ...node.metadata, groupId: idMap.get(groupId), ...(node.metadata?.workflowRequiredInputs ? { workflowRequiredInputs: node.metadata.workflowRequiredInputs.map(id => idMap.get(id) || id) } : {}) } };
         });
 
         const nextConnections = clipboard.connections.flatMap((connection, index) => {
@@ -2411,6 +2416,8 @@ function InfiniteCanvasPage() {
     const handleGenerateNode = useCallback(
         async (nodeId: string, mode: CanvasNodeGenerationMode, prompt: string) => {
             const sourceNode = nodesRef.current.find((node) => node.id === nodeId);
+            const workflowError = isOverseas ? workflowGenerationError(sourceNode, nodesRef.current, prompt, connectionsRef.current) : undefined;
+            if (workflowError) { message.warning(catalogText(workflowError, i18n.language)); return; }
             const generationConfig = buildGenerationConfig(effectiveConfig, sourceNode, mode);
             if (!isAiConfigReady(generationConfig, generationConfig.model)) {
                 openConfigDialog(true);
@@ -2505,6 +2512,7 @@ function InfiniteCanvasPage() {
                         width: reuseImageNode ? sourceNode?.width || imageConfig.width : imageConfig.width,
                         height: reuseImageNode ? sourceNode?.height || imageConfig.height : imageConfig.height,
                         metadata: {
+                            ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}),
                             prompt: effectivePrompt,
                             status: NODE_STATUS_LOADING,
                             images: imageIds.map((id) => ({ id, status: NODE_STATUS_LOADING, content: "", naturalWidth: 0, naturalHeight: 0, bytes: 0, mimeType: "" })),
@@ -2642,6 +2650,7 @@ function InfiniteCanvasPage() {
                         width: reuseVideoNode ? sourceNode.width : spec.width,
                         height: reuseVideoNode ? sourceNode.height : spec.height,
                         metadata: {
+                            ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}),
                             prompt: effectivePrompt,
                             workbenchRequestSignature: reuseVideoNode && !sourceNode?.metadata?.content ? sourceNode?.metadata?.workbenchRequestSignature : undefined,
                             workbenchRequestKey: reuseVideoNode && !sourceNode?.metadata?.content ? sourceNode?.metadata?.workbenchRequestKey : undefined,
@@ -2693,7 +2702,7 @@ function InfiniteCanvasPage() {
                         position: reuseAudioNode ? sourceNode.position : { x: parent.x + (sourceNode?.width || spec.width) + 96, y: parent.y + ((sourceNode?.height || spec.height) - spec.height) / 2 },
                         width: reuseAudioNode ? sourceNode.width : spec.width,
                         height: reuseAudioNode ? sourceNode.height : spec.height,
-                        metadata: { prompt: effectivePrompt, status: NODE_STATUS_LOADING, ...buildAudioGenerationMetadata(generationConfig) },
+                        metadata: { ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}), prompt: effectivePrompt, status: NODE_STATUS_LOADING, ...buildAudioGenerationMetadata(generationConfig) },
                     };
                     pendingChildIds = [audioId];
                     setNodes((prev) =>
@@ -2729,6 +2738,7 @@ function InfiniteCanvasPage() {
                     width: reuseTextNode ? sourceNode.width : textConfig.width,
                     height: reuseTextNode ? sourceNode.height : textConfig.height,
                     metadata: {
+                        ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}),
                         prompt: effectivePrompt,
                         status: NODE_STATUS_LOADING,
                         fontSize: 14,
@@ -2868,6 +2878,8 @@ function InfiniteCanvasPage() {
                 return;
             }
             const sourceNode = findRetrySourceNode(node.id, nodesRef.current, connectionsRef.current) || node;
+            const workflowError = isOverseas ? workflowGenerationError(sourceNode, nodesRef.current, sourceNode.metadata?.prompt || node.metadata?.prompt || "", connectionsRef.current) : undefined;
+            if (workflowError) { message.warning(catalogText(workflowError, i18n.language)); return; }
             const savedImageMetadata = node.type === CanvasNodeType.Image ? node.metadata : undefined;
             const hasSavedImageMetadata = Boolean(savedImageMetadata?.generationType);
             const generationConfig =
@@ -3151,8 +3163,18 @@ function InfiniteCanvasPage() {
     );
 
     const handleAssetInsert = useCallback(
-        (payload: InsertAssetPayload) => {
-            if (payload.kind === "text") {
+        async (payload: InsertAssetPayload) => {
+            if (payload.kind === "workflow") {
+                if (!isOverseas) return;
+                const center = screenToCanvas((containerRef.current?.getBoundingClientRect().left || 0) + size.width / 2, (containerRef.current?.getBoundingClientRect().top || 0) + size.height / 2);
+                let graph;
+                try { graph = instantiateWorkflow(await resolveWorkflowImages(payload.document, true), center); }
+                catch (error) { message.warning(error instanceof Error ? catalogText(error.message, i18n.language) : t("workflow.source")); return; }
+                setNodes(prev => [...prev, ...graph.nodes]);
+                setConnections(prev => [...prev, ...graph.connections]);
+                setSelectedNodeIds(new Set([graph.groupId]));
+                setViewport(focusViewportForNode(graph.nodes[0], size));
+            } else if (payload.kind === "text") {
                 insertAssistantText(payload.content, payload.title);
             } else if (payload.kind === "video") {
                 const spec = NODE_DEFAULT_SIZE[CanvasNodeType.Video];
@@ -3177,7 +3199,7 @@ function InfiniteCanvasPage() {
             }
             setAssetPickerOpen(false);
         },
-        [insertAssistantImage, insertAssistantText, screenToCanvas, size.height, size.width],
+        [insertAssistantImage, insertAssistantText, screenToCanvas, size.height, size.width, message, i18n, t],
     );
 
     // Memoize every callback and render function passed to CanvasNode.
@@ -3294,6 +3316,8 @@ function InfiniteCanvasPage() {
 
     return (
         <main className="relative flex h-full min-h-0 overflow-hidden" style={{ background: theme.canvas.background, color: theme.node.text }}>
+            {isOverseas && nodes.find(n => selectedNodeIds.has(n.id) && n.metadata?.workflow) && <div className="absolute bottom-16 right-4 z-30"><Button onClick={() => setWorkflowSourceOpen(true)}>{t("workflow.source")}</Button></div>}
+            {workflowSourceOpen && <Modal title={t("workflow.source")} open onCancel={() => setWorkflowSourceOpen(false)} footer={null} width={800}>{nodes.filter(n => selectedNodeIds.has(n.id) && n.metadata?.workflow).map(n => <WorkflowSource key={n.id} document={n.metadata!.workflow!} />)}</Modal>}
             <CanvasSidePanel nodes={nodes} selectedNodeIds={selectedNodeIds} onFocusNode={focusNode} onPreviewNode={setPreviewNodeId} onHoverNode={setHoverPreviewNodeId} onInsertAsset={handleAssetInsert} />
             <section className="relative min-w-0 flex-1 overflow-hidden">
                 <CanvasTopBar

@@ -1,4 +1,5 @@
-export type CatalogMedia = { kind: "image" | "video"; url: string; caption: string; poster?: string };
+import type { WorkflowImage, WorkflowReference } from "./workflow";
+export type CatalogMedia = { kind: "image" | "video"; url: string; caption: string; localPath?: string; poster?: string };
 export type OverseasPromptEntry = {
     id: string;
     contentKind: "template" | "case";
@@ -14,7 +15,8 @@ export type OverseasPromptEntry = {
     sourceCompleteness?: "complete" | "excerpt" | "truncated";
     mediaRights?: "pending" | "licensed";
     sources: { role: "original" | "curation"; label: string; url: string; author?: string; license?: string }[];
-    steps: { id: string; title: string; instruction: string; prompts: { en?: string; zh?: string; original?: string }; originalLanguage?: string; textKind?: "licensed-template" | "adaptation" | "source-excerpt"; originalKind?: "excerpt" | "full"; originalZh?: string }[];
+    steps: { image?: WorkflowImage; inputOrder?: string[]; mode?: "image" | "video"; dependsOn?: string[]; id: string; title: string; instruction: string; prompts: { en?: string; zh?: string; original?: string }; originalLanguage?: string; textKind?: "licensed-template" | "licensed-case" | "adaptation" | "source-excerpt"; originalKind?: "excerpt" | "full"; originalZh?: string }[];
+    referenceInputs?: WorkflowReference[];
     referenceMedia: CatalogMedia[];
     outputMedia: CatalogMedia[];
 };

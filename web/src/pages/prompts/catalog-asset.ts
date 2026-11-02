@@ -7,7 +7,7 @@ export function catalogTextAsset(entry: OverseasPromptEntry, stepId: string, lan
     const step = entry.steps.find((item) => item.id === stepId);
     const content = step?.prompts[language];
     if (!step || !content?.trim()) throw new Error("This prompt version is unavailable.");
-    const variant = step.textKind === "source-excerpt" ? "Original excerpt" : language === "original" ? (step.originalKind === "excerpt" ? "Original excerpt" : "Licensed template") : (step.textKind === "adaptation" ? "Adapted example" : "Licensed template");
+    const variant = step.textKind === "licensed-case" ? (language === "zh" ? "Chinese translation" : "Original case prompt") : step.textKind === "source-excerpt" ? "Original excerpt" : language === "original" ? (step.originalKind === "excerpt" ? "Original excerpt" : "Licensed template") : (step.textKind === "adaptation" ? "Adapted example" : "Licensed template");
     const languageLabel = { en: "English", zh: "Chinese", original: "Original" }[language];
     const original = entry.sources.find((source) => source.role === "original");
     return {

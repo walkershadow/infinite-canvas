@@ -1,4 +1,5 @@
 export default {
+    workflow: { name: "Workflow", count_one: "{{count}} stage", count_other: "{{count}} stages", source: "Workflow source & examples" },
     meta: {
         title: "Infinite Canvas",
         description: "An infinite canvas creation tool",
