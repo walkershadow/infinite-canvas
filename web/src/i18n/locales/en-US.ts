@@ -188,6 +188,7 @@ export default {
         addReference: "Add as reference",
     },
     videoWorkbench: {
+        platformNoImages: "No reference images. Drag in up to {{count}} images.",
         title: "Video Studio",
         promptPlaceholder: "Describe camera movement, subject action, atmosphere, and visual style",
         references: "Reference images",

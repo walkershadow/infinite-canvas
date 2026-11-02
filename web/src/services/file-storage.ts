@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { accountDatabaseName } from "@/services/api/workbench";
 import localforage from "localforage";
 import { nanoid } from "nanoid";
@@ -7,7 +7,7 @@ import { withLocalProxy } from "@/stores/use-config-store";
 
 export type UploadedFile = { url: string; storageKey: string; bytes: number; mimeType: string; width?: number; height?: number; durationMs?: number };
 
-const store = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "media_files" });
+const store = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "media_files" });
 const objectUrls = new Map<string, string>();
 
 export async function uploadMediaFile(input: string | Blob, prefix = "file"): Promise<UploadedFile> {
@@ -25,7 +25,7 @@ export async function resolveMediaUrl(storageKey?: string, fallback = "", signal
     if (!storageKey) return fallback;
     const cached = objectUrls.get(storageKey);
     if (cached) return cached;
-    if (isOverseas) {
+    if (isWorkbench) {
         const { cloudMediaUrl } = await import("@/services/workbench/projects");
         const cloud = cloudMediaUrl(storageKey);
         if (cloud && !signal) return cloud;
@@ -42,7 +42,7 @@ export async function getMediaBlob(storageKey: string, signal?: AbortSignal) {
     signal?.throwIfAborted();
     const local = await store.getItem<Blob>(storageKey);
     signal?.throwIfAborted();
-    if (local || !isOverseas) return local;
+    if (local || !isWorkbench) return local;
     const { cloudMediaUrl } = await import("@/services/workbench/projects");
     const url = cloudMediaUrl(storageKey);
     if (!url) return null;

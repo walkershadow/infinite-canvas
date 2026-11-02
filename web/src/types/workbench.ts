@@ -23,9 +23,13 @@ export type WorkbenchBootstrap = {
     models: WorkbenchModel[];
     aiModels?: { id: string; name: string; capability: "image" | "text" | "audio"; price: number; constraints?: { textOnly?: boolean; maxImages?: number; maxVideos?: number; referenceAudio?: boolean; maxAudios?: number; referenceKinds?: ("text" | "image" | "video" | "audio")[] } }[];
     quota: { points: number; daily: { remaining: number } };
-    capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean };
+    capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean; legacyImport?: boolean };
     currency: string;
-    pointsPerUsd: number;
+    pointsPerUsd?: number;
+    pointsPerYuan?: number;
+    region?: "overseas" | "domestic";
+    locale?: "en-US" | "zh-CN";
+    links?: { workbench?: string; login?: string; recharge?: string };
 };
 export type NativeDocument = CanvasProject & { schemaVersion: 1 };
 export type CloudProject = { id: string; revision: number; document: NativeDocument; title: string; createdAt: string; updatedAt: string };

@@ -1,5 +1,5 @@
 import { validateWorkflow } from "@/lib/workflow-validation";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 
@@ -101,7 +101,7 @@ export const useAssetStore = create<AssetStore>()(
                 }),
             replaceAssets: (assets) => set({ assets }),
             cleanupImages: (extra) => {
-                if (isOverseas) return; // Keep local blobs available to unsaved recovery snapshots.
+                if (isWorkbench) return; // Keep local blobs available to unsaved recovery snapshots.
                 window.setTimeout(async () => {
                     const { useCanvasStore } = await import("@/stores/canvas/use-canvas-store");
                     await cleanupUnusedImages({ assets: get().assets, projects: useCanvasStore.getState().projects, extra });
@@ -111,7 +111,7 @@ export const useAssetStore = create<AssetStore>()(
         }),
         {
             name: ASSET_STORE_KEY,
-            skipHydration: isOverseas,
+            skipHydration: isWorkbench,
             storage: assetStorage,
             partialize: (state) => ({ assets: state.assets }) as StorageValue<AssetStore>["state"],
             onRehydrateStorage: () => () => {

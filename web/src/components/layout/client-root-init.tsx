@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
 import { App } from "antd";
@@ -17,7 +17,7 @@ export function ClientRootInit({ children }: { children: ReactNode }) {
     usePromptSourceScheduler();
 
     useEffect(() => {
-        if (isOverseas || handledConfigParams.current) return;
+        if (isWorkbench || handledConfigParams.current) return;
         const searchParams = new URLSearchParams(window.location.search);
         const baseUrl = searchParams.get("baseUrl") || searchParams.get("baseurl");
         const apiKey = searchParams.get("apiKey") || searchParams.get("apikey");

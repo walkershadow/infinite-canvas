@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isOverseas, isDomestic } from "@/constant/integration";
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
@@ -7,7 +7,7 @@ import zhCN from "@/i18n/locales/zh-CN";
 
 export type AppLocale = "zh-CN" | "en-US";
 
-const LOCALE_STORAGE_KEY = isOverseas ? "infinite-canvas:workbench:locale" : "infinite-canvas:locale";
+const LOCALE_STORAGE_KEY = isDomestic ? "infinite-canvas:workbench:domestic:locale" : isOverseas ? "infinite-canvas:workbench:locale" : "infinite-canvas:locale";
 
 i18n.use(initReactI18next).init({
     resources: {

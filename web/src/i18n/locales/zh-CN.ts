@@ -188,6 +188,7 @@ export default {
         addReference: "加入参考图",
     },
     videoWorkbench: {
+        platformNoImages: "暂无参考图，可拖入最多 {{count}} 张图片。",
         title: "视频创作台",
         promptPlaceholder: "描述镜头运动、主体动作、场景氛围和画面风格",
         references: "参考图",

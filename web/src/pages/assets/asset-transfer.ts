@@ -1,6 +1,6 @@
 import { resolveWorkflowImages } from "@/services/workflow-images";
 import { validateWorkflow } from "@/lib/workflow-validation";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { saveAs } from "file-saver";
 
 import { createZip, readZip } from "@/lib/zip";
@@ -70,7 +70,7 @@ export async function readAssetPackage(file: File) {
     const assetFile = zip.get("assets.json");
     if (!assetFile) throw new Error("missing assets.json");
     const data = JSON.parse(await assetFile.text()) as AssetExportFile;
-    for (const asset of data.assets) if (asset.kind === "workflow") { if (!isOverseas) throw new Error("Workflow packages require Workbench."); validateWorkflow(asset.data); }
+    for (const asset of data.assets) if (asset.kind === "workflow") { if (!isWorkbench) throw new Error("Workflow packages require Workbench."); validateWorkflow(asset.data); }
     for (const asset of data.assets) if (asset.kind === "workflow") {
         for (const key of collectImageStorageKeys(asset.data)) {
             const file = data.files.find(item => item.storageKey === key);

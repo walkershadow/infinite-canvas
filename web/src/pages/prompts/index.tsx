@@ -1,6 +1,6 @@
 import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { useSearchParams } from "react-router-dom";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { useQueryClient } from "@tanstack/react-query";
 import { PERSONAL_PROMPT_SOURCE, deletePersonalPrompt } from "@/services/api/personal-prompts";
 import { PersonalPromptEditor } from "./components/personal-prompt-editor";
@@ -23,7 +23,7 @@ export default function PromptsPage() {
     const { message, modal } = App.useApp();
     const [searchParams, setSearchParams] = useSearchParams();
     const collection = searchParams.get("collection");
-    const library = isOverseas ? (collection === "template" || collection === "prompts" ? collection : "case") : "prompts";
+    const library = isWorkbench ? (collection === "template" || collection === "prompts" ? collection : "case") : "prompts";
     const setLibrary = (value: string) => setSearchParams((previous) => { const next = new URLSearchParams(previous); next.set("collection", value); next.delete("id"); return next; });
     const client = useQueryClient();
     const [editing, setEditing] = useState<{ prompt?: Prompt } | null>(null);
@@ -42,7 +42,7 @@ export default function PromptsPage() {
     }, [message, query.error, query.isError, t]);
 
     const removePersonal = (prompt: Prompt) => modal.confirm({
-        title: "Delete personal prompt?", content: prompt.title, okText: "Delete", cancelText: "Cancel", okButtonProps: { danger: true },
+        title: text("Delete personal prompt?"), content: prompt.title, okText: text("Delete"), cancelText: text("Cancel"), okButtonProps: { danger: true },
         onOk: async () => {
             try {
                 await deletePersonalPrompt(prompt);
@@ -68,11 +68,11 @@ export default function PromptsPage() {
 
     return (
         <div className="flex h-full flex-col overflow-hidden bg-background text-stone-800 dark:text-stone-100">
-            {isOverseas && <nav aria-label={text("Prompt library collections")} className="flex shrink-0 flex-wrap gap-2 border-b border-border px-4 py-3 sm:px-6">{([ ["case", "Case studies"], ["template", "Workflow templates"], ["prompts", "Image & personal prompts"] ] as const).map(([value, label]) => <Button key={value} type={library === value ? "primary" : "text"} aria-pressed={library === value} onClick={() => setLibrary(value)}>{text(label)}</Button>)}</nav>}
-            {isOverseas && library !== "prompts" ? <Suspense fallback={<div className="grid flex-1 place-items-center"><Spin /></div>}><OverseasCatalog key={library} contentKind={library} /></Suspense> : <main className="min-h-0 flex-1 overflow-y-auto bg-background bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-4 py-6 [background-size:16px_16px] sm:px-6 lg:py-8 dark:bg-[radial-gradient(rgba(245,245,244,.16)_1px,transparent_1px)]" onScroll={handleListScroll}>
+            {isWorkbench && <nav aria-label={text("Prompt library collections")} className="flex shrink-0 flex-wrap gap-2 border-b border-border px-4 py-3 sm:px-6">{([ ["case", "Case studies"], ["template", "Workflow templates"], ["prompts", "Image & personal prompts"] ] as const).map(([value, label]) => <Button key={value} type={library === value ? "primary" : "text"} aria-pressed={library === value} onClick={() => setLibrary(value)}>{text(label)}</Button>)}</nav>}
+            {isWorkbench && library !== "prompts" ? <Suspense fallback={<div className="grid flex-1 place-items-center"><Spin /></div>}><OverseasCatalog key={library} contentKind={library} /></Suspense> : <main className="min-h-0 flex-1 overflow-y-auto bg-background bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-4 py-6 [background-size:16px_16px] sm:px-6 lg:py-8 dark:bg-[radial-gradient(rgba(245,245,244,.16)_1px,transparent_1px)]" onScroll={handleListScroll}>
                 <div className="mx-auto max-w-7xl">
                     <div className="text-center">
-                        {isOverseas && <Button className="float-right" onClick={() => setEditing({})}>New prompt</Button>}
+                        {isWorkbench && <Button className="float-right" onClick={() => setEditing({})}>New prompt</Button>}
                         <h1 className="text-2xl font-semibold text-stone-950 dark:text-stone-100">{t("prompts.title")}</h1>
                         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">{t("prompts.total", { count: totalPrompts })}</p>
                     </div>
@@ -92,7 +92,7 @@ export default function PromptsPage() {
                         <section className="min-w-0">
                             <Input size="large" prefix={<Search className="size-4 text-stone-400" />} value={titleKeyword} placeholder={t("prompts.search")} onChange={(event) => setTitleKeyword(event.target.value)} />
                             {query.isLoading ? <div className="flex h-60 items-center justify-center"><Spin /></div> : null}
-                            {!query.isLoading ? <div className="mt-5"><PromptGrid items={promptItems} onOpen={setSelectedPrompt} renderActions={(item) => <div className="flex flex-wrap gap-1"><Button type="text" size="small" icon={<FolderPlus className="size-3.5" />} onClick={() => savePromptAsset(item)}>{t("common.addToAssets")}</Button>{isOverseas && item.sourceId === PERSONAL_PROMPT_SOURCE && <><Button type="text" size="small" onClick={() => setEditing({ prompt: item })}>Edit</Button><Button type="text" size="small" danger onClick={() => removePersonal(item)}>Delete</Button></>}</div>} onCopy={(item) => copyText(item.prompt, t("common.promptCopied"))} emptyText={t("prompts.empty")} /></div> : null}
+                            {!query.isLoading ? <div className="mt-5"><PromptGrid items={promptItems} onOpen={setSelectedPrompt} renderActions={(item) => <div className="flex flex-wrap gap-1"><Button type="text" size="small" icon={<FolderPlus className="size-3.5" />} onClick={() => savePromptAsset(item)}>{t("common.addToAssets")}</Button>{isWorkbench && item.sourceId === PERSONAL_PROMPT_SOURCE && <><Button type="text" size="small" onClick={() => setEditing({ prompt: item })}>Edit</Button><Button type="text" size="small" danger onClick={() => removePersonal(item)}>Delete</Button></>}</div>} onCopy={(item) => copyText(item.prompt, t("common.promptCopied"))} emptyText={t("prompts.empty")} /></div> : null}
                             <div className="mt-6 text-center text-xs text-stone-500 dark:text-stone-400">{query.isFetchingNextPage ? t("prompts.loading") : query.hasNextPage ? t("prompts.loadMore") : promptItems.length > 0 ? t("prompts.end") : null}</div>
                         </section>
                     </div>

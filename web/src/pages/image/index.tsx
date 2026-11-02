@@ -1,6 +1,6 @@
 import { acknowledgeAiTask, isWorkbenchTaskPending, WorkbenchTaskPendingError } from "@/services/api/workbench-ai-tasks";
 import { isWorkbenchModel } from "@/stores/use-config-store";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { accountDatabaseName } from "@/services/api/workbench";
 import { ArrowLeft, ArrowRight, BookOpen, CheckSquare, ClipboardPaste, Download, FolderPlus, History, ImagePlus, LoaderCircle, PenLine, Plus, SlidersHorizontal, Sparkles, Trash2, Upload } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
@@ -69,7 +69,7 @@ type UpdateAiConfig = <K extends keyof AiConfig>(key: K, value: AiConfig[K]) => 
 
 const LOG_STORE_KEY = "infinite-canvas:image_generation_logs";
 const RESULT_ACTION_BUTTON_CLASS = "h-auto min-h-6 max-w-full px-2 py-1 [&_.ant-btn-icon]:shrink-0 [&>span:last-child]:whitespace-normal";
-const logStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "image_generation_logs" });
+const logStore = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "image_generation_logs" });
 
 export default function ImagePage() {
     const { message } = App.useApp();

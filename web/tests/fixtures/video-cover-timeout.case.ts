@@ -3,7 +3,7 @@ import { expect, mock, test } from "bun:test";
 const original = (id: string) => ({ id, kind: "video", coverUrl: "", data: { url: `/${id}.mp4` }, note: "preserved" });
 let assets: any[] = [original("stalled"), original("next")];
 mock.module("@/stores/use-asset-store", () => ({ useAssetStore: { getState: () => ({ assets, updateAsset: (id: string, patch: any) => { assets = assets.map((asset) => asset.id === id ? { ...asset, ...patch } : asset); } }) } }));
-mock.module("@/constant/integration", () => ({ isOverseas: true }));
+mock.module("@/constant/integration", () => ({ isWorkbench: true }));
 mock.module("@/services/api/workbench", () => ({ accountDatabaseName: () => "test" }));
 mock.module("@/stores/use-config-store", () => ({ withLocalProxy: (url: string) => url }));
 mock.module("localforage", () => ({ default: { createInstance: () => ({ getItem: async () => null }) } }));

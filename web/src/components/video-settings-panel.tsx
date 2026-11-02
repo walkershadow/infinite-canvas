@@ -1,3 +1,4 @@
+import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { workbenchVideoSelection } from "@/services/workbench/video";
 import { workbenchSession } from "@/services/api/workbench";
 import { isWorkbenchModel, modelOptionName } from "@/stores/use-config-store";
@@ -34,6 +35,7 @@ type VideoSettingsPanelProps = {
 };
 
 export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = true, className = "w-[320px] space-y-4 rounded-2xl px-1 py-0.5" }: VideoSettingsPanelProps) {
+    const { text } = useWorkflowLocale();
     const { t } = useTranslation();
     const seconds = Number(clampVideoSeconds(config.videoSeconds || "6"));
     const videoMode = normalizeVideoModeValue(config.videoMode);
@@ -53,13 +55,13 @@ export function VideoSettingsPanel({ config, onConfigChange, theme, showTitle = 
         const model = workbenchSession().models.find((item) => item.id === modelOptionName(config.model || config.videoModel));
         const selected = model ? workbenchVideoSelection(config, model) : undefined;
         return <div className={className} style={{ color: theme.node.text }} onMouseDown={(event) => event.stopPropagation()}>
-            <SettingGroup title="Duration" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.durations.map((value) => <OptionPill key={value} selected={selected?.duration === value} theme={theme} onClick={() => onConfigChange("videoSeconds", String(value))}>{value}s</OptionPill>)}</div></SettingGroup>
-            <SettingGroup title="Aspect ratio" color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.ratios.map((item) => <OptionPill key={item.value} selected={selected?.ratio === item.value} theme={theme} onClick={() => { onConfigChange("size", item.value); if (model.id === "ali-video") onConfigChange("vquality", item.value.endsWith("-1080p") ? "1080" : "720"); }}>{item.label}</OptionPill>)}</div></SettingGroup>
-            {model?.supportsFrames && <SettingGroup title="Reference mode" color={theme.node.muted}>
+            <SettingGroup title={text("Duration")} color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.durations.map((value) => <OptionPill key={value} selected={selected?.duration === value} theme={theme} onClick={() => onConfigChange("videoSeconds", String(value))}>{value}s</OptionPill>)}</div></SettingGroup>
+            <SettingGroup title={text("Aspect ratio")} color={theme.node.muted}><div className="flex flex-wrap gap-2">{model?.ratios.map((item) => <OptionPill key={item.value} selected={selected?.ratio === item.value} theme={theme} onClick={() => { onConfigChange("size", item.value); if (model.id === "ali-video") onConfigChange("vquality", item.value.endsWith("-1080p") ? "1080" : "720"); }}>{item.label}</OptionPill>)}</div></SettingGroup>
+            {model?.supportsFrames && <SettingGroup title={text("Reference mode")} color={theme.node.muted}>
                 <div className="flex flex-wrap gap-2">{videoModeOptions.map((item) => <OptionPill key={item.value} selected={videoMode === item.value} theme={theme} onClick={() => onConfigChange("videoMode", item.value)}>{t(`settingsPanels.video.modes.${item.labelKey}`)}</OptionPill>)}</div>
-                <p className="mt-2 text-xs" style={{ color: theme.node.muted }}>{videoMode === "frames" ? "One image is the first frame; two images are the first and last frames, in reference order. Video and audio references cannot be mixed with frames." : "Use images, videos and audio as ordinary references. No first or last frame is assigned."}</p>
+                <p className="mt-2 text-xs" style={{ color: theme.node.muted }}>{text(videoMode === "frames" ? "One image is the first frame; two images are the first and last frames, in reference order. Video and audio references cannot be mixed with frames." : "Use images, videos and audio as ordinary references. No first or last frame is assigned.")}</p>
             </SettingGroup>}
-            <p className="text-xs" style={{ color: theme.node.muted }}>Model options and pricing are managed by Workbench.</p>
+            <p className="text-xs" style={{ color: theme.node.muted }}>{text("Model options and pricing are managed by Workbench.")}</p>
         </div>;
     }
     return (

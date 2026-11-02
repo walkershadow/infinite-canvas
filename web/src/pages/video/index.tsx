@@ -1,7 +1,7 @@
 import { ensureAssetVideoCover } from "@/services/asset-video-cover";
 import { canResumePlatformVideo, pollVideoTaskWindow } from "./poll-video-task";
-import { workbenchVideoInput, workbenchVideoSelection } from "@/services/workbench/video";
-import { isOverseas } from "@/constant/integration";
+import { workbenchVideoEstimateText, workbenchVideoInput, workbenchVideoSelection } from "@/services/workbench/video";
+import { isWorkbench } from "@/constant/integration";
 import { accountDatabaseName, workbenchSession } from "@/services/api/workbench";
 import { ArrowLeft, ArrowRight, BookOpen, CheckSquare, ClipboardPaste, Download, FolderPlus, History, LoaderCircle, Plus, SlidersHorizontal, Sparkles, Trash2, Upload, VideoIcon } from "lucide-react";
 import { useEffect, useRef, useState, useSyncExternalStore, type DragEvent } from "react";
@@ -71,12 +71,12 @@ type GenerationLogConfig = Pick<AiConfig, "model" | "videoModel" | "size" | "vqu
 type UpdateAiConfig = <K extends keyof AiConfig>(key: K, value: AiConfig[K]) => void;
 
 const LOG_STORE_KEY = "infinite-canvas:video_generation_logs";
-const requestStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "workbench_requests" });
-const logStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "video_generation_logs" });
+const requestStore = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "workbench_requests" });
+const logStore = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "video_generation_logs" });
 
 export default function VideoPage() {
     const { message, modal } = App.useApp();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const dragDepthRef = useRef(0);
@@ -232,7 +232,7 @@ export default function VideoPage() {
             let requestKey: string | undefined;
             if (isWorkbenchModel(snapshot.config, snapshot.config.model || snapshot.config.videoModel)) {
                 const estimate = workbenchVideoInput(snapshot.config);
-                const confirmed = await new Promise<boolean>((resolve) => modal.confirm({ title: "Generate video", content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). ${estimate.model.freeQuota ? "Workbench applies eligible free quota." : "This model does not use daily free quota."}`, okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false) }));
+                const confirmed = await new Promise<boolean>((resolve) => modal.confirm({ title: t("workbench.generate"), content: workbenchVideoEstimateText(estimate, i18n.language), okText: t("workbench.generate"), cancelText: t("common.cancel"), onOk: () => resolve(true), onCancel: () => resolve(false) }));
                 if (!confirmed) { setRunning(false); setResults([]); return; }
                 const signature = JSON.stringify({ prompt: snapshot.text, model, duration: estimate.duration, ratio: estimate.ratio, videoMode: snapshot.config.videoMode, references: snapshot.references.map((item) => item.storageKey || item.id) });
                 const previous = await requestStore.getItem<{ signature: string; requestKey: string }>("workbench-pending-request");
@@ -501,7 +501,7 @@ export default function VideoPage() {
                                             </button>
                                         </div>
                                     ))}
-                                    {!references.length ? <div className="flex min-w-full items-center justify-center text-sm text-stone-500">{referenceDragTarget ? t("videoWorkbench.dropReferences") : (platformModel ? `No reference images. Drag in up to ${referenceLimit} images.` : t("videoWorkbench.noImages"))}</div> : null}
+                                    {!references.length ? <div className="flex min-w-full items-center justify-center text-sm text-stone-500">{referenceDragTarget ? t("videoWorkbench.dropReferences") : (platformModel ? t("videoWorkbench.platformNoImages", { count: referenceLimit }) : t("videoWorkbench.noImages"))}</div> : null}
                                 </div>
                             </div>
 

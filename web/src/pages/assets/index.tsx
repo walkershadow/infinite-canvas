@@ -1,6 +1,6 @@
 import i18n from "@/i18n";
 import { catalogSummary } from "@/lib/prompt-catalog-locale";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { WorkflowEditor } from "@/components/prompts/workflow-editor";
 import { Copy, Download, PencilLine, Search, Trash2, Upload } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
@@ -29,7 +29,7 @@ type AssetFormValues = {
 
 type ImageDraft = ImageAsset["data"] | null;
 
-const kindOptions: (AssetKind | "all")[] = ["all", "text", "image", "video", ...(isOverseas ? ["workflow" as const] : [])];
+const kindOptions: (AssetKind | "all")[] = ["all", "text", "image", "video", ...(isWorkbench ? ["workflow" as const] : [])];
 
 export default function AssetsPage() {
     const { message } = App.useApp();
@@ -57,7 +57,7 @@ export default function AssetsPage() {
     const title = Form.useWatch("title", form) || "";
     const tags = Form.useWatch("tags", form) || [];
     const content = Form.useWatch("content", form) || "";
-    const validAssets = useMemo(() => assets.filter((asset) => asset.kind === "text" || asset.kind === "image" || asset.kind === "video" || (isOverseas && asset.kind === "workflow")), [assets]);
+    const validAssets = useMemo(() => assets.filter((asset) => asset.kind === "text" || asset.kind === "image" || asset.kind === "video" || (isWorkbench && asset.kind === "workflow")), [assets]);
 
     const filteredAssets = useMemo(() => {
         const query = keyword.trim().toLowerCase();
@@ -299,7 +299,7 @@ export default function AssetsPage() {
                 </div>
             </main>
 
-            {previewAsset?.kind === "workflow" && isOverseas && <WorkflowEditor key={previewAsset.id} document={previewAsset.data} asset={previewAsset} onClose={() => setPreviewAsset(null)} />}
+            {previewAsset?.kind === "workflow" && isWorkbench && <WorkflowEditor key={previewAsset.id} document={previewAsset.data} asset={previewAsset} onClose={() => setPreviewAsset(null)} />}
             <Modal title={editingAsset ? t("assets.edit") : t("assets.add")} open={isAssetOpen} width={980} onCancel={() => setIsAssetOpen(false)} onOk={() => void saveAsset()} okText={t("common.save")} cancelText={t("common.cancel")} destroyOnHidden>
                 <div className="grid gap-6 pt-1 lg:grid-cols-[minmax(0,1fr)_320px]">
                     <Form form={form} layout="vertical" requiredMark={false} initialValues={{ kind: "text", tags: [] }}>
@@ -431,7 +431,7 @@ function AssetCard({ asset, onOpen, onEdit, onCopy, onDownload, onDelete }: { as
                     {cover ? (
                         <img src={cover} alt={asset.title} className="aspect-[4/3] w-full object-cover" />
                     ) : (
-                        <div className={`flex aspect-[4/3] items-center justify-center bg-stone-100 p-5 text-center text-sm leading-6 text-stone-600 dark:bg-stone-900 dark:text-stone-300 ${isOverseas ? "relative overflow-hidden" : ""}`}><span className={isOverseas ? "line-clamp-6 min-w-0 break-words [overflow-wrap:anywhere]" : undefined}>{asset.kind === "workflow" ? `${t("workflow.name")} · ${t("workflow.count", { count: asset.data.stages.length })}` : asset.kind === "text" ? asset.data.content : asset.kind === "video" ? t(failed ? "assets.coverUnavailable" : "assets.coverLoading") : t("assets.noCover")}</span></div>
+                        <div className={`flex aspect-[4/3] items-center justify-center bg-stone-100 p-5 text-center text-sm leading-6 text-stone-600 dark:bg-stone-900 dark:text-stone-300 ${isWorkbench ? "relative overflow-hidden" : ""}`}><span className={isWorkbench ? "line-clamp-6 min-w-0 break-words [overflow-wrap:anywhere]" : undefined}>{asset.kind === "workflow" ? `${t("workflow.name")} · ${t("workflow.count", { count: asset.data.stages.length })}` : asset.kind === "text" ? asset.data.content : asset.kind === "video" ? t(failed ? "assets.coverUnavailable" : "assets.coverLoading") : t("assets.noCover")}</span></div>
                     )}
                 </button>
             }

@@ -20,7 +20,7 @@
 
 所有清单key必须显式提供地址或不可用原因；不可用不等于转存完成。地址必须是 allowedOrigins 中的 HTTPS 公开七牛/CDN地址，不能使用短时签名链接。七牛需要允许浏览器读取、图片跨域下载和视频 Range 请求。密钥只由上传端持有，映射文件不含密钥。
 
-海外构建指定 `VITE_APP_MODE=overseas CATALOG_MEDIA_MAP_FILE=/absolute/path/to/map.json`，路径由构建端读取，只有地址数据进入前端。海外生产构建缺映射或漏key会拒绝继续。独立构建忽略该变量。原始来源链接保留作署名，不作为媒体加载fallback。个人素材上传和账号归属保持原链路。
+Workbench集成构建（海外 `VITE_APP_MODE=overseas`，国内 `VITE_APP_MODE=domestic`）均需要映射；例如海外构建指定 `VITE_APP_MODE=overseas CATALOG_MEDIA_MAP_FILE=/absolute/path/to/map.json`，路径由构建端读取，只有地址数据进入前端。海外生产构建缺映射或漏key会拒绝继续。独立构建忽略该变量。原始来源链接保留作署名，不作为媒体加载fallback。个人素材上传和账号归属保持原链路。
 
 本会话不构建、不部署；转存端已交付68项真实映射，覆盖及本地原图散列已核对，CDN图片和视频Range/CORS已抽查。最终浏览器和构建产物验收由发布端完成。原图暂缺的6例继续支持用户自行上传。
 

@@ -1,5 +1,5 @@
 import { isWorkbenchModel } from "@/stores/use-config-store";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { workbenchRequest } from "@/services/api/workbench";
 import { createWorkbenchVideo, ownedAssetUrl, refreshWorkbenchBalance, workbenchReference } from "@/services/workbench/projects";
 import { workbenchVideoInput, workbenchVideoReferenceMode } from "@/services/workbench/video";
@@ -105,7 +105,7 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
 
 export async function pollVideoGenerationTask(config: AiConfig, task: VideoGenerationTask, options?: RequestOptions): Promise<VideoGenerationTaskState> {
     if (task.provider === "workbench") {
-        if (!isOverseas) throw new Error("Open this task in Workbench.");
+        if (!isWorkbench) throw new Error("Open this task in Workbench.");
         const item = task.projectId
             ? (await workbenchRequest<{ tasks: WorkbenchTask[] }>(`/projects/${encodeURIComponent(task.projectId)}/tasks`, { signal: options?.signal })).tasks.find((item) => item.id === task.id)
             : (await workbenchRequest<{ task: WorkbenchTask }>(`/video/tasks/${encodeURIComponent(task.id)}`, { signal: options?.signal })).task;
@@ -170,7 +170,7 @@ function videoPluginResult(result: unknown): VideoGenerationResult {
 }
 
 export async function storeGeneratedVideo(result: VideoGenerationResult): Promise<UploadedFile> {
-    if (isOverseas && result.url?.startsWith("/api/")) return { url: ownedAssetUrl(result.url), storageKey: "", bytes: 0, mimeType: result.mimeType || "video/mp4" };
+    if (isWorkbench && result.url?.startsWith("/api/")) return { url: ownedAssetUrl(result.url), storageKey: "", bytes: 0, mimeType: result.mimeType || "video/mp4" };
     if (result.blob) return uploadMediaFile(result.blob, "video");
     if (result.url) {
         try {

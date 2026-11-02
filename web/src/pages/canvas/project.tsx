@@ -8,8 +8,8 @@ import { isVideoRecoveryTarget, recoverVideoNodes } from "@/lib/canvas/workbench
 import { assertWorkbenchReferences, isCompatibleReference, referenceKindsForNode } from "@/lib/canvas/canvas-reference-selection";
 import { isWorkbenchTaskPending } from "@/services/api/workbench-ai-tasks";
 import { useWorkbenchAiRecovery } from "./hooks/use-workbench-ai-recovery";
-import { isOverseas } from "@/constant/integration";
-import { workbenchVideoInput } from "@/services/workbench/video";
+import { isWorkbench } from "@/constant/integration";
+import { workbenchVideoEstimateText, workbenchVideoInput } from "@/services/workbench/video";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent as ReactChangeEvent, DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -350,10 +350,10 @@ function InfiniteCanvasPage() {
         const estimate = workbenchVideoInput(config);
         const confirmed = await new Promise<boolean>((resolve) => {
             const dialog = modal.confirm({
-                title: "Generate video",
-                content: `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points ($${estimate.usd.toFixed(4)} ${estimate.currency}). ${estimate.model.freeQuota ? "Eligible daily free quota is applied by Workbench." : "This model does not use daily free quota."} Stopping the wait does not cancel billing.`,
+                title: t("workbench.generate"),
+                content: workbenchVideoEstimateText(estimate, i18n.language),
                 afterClose: () => { signal.removeEventListener("abort", abort); resolve(false); },
-                okText: "Generate", cancelText: "Cancel", onOk: () => resolve(true), onCancel: () => resolve(false),
+                okText: t("workbench.generate"), cancelText: t("common.cancel"), onOk: () => resolve(true), onCancel: () => resolve(false),
             });
             const abort = () => { dialog.destroy(); resolve(false); };
             signal.addEventListener("abort", abort, { once: true });
@@ -364,7 +364,7 @@ function InfiniteCanvasPage() {
             setNodes((prev) => prev.map((item) => item.id === nodeId || item.id === originId ? { ...item, metadata: { ...item.metadata, status: item.metadata?.content ? NODE_STATUS_SUCCESS : NODE_STATUS_IDLE } } : item));
             throw new DOMException("Aborted", "AbortError");
         }
-    }, [modal]);
+    }, [modal, t, i18n.language]);
 
     const completeVideoNodeTask = useCallback(
         async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], prompt: string, images: Parameters<typeof createVideoGenerationTask>[2], signal: AbortSignal, extra: CanvasNodeData["metadata"] = {}, videos: ReferenceVideo[] = [], audios: ReferenceAudio[] = [], alreadyConfirmed = false) => {
@@ -557,7 +557,7 @@ function InfiniteCanvasPage() {
         let cancelled = false;
         const snapshot = nodesRef.current;
 
-        if (isOverseas) void loadProjectVideoTasks(projectId).then((tasks) => {
+        if (isWorkbench) void loadProjectVideoTasks(projectId).then((tasks) => {
             if (cancelled) return;
             setNodes((current) => recoverVideoNodes(current, snapshot, tasks));
         }).catch((error) => { if (!cancelled) message.error(String(error)); });
@@ -567,7 +567,7 @@ function InfiniteCanvasPage() {
     }, [projectLoaded, projectId]);
 
     useEffect(() => {
-        if (isOverseas || !projectLoaded || !["new", "recent", "choose"].includes(searchParams.get("mode") || "")) return;
+        if (isWorkbench || !projectLoaded || !["new", "recent", "choose"].includes(searchParams.get("mode") || "")) return;
         if (!searchParams.has("agentUrl") && !localAgentEnabled && !fragmentBootstrap) openAgentPanel();
     }, [fragmentBootstrap, localAgentEnabled, openAgentPanel, projectLoaded, searchParams]);
 
@@ -2416,7 +2416,7 @@ function InfiniteCanvasPage() {
     const handleGenerateNode = useCallback(
         async (nodeId: string, mode: CanvasNodeGenerationMode, prompt: string) => {
             const sourceNode = nodesRef.current.find((node) => node.id === nodeId);
-            const workflowError = isOverseas ? workflowGenerationError(sourceNode, nodesRef.current, prompt, connectionsRef.current) : undefined;
+            const workflowError = isWorkbench ? workflowGenerationError(sourceNode, nodesRef.current, prompt, connectionsRef.current) : undefined;
             if (workflowError) { message.warning(catalogText(workflowError, i18n.language)); return; }
             const generationConfig = buildGenerationConfig(effectiveConfig, sourceNode, mode);
             if (!isAiConfigReady(generationConfig, generationConfig.model)) {
@@ -2512,7 +2512,7 @@ function InfiniteCanvasPage() {
                         width: reuseImageNode ? sourceNode?.width || imageConfig.width : imageConfig.width,
                         height: reuseImageNode ? sourceNode?.height || imageConfig.height : imageConfig.height,
                         metadata: {
-                            ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}),
+                            ...(isWorkbench ? workflowNodeMetadata(sourceNode) : {}),
                             prompt: effectivePrompt,
                             status: NODE_STATUS_LOADING,
                             images: imageIds.map((id) => ({ id, status: NODE_STATUS_LOADING, content: "", naturalWidth: 0, naturalHeight: 0, bytes: 0, mimeType: "" })),
@@ -2650,7 +2650,7 @@ function InfiniteCanvasPage() {
                         width: reuseVideoNode ? sourceNode.width : spec.width,
                         height: reuseVideoNode ? sourceNode.height : spec.height,
                         metadata: {
-                            ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}),
+                            ...(isWorkbench ? workflowNodeMetadata(sourceNode) : {}),
                             prompt: effectivePrompt,
                             workbenchRequestSignature: reuseVideoNode && !sourceNode?.metadata?.content ? sourceNode?.metadata?.workbenchRequestSignature : undefined,
                             workbenchRequestKey: reuseVideoNode && !sourceNode?.metadata?.content ? sourceNode?.metadata?.workbenchRequestKey : undefined,
@@ -2702,7 +2702,7 @@ function InfiniteCanvasPage() {
                         position: reuseAudioNode ? sourceNode.position : { x: parent.x + (sourceNode?.width || spec.width) + 96, y: parent.y + ((sourceNode?.height || spec.height) - spec.height) / 2 },
                         width: reuseAudioNode ? sourceNode.width : spec.width,
                         height: reuseAudioNode ? sourceNode.height : spec.height,
-                        metadata: { ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}), prompt: effectivePrompt, status: NODE_STATUS_LOADING, ...buildAudioGenerationMetadata(generationConfig) },
+                        metadata: { ...(isWorkbench ? workflowNodeMetadata(sourceNode) : {}), prompt: effectivePrompt, status: NODE_STATUS_LOADING, ...buildAudioGenerationMetadata(generationConfig) },
                     };
                     pendingChildIds = [audioId];
                     setNodes((prev) =>
@@ -2738,7 +2738,7 @@ function InfiniteCanvasPage() {
                     width: reuseTextNode ? sourceNode.width : textConfig.width,
                     height: reuseTextNode ? sourceNode.height : textConfig.height,
                     metadata: {
-                        ...(isOverseas ? workflowNodeMetadata(sourceNode) : {}),
+                        ...(isWorkbench ? workflowNodeMetadata(sourceNode) : {}),
                         prompt: effectivePrompt,
                         status: NODE_STATUS_LOADING,
                         fontSize: 14,
@@ -2878,7 +2878,7 @@ function InfiniteCanvasPage() {
                 return;
             }
             const sourceNode = findRetrySourceNode(node.id, nodesRef.current, connectionsRef.current) || node;
-            const workflowError = isOverseas ? workflowGenerationError(sourceNode, nodesRef.current, sourceNode.metadata?.prompt || node.metadata?.prompt || "", connectionsRef.current) : undefined;
+            const workflowError = isWorkbench ? workflowGenerationError(sourceNode, nodesRef.current, sourceNode.metadata?.prompt || node.metadata?.prompt || "", connectionsRef.current) : undefined;
             if (workflowError) { message.warning(catalogText(workflowError, i18n.language)); return; }
             const savedImageMetadata = node.type === CanvasNodeType.Image ? node.metadata : undefined;
             const hasSavedImageMetadata = Boolean(savedImageMetadata?.generationType);
@@ -3165,7 +3165,7 @@ function InfiniteCanvasPage() {
     const handleAssetInsert = useCallback(
         async (payload: InsertAssetPayload) => {
             if (payload.kind === "workflow") {
-                if (!isOverseas) return;
+                if (!isWorkbench) return;
                 const center = screenToCanvas((containerRef.current?.getBoundingClientRect().left || 0) + size.width / 2, (containerRef.current?.getBoundingClientRect().top || 0) + size.height / 2);
                 let graph;
                 try { graph = instantiateWorkflow(await resolveWorkflowImages(payload.document, true), center); }
@@ -3316,7 +3316,7 @@ function InfiniteCanvasPage() {
 
     return (
         <main className="relative flex h-full min-h-0 overflow-hidden" style={{ background: theme.canvas.background, color: theme.node.text }}>
-            {isOverseas && nodes.find(n => selectedNodeIds.has(n.id) && n.metadata?.workflow) && <div className="absolute bottom-16 right-4 z-30"><Button onClick={() => setWorkflowSourceOpen(true)}>{t("workflow.source")}</Button></div>}
+            {isWorkbench && nodes.find(n => selectedNodeIds.has(n.id) && n.metadata?.workflow) && <div className="absolute bottom-16 right-4 z-30"><Button onClick={() => setWorkflowSourceOpen(true)}>{t("workflow.source")}</Button></div>}
             {workflowSourceOpen && <Modal title={t("workflow.source")} open onCancel={() => setWorkflowSourceOpen(false)} footer={null} width={800}>{nodes.filter(n => selectedNodeIds.has(n.id) && n.metadata?.workflow).map(n => <WorkflowSource key={n.id} document={n.metadata!.workflow!} />)}</Modal>}
             <CanvasSidePanel nodes={nodes} selectedNodeIds={selectedNodeIds} onFocusNode={focusNode} onPreviewNode={setPreviewNodeId} onHoverNode={setHoverPreviewNodeId} onInsertAsset={handleAssetInsert} />
             <section className="relative min-w-0 flex-1 overflow-hidden">

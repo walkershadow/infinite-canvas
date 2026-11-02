@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { create } from "zustand";
 import { persist, type PersistStorage, type StorageValue } from "zustand/middleware";
 
@@ -133,7 +133,7 @@ export const useCanvasStore = create<CanvasStore>()(
         }),
         {
             name: CANVAS_STORE_KEY,
-            skipHydration: isOverseas,
+            skipHydration: isWorkbench,
             storage: canvasStorage,
             partialize: (state) =>
                 ({

@@ -1,10 +1,10 @@
-import { isOverseas } from "@/constant/integration";
-import { bootstrapWorkbench } from "@/services/api/workbench";
+import { isWorkbench, workbenchLocale, isDomestic } from "@/constant/integration";
+import { bootstrapWorkbench, workbenchLink, WorkbenchError } from "@/services/api/workbench";
 
 async function start() {
-    if (isOverseas) {
-        document.documentElement.lang = "en-US";
-        document.title = "Canvas · Workbench";
+    if (isWorkbench) {
+        document.documentElement.lang = workbenchLocale;
+        document.title = isDomestic ? "画布 · 视频工作台" : "Canvas · Workbench";
         await bootstrapWorkbench();
     }
     await import("./app");
@@ -14,10 +14,10 @@ void start().catch((error: unknown) => {
     const description = document.createElement("p");
     description.textContent = error instanceof Error ? error.message : "Canvas could not start.";
     const retry = document.createElement("button");
-    retry.textContent = "Retry";
+    retry.textContent = isDomestic ? "重试" : "Retry";
     retry.onclick = () => window.location.reload();
     const home = document.createElement("a");
-    home.href = "/";
-    home.textContent = "Return to Workbench";
+    home.href = workbenchLink(error instanceof WorkbenchError && error.status === 401 ? "login" : "home");
+    home.textContent = isDomestic ? "返回工作台完成登录或微信绑定" : "Return to Workbench";
     root.replaceChildren(description, retry, home);
 });

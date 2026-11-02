@@ -1,5 +1,5 @@
 import { useEffect, useRef, type Dispatch, type SetStateAction } from "react";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { useAiTasksStore } from "@/stores/use-workbench-ai-store";
 import { acknowledgeAiTask, loadAiTasks, resumeAiTask, type AiTaskRecord, type AiTaskResult } from "@/services/api/workbench-ai-tasks";
 import { ownedAssetUrl } from "@/services/workbench/projects";
@@ -14,11 +14,11 @@ export function useWorkbenchAiRecovery(projectId: string, nodes: CanvasNodeData[
     const applied = useRef(new Map<string, string>());
     const processing = useRef(new Map<string, AbortController>());
     useEffect(() => {
-        if (isOverseas) void loadAiTasks().catch((error) => useAiTasksStore.setState({ error: String(error) }));
+        if (isWorkbench) void loadAiTasks().catch((error) => useAiTasksStore.setState({ error: String(error) }));
         return () => processing.current.forEach((controller) => controller.abort());
     }, []);
     useEffect(() => {
-        if (!isOverseas) return;
+        if (!isWorkbench) return;
         for (const record of records) {
             const owner = record.owner;
             const node = nodes.find((node) => node.id === owner?.nodeId);

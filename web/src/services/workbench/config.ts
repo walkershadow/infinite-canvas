@@ -7,7 +7,7 @@ export async function initializeWorkbenchConfig() {
     await useConfigStore.persist.rehydrate();
     const preferences = useConfigStore.getState().config;
     const session = workbenchSession();
-    const models = [...session.models.map((model) => ({ name: model.id, capability: "video" as const })), ...(session.aiModels || []).map((model) => ({ name: model.id, capability: model.capability }))];
+    const models = [...session.models.filter(() => session.capabilities.video).map((model) => ({ name: model.id, capability: "video" as const })), ...(session.aiModels || []).filter(model => session.capabilities[model.capability]).map((model) => ({ name: model.id, capability: model.capability }))];
     const platform: ModelChannel = { id: "workbench", name: "Workbench", baseUrl: "/api/canvas", apiKey: "", apiFormat: "openai", models };
     const channels = [platform, ...preferences.channels.filter((channel) => channel.id !== "workbench")];
     const select = (capability: ModelCapability) => {

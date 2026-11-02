@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { accountDatabaseName } from "@/services/api/workbench";
 import localforage from "localforage";
 
@@ -16,10 +16,10 @@ export type UploadedImage = {
     mimeType: string;
 };
 
-const store = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "image_files" });
-const previewStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "image_previews" });
-const imageLogStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "image_generation_logs" });
-const videoLogStore = localforage.createInstance({ name: isOverseas ? accountDatabaseName() : "infinite-canvas", storeName: "video_generation_logs" });
+const store = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "image_files" });
+const previewStore = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "image_previews" });
+const imageLogStore = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "image_generation_logs" });
+const videoLogStore = localforage.createInstance({ name: isWorkbench ? accountDatabaseName() : "infinite-canvas", storeName: "video_generation_logs" });
 const objectUrls = new Map<string, string>();
 const previewUrls = new Map<string, string>();
 const previewListeners = new Set<() => void>();
@@ -146,7 +146,7 @@ export async function resolveImageUrl(storageKey?: string, fallback = "") {
     if (!storageKey) return fallback;
     const cached = objectUrls.get(storageKey);
     if (cached) return cached;
-    if (isOverseas) {
+    if (isWorkbench) {
         const { cloudMediaUrl } = await import("@/services/workbench/projects");
         const cloud = cloudMediaUrl(storageKey);
         if (cloud) return cloud;
@@ -160,7 +160,7 @@ export async function resolveImageUrl(storageKey?: string, fallback = "") {
 
 export async function getImageBlob(storageKey: string) {
     const local = await store.getItem<Blob>(storageKey);
-    if (local || !isOverseas) return local;
+    if (local || !isWorkbench) return local;
     const { cloudMediaUrl } = await import("@/services/workbench/projects");
     const url = cloudMediaUrl(storageKey);
     if (!url) return null;

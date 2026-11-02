@@ -46,28 +46,32 @@ function localPluginsManifest(base: string): Plugin {
 export default defineConfig(({ mode, command }) => {
     const env = { ...loadEnv(mode, webDir, ""), ...process.env };
     const overseas = env.VITE_APP_MODE === "overseas";
+    const domestic = env.VITE_APP_MODE === "domestic";
+    const integrated = overseas || domestic;
     let catalogMediaMap: CatalogMediaMap | null = null;
-    if (overseas) {
+    if (integrated) {
         if (env.CATALOG_MEDIA_MAP_FILE) {
             catalogMediaMap = JSON.parse(readFileSync(resolve(webDir, env.CATALOG_MEDIA_MAP_FILE), "utf8"));
             validateCatalogMediaMap(rawOverseasPromptCatalog, catalogMediaMap!);
         } else if (command === "build") {
-            throw new Error("Overseas builds require CATALOG_MEDIA_MAP_FILE. See docs/catalog-media-storage.md.");
+            throw new Error("Workbench builds require CATALOG_MEDIA_MAP_FILE. See docs/catalog-media-storage.md.");
         } else {
             catalogMediaMap = { version: 1, allowedOrigins: [], media: {} };
         }
     }
-    const base = overseas ? "/canvas/" : env.VITE_BASE || "/";
+    const proxyTarget = env.WORKBENCH_DEV_ORIGIN || (domestic ? "http://127.0.0.1:3102" : "http://localhost:3100");
+    const proxy = { target: proxyTarget, changeOrigin: true, xfwd: true };
+    const base = integrated ? "/canvas/" : env.VITE_BASE || "/";
     return {
         base,
-        build: { copyPublicDir: !overseas },
-        server: overseas ? { proxy: { "/api": { target: env.WORKBENCH_DEV_ORIGIN || "http://localhost:3100", changeOrigin: true, xfwd: true } } } : undefined,
-        plugins: [react(), localPluginsManifest(base), ...(overseas ? [overseasPublicAssets(), {
+        build: { copyPublicDir: !integrated },
+        server: integrated ? { proxy: { "/api": proxy } } : undefined,
+        plugins: [react(), localPluginsManifest(base), ...(integrated ? [overseasPublicAssets(), {
             name: "overseas-html",
             transformIndexHtml: (html: string) => html
-                .replace('lang="zh-CN"', 'lang="en-US"')
-                .replace("<title>无限画布</title>", "<title>Canvas · Workbench</title>")
-                .replace('content="一个无限画布创作工具"', 'content="Create with images, video, text, and connected workflows in Workbench Canvas."'),
+                .replace('lang="zh-CN"', domestic ? 'lang="zh-CN"' : 'lang="en-US"')
+                .replace("<title>无限画布</title>", domestic ? "<title>画布 · 视频工作台</title>" : "<title>Canvas · Workbench</title>")
+                .replace('content="一个无限画布创作工具"', domestic ? 'content="在工作台画布中使用视频、素材与创作流程。"' : 'content="Create with images, video, text, and connected workflows in Workbench Canvas."'),
         }] : [])],
         resolve: {
             alias: {

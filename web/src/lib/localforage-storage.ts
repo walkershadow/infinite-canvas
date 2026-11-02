@@ -1,10 +1,10 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { accountDatabaseName } from "@/services/api/workbench";
 import localforage from "localforage";
 import type { StateStorage } from "zustand/middleware";
 
 localforage.config({
-    name: isOverseas ? accountDatabaseName() : "infinite-canvas",
+    name: isWorkbench ? accountDatabaseName() : "infinite-canvas",
     storeName: "app_state",
 });
 
@@ -14,7 +14,7 @@ export const localForageStorage: StateStorage = {
         try {
             return (await localforage.getItem<string>(name)) || null;
         } catch (error) {
-            if (isOverseas) throw error;
+            if (isWorkbench) throw error;
             return window.localStorage.getItem(name);
         }
     },
@@ -23,7 +23,7 @@ export const localForageStorage: StateStorage = {
         try {
             await localforage.setItem(name, value);
         } catch (error) {
-            if (isOverseas) throw error;
+            if (isWorkbench) throw error;
             window.localStorage.setItem(name, value);
         }
     },
@@ -32,7 +32,7 @@ export const localForageStorage: StateStorage = {
         try {
             await localforage.removeItem(name);
         } catch (error) {
-            if (isOverseas) throw error;
+            if (isWorkbench) throw error;
             window.localStorage.removeItem(name);
         }
     },

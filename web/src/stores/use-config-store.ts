@@ -1,5 +1,5 @@
 import { accountDatabaseName, workbenchSession } from "@/services/api/workbench";
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { useMemo } from "react";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -212,7 +212,7 @@ export function resolveModelScript(config: AiConfig, value: string) {
 }
 
 export function isWorkbenchModel(config: AiConfig, value: string) {
-    return isOverseas && findChannelModel(config, value)?.channel.id === "workbench";
+    return isWorkbench && findChannelModel(config, value)?.channel.id === "workbench";
 }
 
 function isAiConfigReady(config: AiConfig, model: string) {
@@ -255,8 +255,8 @@ export const useConfigStore = create<ConfigStore>()(
             clearPromptContinue: () => set({ shouldPromptContinue: false }),
         }),
         {
-            name: isOverseas ? `${accountDatabaseName()}:preferences` : CONFIG_STORE_KEY,
-            skipHydration: isOverseas,
+            name: isWorkbench ? `${accountDatabaseName()}:preferences` : CONFIG_STORE_KEY,
+            skipHydration: isWorkbench,
             partialize: (state) => ({ config: state.config, webdav: state.webdav }),
             merge: (persisted, current) => {
                 const persistedState = (persisted || {}) as Partial<ConfigStore>;
@@ -275,10 +275,10 @@ export const useConfigStore = create<ConfigStore>()(
                         apiFormat: normalizeApiFormat(config.apiFormat),
                         channels,
                         models,
-                        imageModel: isOverseas ? config.imageModel : normalizeModelOptionValue(config.imageModel || config.model, channels),
-                        videoModel: isOverseas ? config.videoModel : normalizeModelOptionValue(config.videoModel, channels),
-                        textModel: isOverseas ? config.textModel : normalizeModelOptionValue(config.textModel || config.model, channels),
-                        audioModel: isOverseas ? config.audioModel : normalizeModelOptionValue(config.audioModel || defaultConfig.audioModel, channels),
+                        imageModel: isWorkbench ? config.imageModel : normalizeModelOptionValue(config.imageModel || config.model, channels),
+                        videoModel: isWorkbench ? config.videoModel : normalizeModelOptionValue(config.videoModel, channels),
+                        textModel: isWorkbench ? config.textModel : normalizeModelOptionValue(config.textModel || config.model, channels),
+                        audioModel: isWorkbench ? config.audioModel : normalizeModelOptionValue(config.audioModel || defaultConfig.audioModel, channels),
                         audioVoice: config.audioVoice || defaultConfig.audioVoice,
                         audioFormat: config.audioFormat || defaultConfig.audioFormat,
                         audioSpeed: config.audioSpeed || defaultConfig.audioSpeed,

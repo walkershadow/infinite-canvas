@@ -19,6 +19,7 @@
 - [Canvas Data Structure](/docs/development/canvas-data-structure)
 - [How the Local Codex Connection Works](/docs/development/local-codex-canvas)
 
+- [国内 Workbench Canvas 本地适配](./domestic-workbench.md)
 - [海外 Workbench 集成](/docs/development/overseas-workbench)
 - [海外公共案例媒体七牛转存协议](./catalog-media-storage.md)
 - [海外公共提示词目录开发与验收](./overseas-prompt-catalog.md)

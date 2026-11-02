@@ -43,6 +43,11 @@ test.skipIf(!mapPath)("real CDN map covers catalog, saved workflows and isolated
         expect(overseas.build.copyPublicDir).toBe(false);
         expect(JSON.parse(overseas.define.__CATALOG_MEDIA_MAP__)).toEqual(mapping);
         expect(overseas.plugins.some((p: any) => p?.name === "overseas-public-assets")).toBe(true);
+        process.env.VITE_APP_MODE = "domestic";
+        const domestic = await resolveConfig({ mode: "production", command: "build" });
+        expect(domestic.base).toBe("/canvas/");
+        expect(domestic.build.copyPublicDir).toBe(false);
+        expect(JSON.parse(domestic.define.__CATALOG_MEDIA_MAP__)).toEqual(mapping);
         process.env.VITE_APP_MODE = "standalone";
         const standalone = await resolveConfig({ mode: "production", command: "build" });
         expect(standalone.build.copyPublicDir).toBe(true);

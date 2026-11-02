@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { accountDatabaseName } from "@/services/api/workbench";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -46,7 +46,7 @@ export const usePromptSourceStore = create<PromptSourceStore>()(
             updateSchedule: (key, value) => set((state) => ({ schedule: { ...state.schedule, [key]: value } })),
         }),
         {
-            name: isOverseas ? `${accountDatabaseName()}:prompt-sources` : PROMPT_SOURCE_STORE_KEY,
+            name: isWorkbench ? `${accountDatabaseName()}:prompt-sources` : PROMPT_SOURCE_STORE_KEY,
             partialize: (state) => ({ sources: state.sources, schedule: state.schedule }),
             merge: (persisted, current) => {
                 const persistedState = (persisted || {}) as Partial<PromptSourceStore>;

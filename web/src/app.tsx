@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import "antd/dist/reset.css";
@@ -11,7 +11,7 @@ import "@/i18n";
 import { initAnalytics } from "@/lib/analytics";
 import { router } from "@/router";
 
-if (!isOverseas) initAnalytics();
+if (!isWorkbench) initAnalytics();
 
 document.body.style.fontFamily = '"SF Pro Display","SF Pro Text","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif';
 

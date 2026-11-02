@@ -1,4 +1,4 @@
-import { isOverseas } from "@/constant/integration";
+import { isWorkbench } from "@/constant/integration";
 import { PERSONAL_PROMPT_SOURCE } from "@/services/api/personal-prompts";
 import { memo, useEffect, useMemo, useRef, useState, useSyncExternalStore, type PointerEvent as ReactPointerEvent } from "react";
 import { App, Empty, Input, Popconfirm, Select, Spin, Tag } from "antd";
@@ -384,7 +384,7 @@ const ASSET_GROUPS: { kind: AssetKind; icon: typeof Square }[] = [
     { kind: "image", icon: ImageIcon },
     { kind: "video", icon: Video },
     { kind: "text", icon: FileText },
-    ...(isOverseas ? [{ kind: "workflow" as const, icon: FileText }] : []),
+    ...(isWorkbench ? [{ kind: "workflow" as const, icon: FileText }] : []),
 ];
 
 function buildInsertPayload(asset: Asset): InsertAssetPayload {
@@ -556,7 +556,7 @@ const CanvasPromptsTab = memo(function CanvasPromptsTab({ onInsert, theme }: { o
     const { message } = App.useApp();
     const { t } = useTranslation();
     const sources = usePromptSourceStore((state) => state.sources);
-    const enabledSources = useMemo(() => [...(isOverseas ? [{ id: PERSONAL_PROMPT_SOURCE, name: "My prompts" }] : []), ...sources.filter((source) => source.enabled)], [sources]);
+    const enabledSources = useMemo(() => [...(isWorkbench ? [{ id: PERSONAL_PROMPT_SOURCE, name: "My prompts" }] : []), ...sources.filter((source) => source.enabled)], [sources]);
     const [keyword, setKeyword] = useState("");
     const [expanded, setExpanded] = useState<Record<string, boolean>>({});
     const [detail, setDetail] = useState<Prompt | null>(null);

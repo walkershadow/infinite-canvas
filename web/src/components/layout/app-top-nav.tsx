@@ -1,4 +1,5 @@
-import { isOverseas } from "@/constant/integration";
+import { workbenchLink } from "@/services/api/workbench";
+import { isWorkbench, isDomestic } from "@/constant/integration";
 import { Bot, Menu } from "lucide-react";
 import { Button, Tooltip } from "antd";
 import { Link, useLocation } from "react-router-dom";
@@ -28,7 +29,7 @@ export function AppTopNav() {
     const activeToolSlug = navigationTools.some((tool) => tool.slug === slug) ? (slug as NavigationToolSlug) : undefined;
 
     useEffect(() => {
-        if (isOverseas || autoConnectRef.current || agentEnabled || agentConnected || !agentToken.trim()) return;
+        if (isWorkbench || autoConnectRef.current || agentEnabled || agentConnected || !agentToken.trim()) return;
         autoConnectRef.current = true;
         connectAgent({ silent: true });
     }, [agentConnected, agentEnabled, agentToken, connectAgent]);
@@ -38,8 +39,8 @@ export function AppTopNav() {
             {!hideHeader ? (
                 <header className="sticky top-0 z-20 shrink-0 md:h-14 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
                     <div className="mx-auto flex h-full max-w-7xl flex-col items-stretch justify-between gap-1 px-3 py-2 md:flex-row md:gap-5 md:px-6 md:py-0">
-                        <div className={cn("flex min-w-0 items-center justify-between md:justify-start", isOverseas && "md:flex-1")}>
-                            <Link to={isOverseas ? `${window.location.origin}/workbench` : "/"} reloadDocument={isOverseas} aria-label={isOverseas ? "Return to Workbench" : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
+                        <div className={cn("flex min-w-0 items-center justify-between md:justify-start", isWorkbench && "md:flex-1")}>
+                            <Link to={isWorkbench ? `${window.location.origin}${workbenchLink("home")}` : "/"} reloadDocument={isWorkbench} aria-label={isWorkbench ? (isDomestic ? "返回工作台" : "Return to Workbench") : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
                                 <span
                                     className="size-5 shrink-0 bg-current"
                                     style={{
@@ -47,7 +48,7 @@ export function AppTopNav() {
                                         WebkitMask: `url(${import.meta.env.BASE_URL}logo.svg) center / contain no-repeat`,
                                     }}
                                 />
-                                <span className="text-base font-medium">{isOverseas ? "Workbench" : t("meta.title")}</span>
+                                <span className="text-base font-medium">{isWorkbench ? (isDomestic ? "视频工作台" : "Workbench") : t("meta.title")}</span>
                             </Link>
 
                             <button
@@ -83,7 +84,7 @@ export function AppTopNav() {
                             </nav>
                         </div>
 
-                        <div className={cn("my-auto flex h-9 min-w-0 items-center justify-end gap-2 justify-self-end whitespace-nowrap", isOverseas && "shrink-0")}>
+                        <div className={cn("my-auto flex h-9 min-w-0 items-center justify-end gap-2 justify-self-end whitespace-nowrap", isWorkbench && "shrink-0")}>
                             <Tooltip title={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")}>
                                 <Button type="text" shape="circle" className="!h-8 !w-8 !min-w-8" icon={<Bot className="size-4" />} onClick={togglePanel} aria-label={t(panelOpen ? "topNav.closeAgent" : "topNav.openAgent")} />
                             </Tooltip>
