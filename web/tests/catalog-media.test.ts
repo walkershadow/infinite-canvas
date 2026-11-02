@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { rawOverseasPromptCatalog } from "../src/services/api/overseas-prompt-catalog";
-import { catalogMediaDependencies, mapCatalogMedia, validateCatalogMediaMap, type CatalogMediaMap } from "../src/lib/catalog-media";
+import { catalogMediaDependencies, mapCatalogMedia, mapWorkflowCatalogMedia, validateCatalogMediaMap, type CatalogMediaMap } from "../src/lib/catalog-media";
 import manifest from "../../docs/catalog-media-manifest.json";
 import { catalogWorkflow, instantiateWorkflow, workflowGenerationError } from "../src/lib/workflow";
 
@@ -46,4 +46,32 @@ test("incomplete or third-party mappings fail; explicit unavailable media cannot
     const graph = instantiateWorkflow(catalogWorkflow(meilin));
     const video = graph.nodes.find(n => n.type === "video")!;
     expect(workflowGenerationError(video, graph.nodes, video.metadata!.prompt!, graph.connections)).toContain("required");
+});
+
+test("saved snapshots resolve known URLs while preserving edits, personal uploads and unknown media", () => {
+    const entry = rawOverseasPromptCatalog.find(e => e.id === "seedance:real-case-06-aimikoda")!;
+    const saved = catalogWorkflow(entry, "zh");
+    saved.stages[0].prompt = "用户修改的完整提示词";
+    saved.stages[0].title = "自定义步骤名称";
+    saved.references[0].role = "自定义参考用途";
+    const image = saved.references[0].image!;
+    delete image.localPath; // Old snapshots may retain only the original URL.
+    saved.stages[0].image = { url: image.url, storageKey: "image:personal-upload", width: 50, height: 60 };
+    saved.source.outputMedia.push({ kind: "video", url: "https://user.example/custom.mp4", caption: "个人样例" });
+    const original = structuredClone(saved);
+    const mapped = mapWorkflowCatalogMedia(saved, rawOverseasPromptCatalog, mapping);
+    expect(saved).toEqual(original);
+    expect(mapped.stages[0]).toEqual(original.stages[0]);
+    expect(mapped.references[0].role).toBe("自定义参考用途");
+    expect(mapped.references[0].image!.url).toStartWith("https://cdn.example.com/");
+    expect(mapped.source.outputMedia.at(-1)).toEqual(original.source.outputMedia.at(-1));
+    expect(mapped.source.sources).toEqual(original.source.sources);
+    expect(mapped.source.steps.map(s => s.prompts)).toEqual(original.source.steps.map(s => s.prompts));
+    expect(mapWorkflowCatalogMedia(mapped, rawOverseasPromptCatalog, mapping)).toEqual(mapped);
+    expect(mapWorkflowCatalogMedia(saved, rawOverseasPromptCatalog, null)).toEqual(saved);
+    const missing = mapWorkflowCatalogMedia(saved, rawOverseasPromptCatalog, { version: 1, allowedOrigins: [], media: {} });
+    expect(missing.references[0].image).toBeUndefined();
+    expect(missing.stages[0].image).toEqual(saved.stages[0].image);
+    expect(missing.source.outputMedia[0].unavailable).toBe(true);
+    expect(missing.source.outputMedia.at(-1)).toEqual(saved.source.outputMedia.at(-1));
 });

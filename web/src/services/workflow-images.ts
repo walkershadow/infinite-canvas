@@ -1,3 +1,4 @@
+import { resolveCatalogWorkflowMedia } from "./api/overseas-prompt-catalog";
 import { resolveImageUrl, uploadImage } from "@/services/image-storage";
 import { validateWorkflow } from "@/lib/workflow-validation";
 import type { WorkflowDocument, WorkflowImage } from "@/types/workflow";
@@ -8,7 +9,7 @@ export function workflowImageUrl(image: WorkflowImage) {
 
 export async function resolveWorkflowImages(document: WorkflowDocument, importFiles = false): Promise<WorkflowDocument> {
     validateWorkflow(document);
-    const copy = structuredClone(document);
+    const copy = resolveCatalogWorkflowMedia(document);
     const pending = new Map<string, Promise<WorkflowImage>>();
     await Promise.all([...copy.references, ...copy.stages].map(async item => {
         if (!item.image) return;

@@ -1,4 +1,5 @@
-import { mapCatalogMedia } from "../../lib/catalog-media";
+import type { WorkflowDocument } from "../../types/workflow";
+import { mapCatalogMedia, mapWorkflowCatalogMedia } from "../../lib/catalog-media";
 import templates from "./overseas-workflow-templates.json";
 import expandedCases from "./overseas-expanded-cases.json";
 import type { OverseasPromptEntry } from "@/types/prompt-catalog";
@@ -494,3 +495,7 @@ export const rawOverseasPromptCatalog: OverseasPromptEntry[] = [...templates as 
 
 export const overseasPromptCatalog = typeof __CATALOG_MEDIA_MAP__ !== "undefined" && __CATALOG_MEDIA_MAP__
     ? mapCatalogMedia(rawOverseasPromptCatalog, __CATALOG_MEDIA_MAP__) : rawOverseasPromptCatalog;
+
+export function resolveCatalogWorkflowMedia(document: WorkflowDocument) {
+    return mapWorkflowCatalogMedia(document, rawOverseasPromptCatalog, typeof __CATALOG_MEDIA_MAP__ !== "undefined" ? __CATALOG_MEDIA_MAP__ : null);
+}

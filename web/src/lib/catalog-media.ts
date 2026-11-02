@@ -1,3 +1,4 @@
+import type { WorkflowDocument } from "../types/workflow";
 import type { OverseasPromptEntry } from "../types/prompt-catalog";
 
 export type CatalogMediaMap = { version: 1; allowedOrigins: string[]; media: Record<string, { url: string } | { unavailable: true; reason: string }> };
@@ -36,28 +37,61 @@ export function validateCatalogMediaMap(entries: OverseasPromptEntry[], mapping:
     }
 }
 
-export function mapCatalogMedia(entries: OverseasPromptEntry[], mapping: CatalogMediaMap): OverseasPromptEntry[] {
+function mediaResolver(catalog: OverseasPromptEntry[], mapping: CatalogMediaMap) {
+    const aliases = new Map<string, string>();
+    for (const item of catalogMediaDependencies(catalog)) {
+        aliases.set(item.key, item.key);
+        for (const url of item.urls) aliases.set(url, item.key);
+        const mapped = mapping.media[item.key];
+        if (mapped && "url" in mapped) aliases.set(mapped.url, item.key);
+    }
+    return (item: { url: string; localPath?: string; storageKey?: string }) => {
+        if (item.storageKey) return;
+        const key = aliases.get(item.localPath ? `web/public/${item.localPath}` : item.url);
+        return key ? mapping.media[key] || { unavailable: true as const, reason: "Media mapping unavailable" } : undefined;
+    };
+}
+
+export function mapCatalogMedia(entries: OverseasPromptEntry[], mapping: CatalogMediaMap, catalog = entries): OverseasPromptEntry[] {
     const copy = structuredClone(entries);
-    const target = (item: { url: string; localPath?: string }) => mapping.media[item.localPath ? `web/public/${item.localPath}` : item.url];
+    const target = mediaResolver(catalog, mapping);
     for (const entry of copy) {
         for (const media of [...entry.referenceMedia, ...entry.outputMedia]) {
             const result = target(media);
-            media.originalUrl = media.url;
-            delete media.localPath;
-            if (result && "url" in result) media.url = result.url;
-            else media.unavailable = true;
+            if (result) {
+                media.originalUrl ??= media.url;
+                delete media.localPath;
+                if ("url" in result) { media.url = result.url; delete media.unavailable; }
+                else media.unavailable = true;
+            }
             if (media.poster) {
                 const poster = target({ url: media.poster });
-                media.originalPoster = media.poster;
-                media.poster = poster && "url" in poster ? poster.url : undefined;
+                if (poster) {
+                    media.originalPoster ??= media.poster;
+                    media.poster = "url" in poster ? poster.url : undefined;
+                }
             }
         }
         for (const item of [...entry.steps, ...(entry.referenceInputs || [])]) {
             if (!item.image) continue;
             const result = target(item.image);
             if (result && "url" in result) { item.image.url = result.url; delete item.image.localPath; }
-            else delete item.image;
+            else if (result) delete item.image;
         }
+    }
+    return copy;
+}
+
+export function mapWorkflowCatalogMedia(document: WorkflowDocument, catalog: OverseasPromptEntry[], mapping: CatalogMediaMap | null): WorkflowDocument {
+    const copy = structuredClone(document);
+    if (!mapping) return copy;
+    copy.source = mapCatalogMedia([copy.source], mapping, catalog)[0];
+    const target = mediaResolver(catalog, mapping);
+    for (const item of [...copy.stages, ...copy.references]) {
+        if (!item.image) continue;
+        const result = target(item.image);
+        if (result && "url" in result) { item.image.url = result.url; delete item.image.localPath; }
+        else if (result) delete item.image;
     }
     return copy;
 }
