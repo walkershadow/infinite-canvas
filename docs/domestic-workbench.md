@@ -48,4 +48,17 @@ VITE_APP_MODE=domestic CATALOG_MEDIA_MAP_FILE=/tmp/catalog-qiniu-map.json WORKBE
 | overseas | `/tmp/infinite-canvas-overseas-validation` | 29.32秒；英文入口、68项映射、无case-references |
 | standalone | `/tmp/infinite-canvas-standalone-validation` | 37.07秒；中文根入口、保留10张原图、不含七牛映射 |
 
-两种集成构建使用 `CATALOG_MEDIA_MAP_FILE=/tmp/catalog-qiniu-map.json`。三种产物均保留config.js和logo.svg。现有非module config.js、混合静态/动态导入及大分包警告不阻止构建，本轮未改分包或警告阈值。以上不是部署或已登录浏览器验收；真实登录后的创建、保存、刷新恢复仍待本次图形验证码授权。
+两种集成构建使用 `CATALOG_MEDIA_MAP_FILE=/tmp/catalog-qiniu-map.json`。三种产物均保留config.js和logo.svg。现有非module config.js、混合静态/动态导入及大分包警告不阻止构建，本轮未改分包或警告阈值。以上不是部署；真实登录浏览器验收结果见下节。
+
+
+### 真实同源浏览器验收
+
+经用户确认后，在 `http://127.0.0.1:3102/login` 完成临时账号图形验证码和登录，再从工作台进入 `/canvas/`，未使用UI夹具。
+
+- 创建云画布“无限画布 1”，项目ID `R0sqAOhNKdnyN2XMPmJ_8`；添加一个文本节点，内容为“国内云画布本地验收：刷新后保留此文本。未提交生成。”。
+- 页面显示“文档已保存”；刷新后从云端加载同一项目，文本完整恢复，列表显示1个节点、0条连线。
+- 视频创作台显示国内2.0 Fast、2.5、2.5 · 30s、sd2.5、Minimax及Wan选项，自配渠道仍保留。没有首尾帧设置。
+- 工作台显示100点（10元）；画布报价确认显示2.0 Fast、10秒、预计10点（¥1.0000），取消确认后生成记录仍为0、余额仍为100点。
+- 未提交生成、未上传媒体、未部署；临时账号及上述项目由国内主会话清理。截图保存在 `/tmp/domestic-real-canvas-restored.png` 与 `/tmp/domestic-real-cny-confirm.png`。
+
+本次覆盖登录、创建、编辑、保存、刷新恢复和国内模型/币种展示，不代替真实生成、媒体上传或跨设备验收。
