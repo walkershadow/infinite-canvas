@@ -40,7 +40,7 @@ export function AppTopNav() {
                 <header className="sticky top-0 z-20 shrink-0 md:h-14 border-b border-stone-200 bg-background/90 backdrop-blur-xl dark:border-stone-800">
                     <div className="mx-auto flex h-full max-w-7xl flex-col items-stretch justify-between gap-1 px-3 py-2 md:flex-row md:gap-5 md:px-6 md:py-0">
                         <div className={cn("flex min-w-0 items-center justify-between md:justify-start", isWorkbench && "md:flex-1")}>
-                            <Link to={isWorkbench ? `${window.location.origin}${workbenchLink("home")}` : "/"} reloadDocument={isWorkbench} aria-label={isWorkbench ? (isDomestic ? "返回工作台" : "Return to Workbench") : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
+                            <Link to={isWorkbench ? `${window.location.origin}${workbenchLink("home")}` : "/"} reloadDocument={isWorkbench} aria-label={isWorkbench ? (isDomestic ? "返回工作台" : "Return to AI Creator") : undefined} className="flex h-full shrink-0 items-center gap-2 text-sm font-semibold leading-none tracking-tight text-stone-950 transition hover:text-stone-600 dark:text-stone-100 dark:hover:text-stone-300">
                                 <span
                                     className="size-5 shrink-0 bg-current"
                                     style={{
@@ -48,7 +48,7 @@ export function AppTopNav() {
                                         WebkitMask: `url(${import.meta.env.BASE_URL}logo.svg) center / contain no-repeat`,
                                     }}
                                 />
-                                <span className="text-base font-medium">{isWorkbench ? (isDomestic ? "视频工作台" : "Workbench") : t("meta.title")}</span>
+                                <span className="text-base font-medium">{isWorkbench ? (isDomestic ? "视频工作台" : "AI Creator") : t("meta.title")}</span>
                             </Link>
 
                             <button

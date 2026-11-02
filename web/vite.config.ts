@@ -70,8 +70,8 @@ export default defineConfig(({ mode, command }) => {
             name: "overseas-html",
             transformIndexHtml: (html: string) => html
                 .replace('lang="zh-CN"', domestic ? 'lang="zh-CN"' : 'lang="en-US"')
-                .replace("<title>无限画布</title>", domestic ? "<title>画布 · 视频工作台</title>" : "<title>Canvas · Workbench</title>")
-                .replace('content="一个无限画布创作工具"', domestic ? 'content="在工作台画布中使用视频、素材与创作流程。"' : 'content="Create with images, video, text, and connected workflows in Workbench Canvas."'),
+                .replace("<title>无限画布</title>", domestic ? "<title>画布 · 视频工作台</title>" : "<title>Canvas · AI Creator</title>")
+                .replace('content="一个无限画布创作工具"', domestic ? 'content="在工作台画布中使用视频、素材与创作流程。"' : 'content="Create with images, video, text, and connected workflows in AI Creator Canvas."'),
         }] : [])],
         resolve: {
             alias: {

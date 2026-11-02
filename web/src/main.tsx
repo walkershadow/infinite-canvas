@@ -1,10 +1,10 @@
-import { isWorkbench, workbenchLocale, isDomestic } from "@/constant/integration";
+import { isWorkbench, workbenchLocale, isDomestic, isOverseas } from "@/constant/integration";
 import { bootstrapWorkbench, workbenchLink, WorkbenchError } from "@/services/api/workbench";
 
 async function start() {
     if (isWorkbench) {
         document.documentElement.lang = workbenchLocale;
-        document.title = isDomestic ? "画布 · 视频工作台" : "Canvas · Workbench";
+        document.title = isDomestic ? "画布 · 视频工作台" : "Canvas · AI Creator";
         await bootstrapWorkbench();
     }
     await import("./app");
@@ -18,6 +18,6 @@ void start().catch((error: unknown) => {
     retry.onclick = () => window.location.reload();
     const home = document.createElement("a");
     home.href = workbenchLink(error instanceof WorkbenchError && error.status === 401 ? "login" : "home");
-    home.textContent = isDomestic ? "返回工作台完成登录或微信绑定" : "Return to Workbench";
+    home.textContent = isDomestic ? "返回工作台完成登录或微信绑定" : isOverseas ? "Return to AI Creator" : "Return to Workbench";
     root.replaceChildren(description, retry, home);
 });

@@ -11,8 +11,8 @@ const LOCALE_STORAGE_KEY = isDomestic ? "infinite-canvas:workbench:domestic:loca
 
 i18n.use(initReactI18next).init({
     resources: {
-        "zh-CN": { translation: zhCN },
-        "en-US": { translation: enUS },
+        "zh-CN": { translation: isOverseas ? { ...zhCN, meta: { title: "画布 · AI Creator", description: "在 AI Creator 画布中使用图像、视频、文本与创作流程。" } } : zhCN },
+        "en-US": { translation: isOverseas ? { ...enUS, meta: { title: "Canvas · AI Creator", description: "Create with images, video, text, and connected workflows in AI Creator Canvas." } } : enUS },
     },
     lng: (localStorage.getItem(LOCALE_STORAGE_KEY) as AppLocale) || (isOverseas ? "en-US" : "zh-CN"),
     fallbackLng: "zh-CN",
