@@ -2,7 +2,7 @@ import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { catalogTitle, catalogSummary } from "@/lib/prompt-catalog-locale";
 import { useSearchParams } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { Empty, Input, Tag } from "antd";
+import { Button, Empty, Input, Select, Tag } from "antd";
 import { ArrowUpRight, Clapperboard, Search } from "lucide-react";
 import { overseasPromptCatalog } from "@/services/api/overseas-prompt-catalog";
 import type { OverseasPromptEntry } from "@/types/prompt-catalog";
@@ -24,12 +24,26 @@ export default function OverseasCatalog({ contentKind }: { contentKind: Overseas
     const tags = [...new Set(entries.flatMap((entry) => entry.tags))];
     const sources = [...new Set(entries.flatMap((entry) => entry.sources.map((item) => item.label)))];
     const items = useMemo(() => filterCatalog(overseasPromptCatalog, { contentKind, keyword, category, source, tag }), [contentKind, keyword, category, source, tag]);
-    return <main className="min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:py-8">
+    const filters = [{ label: "Category", all: "All categories", value: category, options: categories, change: setCategory }, { label: "Source", all: "All sources", value: source, options: sources, change: setSource }, { label: "Tag", all: "All tags", value: tag, options: tags, change: setTag }];
+    const active = keyword.trim() || category || source || tag;
+    return <main className="min-w-0 min-h-0 flex-1 overflow-y-auto px-4 py-6 sm:px-6 lg:py-8">
         <div className="mx-auto max-w-7xl">
-            <div className="mb-6 border-b border-border pb-6"><p className="mb-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">{text("Public prompt library")}</p><h1 className="text-2xl font-semibold">{contentKind === "template" ? text("Workflow templates") : text("Case studies")}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{contentKind === "template" ? text("Save a complete template or edit its workflow in Canvas. Explore six categories, with original text and bilingual planning instructions.") : text("Explore published workflows, reference inputs and results. Learn from the original creator before adapting the prompts.")}</p></div>
-            <Input aria-label={text("Search public catalog")} size="large" prefix={<Search className="size-4" />} placeholder={text("Search titles, prompts, models, tags or authors…")} value={keyword} onChange={(event) => setKeyword(event.target.value)} />
-            <div className="my-5 grid gap-4 sm:grid-cols-3">{([{ label: text("Category"), value: category, options: categories, change: setCategory }, { label: text("Source"), value: source, options: sources, change: setSource }, { label: text("Tag"), value: tag, options: tags, change: setTag }]).map((filter) => <div key={filter.label}><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">{filter.label}</p><div className="flex flex-wrap gap-1.5">{["", ...filter.options].map((option) => <Tag.CheckableTag key={option} checked={filter.value === option} onChange={() => filter.change(option)}>{option ? text(option) : filter.label === text("Category") ? text("All categories") : filter.label === text("Source") ? text("All sources") : text("All tags")}</Tag.CheckableTag>)}</div></div>)}</div>
-            <p className="mb-4 text-xs text-muted-foreground">{items.length} {text(contentKind === "template" ? "Workflow templates" : "Case studies")}</p>
+            <div className="mb-4 border-b border-border pb-4 sm:mb-6 sm:pb-6"><p className="mb-2 text-xs font-medium uppercase tracking-widest text-muted-foreground">{text("Public prompt library")}</p><h1 className="text-2xl font-semibold">{contentKind === "template" ? text("Workflow templates") : text("Case studies")}</h1><p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">{contentKind === "template" ? text("Save a complete template or edit its workflow in Canvas. Explore six categories, with original text and bilingual planning instructions.") : text("Explore published workflows, reference inputs and results. Learn from the original creator before adapting the prompts.")}</p></div>
+            <Input allowClear aria-label={text("Search public catalog")} size="large" prefix={<Search className="size-4" />} placeholder={text("Search titles, prompts, models, tags or authors…")} value={keyword} onChange={(event) => setKeyword(event.target.value)} />
+            <section aria-label={text("Filter catalog")} className="my-4 space-y-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">{filters.map(filter => <div key={filter.label} className="min-w-0">
+                    <label htmlFor={`catalog-${filter.label}`} className="mb-1 block text-xs text-muted-foreground">{text(filter.label)}</label>
+                    <Select id={`catalog-${filter.label}`} aria-label={text(filter.label)} className="w-full min-w-0" value={filter.value || undefined} placeholder={text(filter.all)} allowClear
+                        showSearch={{ optionFilterProp: ["label", "value"] }} popupMatchSelectWidth={false} styles={{ popup: { root: { width: "min(360px, calc(100vw - 32px))" } } }}
+                        optionRender={option => <span className="whitespace-normal break-words">{option.label}</span>}
+                        options={filter.options.map(value => ({ value, label: text(value) }))} onChange={value => filter.change(value || "")} />
+                </div>)}</div>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                    <p role="status" aria-live="polite" className="mr-auto text-xs text-muted-foreground">{items.length} {text(contentKind === "template" ? "Workflow templates" : "Case studies")}</p>
+                    {active && <Button size="small" type="text" onClick={() => { setKeyword(""); setCategory(""); setSource(""); setTag(""); }}>{text("Clear filters")}</Button>}
+                </div>
+                {active && <div aria-label={text("Selected filters")} className="flex min-w-0 flex-wrap gap-2">{[{ label: "Search", value: keyword.trim(), change: setKeyword }, ...filters].filter(filter => filter.value).map(filter => <Tag key={filter.label} closable onClose={() => filter.change("")} className="!m-0 !inline-flex max-w-full items-center"><span className="min-w-0 truncate" title={`${text(filter.label)}: ${text(filter.value)}`}>{text(filter.label)}: {text(filter.value)}</span></Tag>)}</div>}
+            </section>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{items.map((entry) => {
                 const cover = entry.outputMedia.find((media) => !media.unavailable && media.kind === "image")?.url || entry.outputMedia.find((media) => !media.unavailable && media.poster)?.poster || entry.referenceMedia.find((media) => !media.unavailable && media.kind === "image")?.url;
                 return <button key={entry.id} type="button" onClick={() => openEntry(entry)} className="group flex min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-background text-left transition-colors hover:bg-muted/30">

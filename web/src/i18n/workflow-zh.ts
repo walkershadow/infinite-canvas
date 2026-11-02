@@ -1,4 +1,8 @@
 export default {
+    "Filter catalog": "筛选目录",
+    "Selected filters": "已选条件",
+    "Clear filters": "清除筛选",
+    "Search": "搜索",
     "Media unavailable": "媒体暂不可用",
     "Source limitation · see details": "来源尚有缺项 · 查看详情",
     "Seedance (archived source)": "Seedance（归档来源）",
