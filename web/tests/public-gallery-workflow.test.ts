@@ -1,3 +1,4 @@
+import { poseGroupForKind } from "@/lib/public-library";
 import { expect, test } from "bun:test";
 import { catalogWorkflow, instantiateWorkflow, workflowAsset, workflowGenerationError } from "@/lib/workflow";
 import { replaceReferenceImage } from "@/lib/canvas/replace-reference-image";
@@ -51,4 +52,14 @@ test("a real-case order is independent of the generic template order", () => {
     doc.stages[0].inputOrder = ["face", "pose", "outfit"];
     const { nodes, connections } = instantiateWorkflow(doc);
     expect(connections.map(edge => nodes.find(node => node.id === edge.fromNodeId)!.metadata!.workflowReference!.galleryCategory)).toEqual(["face", "pose", "outfit"]);
+});
+
+
+test("pose representation switching preserves the source action and angle identity", () => {
+    for (const angle of ["front", "high", "low", "side", "diag"]) {
+        expect(poseGroupForKind(`pose-full_sexy_P001_${angle}`, "depth")).toBe(`depth-full_sexy_P001_${angle}`);
+        expect(poseGroupForKind(`depth-full_sexy_P001_${angle}`, "pose")).toBe(`pose-full_sexy_P001_${angle}`);
+    }
+    expect(poseGroupForKind("pose-full_sexy_P001", "depth")).toBe("depth-full_sexy_P001");
+    expect(poseGroupForKind("", "depth")).toBe("");
 });

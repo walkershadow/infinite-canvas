@@ -26,6 +26,10 @@ test(`${mode}: only explicit overseas permission permits catalog access`, async 
     expect(query.get("groupId")).toBe("action-1");
     expect(query.get("page")).toBe("2");
     expect(calls[0].init.signal).toBe(controller.signal);
+    await api.listPublicLibrary({ kind: "depth", page: 1, search: "", category: "", groupId: "depth-full_sexy_P001" }, controller.signal);
+    const depthQuery = new URL(calls[1].path, "https://example.test").searchParams;
+    expect(depthQuery.get("kind")).toBe("depth");
+    expect(depthQuery.get("groupId")).toBe("depth-full_sexy_P001");
     reject = true;
     await expect(api.listPublicWorkflows("zh")).rejects.toThrow("access denied");
 });

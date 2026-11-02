@@ -5,7 +5,7 @@
 ## 接口
 
 - `GET /api/canvas/public-library?kind=face|outfit|pose|depth&search=&category=&page=1&groupId=`：返回 `{items,total,page,pageSize,facets:{categories,categoryLabels}}`。使用后端约定的24条分页，前端不截断总数；搜索提交后重新从第一页加载。
-- 条目：`{id,kind,groupId,title:{en,zh,original},category,categoryLabel,tags,tagsLocalized,angle?,angleLabel?,thumbnailUrl,url,width,height,source:{label,url,author}}`。姿势默认每动作一条，打开动作后带 groupId 查询角度。只渲染当前页，缩略图懒加载；打开详情或选入流程才读取原图。
+- 条目：`{id,kind,groupId,title:{en,zh,original},category,categoryLabel,tags,tagsLocalized,angle?,angleLabel?,thumbnailUrl,url,width,height,source:{label,url,author}}`。姿势默认每动作一条，打开动作后带 groupId 查询角度。姿势入口及流程参考选图器均提供“线稿 / 深度图”切换，分别请求kind=pose/depth；groupId以pose-/depth-为前缀，同动作切换仅替换此前缀，重置分页但保留搜索与分类。仅展示实际返回视角，不为缺角度生成占位图。只渲染当前页，缩略图懒加载；打开详情或选入流程才读取原图。
 - `GET /api/canvas/public-library/workflows?language=en|zh|original`：返回 `{items:WorkflowDocument[]}`，只包含已发布模板/案例。
 - `POST /api/canvas/public-library/workflows/{source.id}/open?language=en|zh|original`：直接返回 `WorkflowDocument`，沿用已确认 POST 契约，不需要新增 GET 详情。
 - 需保留 `references[].galleryCategory` 及 `source.referenceInputs[].galleryCategory`（face/outfit/pose/depth）；画布节点透传到 `metadata.workflowReference.galleryCategory`。工作流 schemaVersion 仍为1。source.referenceMedia/outputMedia 使用同源绝对URL以保持现有校验不变；references[].image.url 使用相对受保护路径。
@@ -33,3 +33,5 @@
 首次人物缩略图曾有单张加载失败，重新打开后恢复；后端随后改为复用S3Client并使用SDK读取，复查13张人物缩略图全部加载成功。普通账号开关与收费生成的权限验证由后端测试覆盖，本轮前端浏览器只验收当前有权限会话，不将其记作多账号或收费生成验收。
 
 管理员页SSR修复后浏览器复查通过：59条素材、2个流程、Administrator preview only，开关关闭。后端切换Cloudflare R2后再次只读验收：模板／案例全部参考图和三张实际结果加载正常，已有Assets重开及原画布刷新后图片正常，用户提示词保留。管理页显示Storage: Cloudflare R2。未新增重复验收资产、未提交生成、未切换开关；页面保持英文。截图 `/tmp/public-library-r2-case.png`、`/tmp/public-library-r2-assets.png`、`/tmp/public-library-r2-canvas.png`、`/tmp/public-library-r2-admin.png`。存储提供商切换由后端负责，前端受保护接口路径不变。
+
+深度图作为普通图片参考保存到既有姿势输入节点，保留连线、输入顺序及编辑稿；不意味着支持ControlNet深度控制。公共库仍由服务端权限控制，仅海外可见，不改变默认管理员权限、国内与独立模式。全量图库沿用24条服务端分页及原生图片懒加载，不预取全部原图；实际素材导入数量由工作台侧核验，不将前端功能完成等同全量入库完成。

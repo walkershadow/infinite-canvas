@@ -4,23 +4,31 @@ import { Alert, Button, Empty, Input, Pagination, Select, Spin } from "antd";
 import { useTranslation } from "react-i18next";
 import { canUsePublicLibrary, listPublicLibrary } from "@/services/api/public-library";
 import { workbenchSession } from "@/services/api/workbench";
+import { poseGroupForKind } from "@/lib/public-library";
 import type { GalleryCategory, PublicLibraryItem } from "@/types/public-gallery";
 
 export function PublicImagePicker({ kind, onSelect }: { kind: GalleryCategory; onSelect: (item: PublicLibraryItem) => void }) {
     const { t, i18n } = useTranslation();
     const language = i18n.resolvedLanguage?.startsWith("zh") ? "zh" : "en";
+    const [poseKind, setPoseKind] = useState<"pose" | "depth">(kind === "depth" ? "depth" : "pose");
+    const isPose = kind === "pose" || kind === "depth";
+    const activeKind = isPose ? poseKind : kind;
     const [search, setSearch] = useState("");
     const [category, setCategory] = useState("");
     const [page, setPage] = useState(1);
     const [groupId, setGroupId] = useState("");
     const allowed = canUsePublicLibrary();
     const query = useQuery({
-        queryKey: ["public-library", workbenchSession().user.id, kind, search, category, page, groupId],
-        queryFn: ({ signal }) => listPublicLibrary({ kind, search, category, page, groupId }, signal), enabled: allowed,
+        queryKey: ["public-library", workbenchSession().user.id, activeKind, search, category, page, groupId],
+        queryFn: ({ signal }) => listPublicLibrary({ kind: activeKind, search, category, page, groupId }, signal), enabled: allowed,
     });
     if (!allowed) return <Alert type="info" title={t("publicLibrary.disabled")} />;
-    const grouped = (kind === "pose" || kind === "depth") && !groupId;
+    const grouped = isPose && !groupId;
     return <div className="space-y-4">
+        {isPose && <div role="group" aria-label={t("publicLibrary.poseFormat")} className="flex flex-wrap items-center gap-2">
+            {(["pose", "depth"] as const).map(value => <Button key={value} type="text" aria-pressed={activeKind === value} className={activeKind === value ? "!bg-muted" : ""} onClick={() => { setPoseKind(value); setGroupId(current => poseGroupForKind(current, value)); setPage(1); }}>{t(value === "pose" ? "publicLibrary.lineArt" : "publicLibrary.depth")}</Button>)}
+        </div>}
+        {isPose && activeKind === "depth" && <p className="text-xs text-muted-foreground">{t("publicLibrary.depthHint")}</p>}
         {groupId ? <Button type="text" onClick={() => { setGroupId(""); setPage(1); }}>{t("publicLibrary.backToActions")}</Button> : <div className="flex flex-wrap gap-2">
             <Input.Search aria-label={t("publicLibrary.search")} placeholder={t("publicLibrary.search")} allowClear className="min-w-40 flex-1" onSearch={value => { setSearch(value); setPage(1); }} />
             <Select aria-label={t("publicLibrary.category")} className="min-w-40" value={category} onChange={value => { setCategory(value); setPage(1); }} options={[{ value: "", label: t("common.all") }, ...(query.data?.facets.categories || []).map(value => ({ value, label: query.data?.facets.categoryLabels?.[value]?.[language] || query.data?.items.find(item => item.category === value)?.categoryLabel?.[language] || t("publicLibrary.category") }))]} />
