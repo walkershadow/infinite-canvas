@@ -24,7 +24,8 @@ export function CatalogDetailDialog({ entry, related, onOpenRelated, onClose }: 
                 {entry.sourceModel && <p className="mt-2 text-xs text-muted-foreground">{text("Source model")}: <strong>{text(entry.sourceModel)}</strong> · {text("This is the original creator’s model, not a selected Workbench model.")}</p>}
 
             </div>
-            {entry.sourceCompleteness !== "complete" && <p role="status" className="text-sm">{text("The source contains an incomplete continuation. Only complete verified steps are included below; this is not the entire original workflow.")}</p>}
+            {entry.sourceCompleteness !== "complete" && <p role="status" className="text-sm">{text("The published source is incomplete. Its available text is preserved for review; do not treat it as a complete original workflow.")}</p>}
+            {entry.availabilityNote && <p role="status" className="rounded-lg border border-border p-3 text-sm">{text(entry.availabilityNote)}</p>}
             <WorkflowActions document={catalogWorkflow(entry, language)} />
             {entry.contentKind === "case" && <p className="rounded-lg border border-border p-3 text-xs leading-6 text-muted-foreground">{text("External example · Not tested on this platform. Source model and timing are preserved; choose compatible model settings before generation.")}</p>}
             {entry.outputMedia.length > 0 && <MediaSection title={text("Output results")} items={entry.outputMedia} />}
@@ -73,7 +74,7 @@ function PromptStep({ step, index, entry }: { step: OverseasPromptEntry["steps"]
         <p className="my-3 text-sm leading-6 text-muted-foreground">{text(step.instruction)}</p>
         <Tabs key={language} defaultActiveKey={language} items={(["en", "zh", "original"] as const).filter((language) => step.prompts[language]?.trim()).map((language) => {
             const label = language === "en" ? text("English") : language === "zh" ? text("Chinese") : text("Original");
-            const kindLabel = step.textKind === "licensed-case" ? text(language === "zh" ? "Chinese translation" : "Original case prompt") : step.textKind === "source-excerpt" ? (language === "zh" ? text("Translation of original excerpt") : text("Original excerpt")) : language === "original" ? step.originalKind === "full" ? text("Licensed template") : text("Original excerpt") : step.textKind === "licensed-template" ? text("Licensed template") : text("Adapted example");
+            const kindLabel = step.textKind === "licensed-case" ? text(language === "original" || language === step.originalLanguage ? "Original case prompt" : language === "zh" ? "Chinese translation" : "English translation") : step.textKind === "source-excerpt" ? (language === "zh" ? text("Translation of original excerpt") : text("Original excerpt")) : language === "original" ? step.originalKind === "full" ? text("Licensed template") : text("Original excerpt") : step.textKind === "licensed-template" ? text("Licensed template") : text("Adapted example");
             return { key: language, label, children: <div>
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><span className="text-xs font-medium">{kindLabel}{language === "original" && step.originalLanguage ? ` · ${step.originalLanguage}` : ""}</span><Button size="small" type="text" icon={<Copy className="size-3.5" />} aria-label={`${text("Copy")} ${text("Step")} ${index + 1} ${label} ${kindLabel}`} onClick={() => copyText(step.prompts[language]!)}>{text("Copy")} {label} · {kindLabel}</Button></div>
                 <pre className="max-h-72 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-muted/40 p-3 font-mono text-xs leading-6" lang={language === "original" ? undefined : language}>{step.prompts[language]}</pre>

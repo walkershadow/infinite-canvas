@@ -25,8 +25,11 @@ export function instantiateWorkflow(document: WorkflowDocument, origin = { x: 0,
     const connections: CanvasConnection[] = [];
     const nodes: CanvasNodeData[] = [];
     const addEdge = (from: string, to: string) => connections.push({ id: nanoid(), fromNodeId: from, toNodeId: to });
-    document.references.forEach((ref, i) => {
-        nodes.push({ id: refIds.get(ref.id)!, type: ref.kind, title: `${catalogText("Input material", document.language)} · ${ref.title} · ${ref.role}${ref.required ? ` (${catalogText("Required", document.language)})` : ""}`, position: { x: origin.x + 40, y: origin.y + 90 + i * 280 }, width: 280, height: ref.image ? 280 * ref.image.height / ref.image.width : 220, metadata: { groupId, status: ref.image ? "success" : "idle", ...(ref.image ? { content: ref.image.url, storageKey: ref.image.storageKey } : {}), workflowReference: { role: ref.role, required: ref.required } } });
+    let referenceY = origin.y + 90;
+    document.references.forEach(ref => {
+        const height = ref.image ? 280 * ref.image.height / ref.image.width : 220;
+        nodes.push({ id: refIds.get(ref.id)!, type: ref.kind, title: `${catalogText("Input material", document.language)} · ${ref.title} · ${ref.role}${ref.required ? ` (${catalogText("Required", document.language)})` : ""}`, position: { x: origin.x + 40, y: referenceY }, width: 280, height, metadata: { groupId, status: ref.image ? "success" : "idle", ...(ref.image ? { content: ref.image.url, storageKey: ref.image.storageKey } : {}), workflowReference: { role: ref.role, required: ref.required } } });
+        referenceY += height + 60;
     });
     document.stages.forEach((stage, i) => {
         const id = stageIds.get(stage.id)!;
@@ -40,7 +43,7 @@ export function instantiateWorkflow(document: WorkflowDocument, origin = { x: 0,
         ordered.forEach(input => addEdge(refIds.get(input) || stageIds.get(input)!, id));
     });
     // The immutable source snapshot lives on the group, not in a generation input node.
-    nodes.unshift({ id: groupId, type: CanvasNodeType.Group, title: catalogTitle(document.source, document.language), position: origin, width: Math.max(800, 440 + document.stages.length * 400), height: Math.max(420, 150 + document.references.length * 280), metadata: { workflow: structuredClone(document) } });
+    nodes.unshift({ id: groupId, type: CanvasNodeType.Group, title: catalogTitle(document.source, document.language), position: origin, width: Math.max(800, 440 + document.stages.length * 400), height: Math.max(420, ...nodes.map(node => node.position.y - origin.y + node.height + 60)), metadata: { workflow: structuredClone(document) } });
     return { nodes, connections, groupId };
 }
 export function workflowGenerationError(node: CanvasNodeData | undefined, nodes: CanvasNodeData[], prompt: string, connections?: CanvasConnection[]): string | undefined {

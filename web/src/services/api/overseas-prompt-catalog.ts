@@ -1,7 +1,8 @@
 import templates from "./overseas-workflow-templates.json";
+import expandedCases from "./overseas-expanded-cases.json";
 import type { OverseasPromptEntry } from "@/types/prompt-catalog";
 
-// Curated seed only. Original creators retain rights; do not mirror external media.
+// User-authorized source transcripts and bundled original reference images.
 // User-authorized prompt transcripts. Steps follow source headings; incomplete continuations stay separate.
 const seedCatalog: OverseasPromptEntry[] = [
   {
@@ -488,4 +489,4 @@ const seedCatalog: OverseasPromptEntry[] = [
   }
 ];
 
-export const overseasPromptCatalog: OverseasPromptEntry[] = [...templates as OverseasPromptEntry[], ...seedCatalog.filter(entry => entry.contentKind === "case")];
+export const overseasPromptCatalog: OverseasPromptEntry[] = [...templates as OverseasPromptEntry[], ...seedCatalog.filter(entry => entry.contentKind === "case"), ...expandedCases as OverseasPromptEntry[]];

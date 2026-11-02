@@ -39,7 +39,7 @@ test("public catalog has valid related entries, explicit excerpt/adaptation labe
             if (step.prompts.en || step.prompts.zh) expect(step.textKind).toBeDefined();
             if (item.contentKind === "case") {
                 expect(step.textKind).toBe("licensed-case");
-                expect(step.prompts.en).toBe(step.prompts.original);
+                expect(step.prompts[step.originalLanguage === "zh" ? "zh" : "en"]).toBe(step.prompts.original);
                 expect(step.prompts.zh?.trim()).toBeTruthy();
                 if (step.prompts.original) expect(step.originalKind).toBe("full");
             }

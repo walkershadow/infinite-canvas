@@ -8,9 +8,10 @@
       "title": "乡间少女与喷火龙共烤火鸡",
       "sourceUrl": "https://x.com/Arzoo12sh/status/2113215535706198293",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-prompt-the-dragon-and-the-roasted-turkey-78a39f6877d8",
-      "status": "source-reviewed-pending-rights",
+      "status": "imported",
       "promptSourceUrl": "https://x.com/Alishba_Ai/status/2113215539057439151",
-      "sourceReview": "原账号 Arzoo12sh 已更名 Alishba_Ai；完整 27 秒提示词在作者续帖。六镜头是同一次视频生成，无明示外部输入。"
+      "promptSha256": "1a8828ceaaff1f39bde33e75e88de48dd495690d88021b0d2d00da2d9d436347",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:character-reference-lock",
@@ -18,7 +19,10 @@
       "title": "红裙女子提着食材登上云端山顶小屋",
       "sourceUrl": "https://x.com/sophiaparkerr_/status/2107096810783461509",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-create-a-cinematic-photorealistic-30-second-vertical-video-using-the-provided-9668ab5250ad",
-      "status": "pending-source-review"
+      "status": "missing-original-inputs",
+      "promptSourceUrl": "https://x.com/sophiaparkerr_/status/2107096810783461509",
+      "promptSha256": "68b0696ebd3fc8a28d18e7f9a37667cfab3df319db4e43246168ca60f4e8dda4",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:storyboard-grid-to-video",
@@ -34,7 +38,10 @@
       "title": "mini DV 咖啡 ASMR vlog",
       "sourceUrl": "https://x.com/Strength04_X/status/2083094742682787939",
       "curationUrl": "https://goodcase.ai/cases/seedance-25-minidv-coffee-asmr-vlog",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/Strength04_X/status/2083094742682787939",
+      "promptSha256": "e7f44da6140a6f69e03a3d18ad64b289331623cac90201ce671f8fe5cffa36cc",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:pov-continuous-take",
@@ -42,7 +49,10 @@
       "title": "Seedance 2.5 生成 GoPro 钓鱼到烤鱼全流程",
       "sourceUrl": "https://x.com/abxxai/status/2087189194720657649",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-gopro-94a73eef1dbf",
-      "status": "pending-source-review"
+      "status": "missing-original-inputs",
+      "promptSourceUrl": "https://x.com/abxxai/status/2087189194720657649",
+      "promptSha256": "17a06af0cd166adc6ef96830562b6c0958590bde54a522af377b8534562ce2f2",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:retro-found-footage",
@@ -50,7 +60,10 @@
       "title": "首尔夏夜 Vlog",
       "sourceUrl": "https://x.com/AIwithkhan/status/2092971211169100048",
       "curationUrl": "https://goodcase.ai/cases/vlog-c8171f712492",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/AIwithkhan/status/2092971211169100048",
+      "promptSha256": "8189cb130931eeeca25285ecc6162a927f1f003007e2add3187f4f3819187261",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:pet-animal",
@@ -58,7 +71,10 @@
       "title": "奶奶与狸猫麻雀逛早市",
       "sourceUrl": "https://x.com/Just_sharon7/status/2103503970815930610",
       "curationUrl": "https://goodcase.ai/cases/seedance-grandma-is-out-here-for-the-shopping-with-her-pet-sparrow-d6d07e610943",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/Just_sharon7/status/2103503970815930610",
+      "promptSha256": "aac1d05f9ea51b131cbb8a515cc1fbda0e8d95c4721d2eb6d0fbb2321aa791c8",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:ugc-creator-review",
@@ -66,7 +82,13 @@
       "title": "护肤品自拍口播 UGC 广告",
       "sourceUrl": "https://x.com/abxxai/status/2095179656802844727",
       "curationUrl": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/abxxai/status/2095179707767767109",
+      "promptSha256": "300ceed7f3657cbe67b9fcc8cfbdcf7336b839d8c0f3a95eaa4d31ade3589a73",
+      "referenceFiles": [
+        "case-references/ugc-character.jpg",
+        "case-references/ugc-product.jpg"
+      ]
     },
     {
       "templateId": "seedance:product-commercial-shotlist",
@@ -74,8 +96,10 @@
       "title": "宝石蝎幻化为高跟鞋",
       "sourceUrl": "https://x.com/juliaevee/status/2092783528887083290",
       "curationUrl": "https://goodcase.ai/cases/juliaevee-seedance-ai-ae713e2e2dbc",
-      "status": "source-reviewed-pending-rights",
-      "sourceReview": "原帖包含完整单步视频提示词及外部成片，无明示参考输入。作者标注 Seedance 2.0。"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/juliaevee/status/2092783528887083290",
+      "promptSha256": "a40b646a92fd8ec0eef1e6cd2c9000a1cdc4de53888b7413df55dd6cf9ebe190",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:process-transformation-montage",
@@ -83,7 +107,10 @@
       "title": "泥土中诞生的罐中小鸟",
       "sourceUrl": "https://x.com/Yesandyou_/status/2090075447195480403",
       "curationUrl": "https://goodcase.ai/cases/yesandyou-seedance-ai-2a9dc20c947d",
-      "status": "pending-source-review"
+      "status": "missing-original-inputs",
+      "promptSourceUrl": "https://x.com/Yesandyou_/status/2090075447195480403",
+      "promptSha256": "015d3776b498714e4ba8649e04c54c4249f8c8c2f1d502418273d4fbb6ee2672",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:fashion-lookbook",
@@ -91,7 +118,10 @@
       "title": "黑衣女子静立于同步人群中央",
       "sourceUrl": "https://x.com/AIwithkhan/status/2099707375943066094",
       "curationUrl": "https://goodcase.ai/cases/seedance-i-came-like-a-storm-d30f955b4248",
-      "status": "pending-source-review"
+      "status": "missing-original-inputs",
+      "promptSourceUrl": "https://x.com/AIwithkhan/status/2099707375943066094",
+      "promptSha256": "3fc7b0207c223b6b07db7eef7b5086d3e2fe3fad0395bbd820ae07d4e80e36e4",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:food-asmr",
@@ -99,7 +129,10 @@
       "title": "夏日厨房里的日式猪排盖饭",
       "sourceUrl": "https://x.com/Goodmanprotocol/status/2098845134326808734",
       "curationUrl": "https://goodcase.ai/cases/seedance-create-a-30-second-fast-paced-cinematic-japanese-anime-cooking-video-showing-th-236ad940a8f1",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/Goodmanprotocol/status/2098845134326808734",
+      "promptSha256": "de0425beb3e022d2a02e3486fc68fe489d3eb35f35e25306b411211bff5ec9de",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:dialogue-performance-beats",
@@ -107,7 +140,10 @@
       "title": "少女教巨龙用小火烤爱心面包",
       "sourceUrl": "https://x.com/ElsaSofia__AI/status/2113089111699673461",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-photorealistic-medieval-fantasy-film-8ed9c8bbccd4",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/ElsaSofia__AI/status/2113089114585350168",
+      "promptSha256": "32b1c769a3b9a6e11f20018662a759bfcbc8366d85a74d9ad0bcce1337290d74",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:cinematic-narrative-short",
@@ -115,7 +151,12 @@
       "title": "女子藏身地牢守护三只幼龙",
       "sourceUrl": "https://x.com/Adnan_Ai2/status/2113945930185732358",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-long-detailed-prompt-66ee33ce05b6",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/Adnan_Ai2/status/2113945937370390650",
+      "promptSha256": "e1a29b1181d159b29d8085a66b4734b75a4dbc78c5625671cb9fa17da11f688d",
+      "referenceFiles": [
+        "case-references/dragon-dungeon-sheet.jpg"
+      ]
     },
     {
       "templateId": "seedance:travel-city-walk",
@@ -123,7 +164,10 @@
       "title": "巴厘岛梦幻夏日旅行日记",
       "sourceUrl": "https://x.com/eshal__ai/status/2096840505355370629",
       "curationUrl": "https://goodcase.ai/cases/seedance-a-cinematic-30-second-tropical-travel-vlog-montage-featuring-a-beautiful-20-yea-6af38a792806",
-      "status": "pending-source-review"
+      "status": "archived-source",
+      "promptSourceUrl": "https://x.com/eshal__ai/status/2096840505355370629",
+      "promptSha256": "26b8d0ebfb326a4b3678f6f4b442885f18d44f1429eeb7865dac12ab47c5058f",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:meme-comedy",
@@ -131,7 +175,10 @@
       "title": "首尔地铁反击：女子将挑衅者扔进垃圾桶",
       "sourceUrl": "https://x.com/AIwithSynthia/status/2108760866422415701",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-create-a-live-action-cinematic-revenge-comedy-video-set-in-a-seoul-subway-stati-ce9067a15dcc",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/AIwithSynthia/status/2108760866422415701",
+      "promptSha256": "b3c06d007b9d00bfc4c8dd6ee526ced5d7363aa9186e4255601333494ee02910",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:horror-suspense",
@@ -139,7 +186,10 @@
       "title": "实验室寄生体感染突袭",
       "sourceUrl": "https://x.com/auqibhabib/status/2099725768310009982",
       "curationUrl": "https://goodcase.ai/cases/seedance-cinematic-sci-fi-horror-action-short-film-set-in-a-research-laboratory-opens-w-9661cd7bd95d",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/auqibhabib/status/2099725768310009982",
+      "promptSha256": "e6e56678ff68e043128d1337991e980c4eb3c8471a6bd32f82c94447c2b8ce4d",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:game-ui-livestream",
@@ -147,7 +197,10 @@
       "title": "Seedance 2.5 超真实 AI 动态桌面壁纸：换装互动女主一镜到底",
       "sourceUrl": "https://x.com/cnyzgkc/status/2099029556434985065",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-ai-cabf3749d5b6",
-      "status": "pending-source-review"
+      "status": "missing-original-inputs",
+      "promptSourceUrl": "https://x.com/cnyzgkc/status/2099029559601688593",
+      "promptSha256": "569c157fdcdcf24b4d60baee7f8e0c4d8ca214b8ee4329c0f116bd4d01d345ef",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:anime-style-lock",
@@ -155,7 +208,12 @@
       "title": "蓝夹克双辫女剑士破框而出",
       "sourceUrl": "https://x.com/aimikoda/status/2106044483863191748",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/aimikoda/status/2106044848310452333",
+      "promptSha256": "a1a0bcfa373257479f4cdbbcc4cb07b97377d74f54775daed3385d1ed558d756",
+      "referenceFiles": [
+        "case-references/frame-break-blue.jpg"
+      ]
     },
     {
       "templateId": "seedance:stop-motion-cadence",
@@ -163,7 +221,10 @@
       "title": "Erling Haaland 黏土动画园艺",
       "sourceUrl": "https://x.com/noorwithwifi/status/2079818537137475762",
       "curationUrl": "https://goodcase.ai/cases/erling-haaland-525acabe78da",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/noorwithwifi/status/2079818537137475762",
+      "promptSha256": "80b074ba0e9c29459c7c61b052b53ce9391a10f60d530019cfb9dd50847969cd",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:3d-cartoon",
@@ -171,7 +232,10 @@
       "title": "幼儿开门学字母与单词",
       "sourceUrl": "https://x.com/Zarnab_with_Ai/status/2104764823091490851",
       "curationUrl": "https://goodcase.ai/cases/seedance-made-with-seedance-2-5-73b10f69e32a",
-      "status": "pending-source-review"
+      "status": "original-truncated",
+      "promptSourceUrl": "https://x.com/Zarnab_with_Ai/status/2104764823091490851",
+      "promptSha256": "09c9349b20b15bd0ca230d9222f46b6e59687f6408f8e25e4a3e4f065a8fe1ea",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:combat-choreography",
@@ -179,7 +243,10 @@
       "title": "女子在餐厅后厨迎战三名男子",
       "sourceUrl": "https://x.com/Alina_with_Ai/status/2113816556140675163",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-prompt-video-178003b0959b",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/Alina_with_Ai/status/2113816560486010958",
+      "promptSha256": "feaa53ec355438dc7ee29628d0cdfa18ac7b35dbbcefc3186bcb6a86396b6e33",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:music-beat-sync-mv",
@@ -187,7 +254,10 @@
       "title": "双人 K-pop MV 逐镜分镜",
       "sourceUrl": "https://x.com/Just_sharon7/status/2083422886686031982",
       "curationUrl": "https://goodcase.ai/cases/seedance-25-kpop-mv-dual-idol",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/Just_sharon7/status/2083422886686031982",
+      "promptSha256": "fb84c805e33f255ed927f646f7044978cabb47e7071219a79824e041f53a9b31",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:time-freeze-rewind",
@@ -195,7 +265,10 @@
       "title": "复古餐厅时间冻结与倒放",
       "sourceUrl": "https://x.com/techhalla/status/2083389002552664385",
       "curationUrl": "https://goodcase.ai/cases/seedance-25-diner-frozen-time-rewind",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/techhalla/status/2083389002552664385",
+      "promptSha256": "0f40d4a69082ba62b39b4e8104763cced355655647aea1982eafffd9496d4299",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:car-vehicle",
@@ -203,7 +276,10 @@
       "title": "未来公路上的机车与超跑追逐",
       "sourceUrl": "https://x.com/itsSaira_1/status/2104064261005709551",
       "curationUrl": "https://goodcase.ai/cases/seedance-cinematic-photorealistic-sci-fi-action-sequence-moody-desaturated-color-grade-edfd133b78ea",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/itsSaira_1/status/2104064261005709551",
+      "promptSha256": "4ffbe379b5fc6ac3b3d4054c2a6c5e58e3e74d568c4283d08506b71539fd71a8",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:epic-fantasy-scifi",
@@ -211,7 +287,10 @@
       "title": "绿裙女子召唤烈焰树灵迎战恶魔群",
       "sourceUrl": "https://x.com/itsSaira_1/status/2107685928647160275",
       "curationUrl": "https://goodcase.ai/cases/seedance-2-5-cinematic-dark-fantasy-battle-16-9-photoreal-shallow-depth-of-field-anamorp-a90377df74d6",
-      "status": "pending-source-review"
+      "status": "imported",
+      "promptSourceUrl": "https://x.com/itsSaira_1/status/2107685928647160275",
+      "promptSha256": "4035d17f45534e8f29e3ff56554f6bc329f0b7dfcbda62c4137888154aa63797",
+      "referenceFiles": []
     },
     {
       "templateId": "seedance:sports-extreme",
@@ -219,7 +298,10 @@
       "title": "Seedance：不会有人认为这是真的吧？😄",
       "sourceUrl": "https://x.com/johnAGI168/status/2095025524586193105",
       "curationUrl": "https://goodcase.ai/cases/seedance-269d1fc95820",
-      "status": "pending-source-review"
+      "status": "missing-original-inputs",
+      "promptSourceUrl": "https://x.com/johnAGI168/status/2095025524586193105",
+      "promptSha256": "99ff7e48d19159c9e0f9f111b48dc3f20886a5cf40c24d79a1552395f1289db0",
+      "referenceFiles": []
     }
   ]
 }

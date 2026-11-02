@@ -12,6 +12,7 @@ export type OverseasPromptEntry = {
     tags: string[];
     sourceModel?: string;
     notes?: string[];
+    availabilityNote?: string;
     sourceCompleteness?: "complete" | "excerpt" | "truncated";
     mediaRights?: "pending" | "licensed";
     sources: { role: "original" | "curation"; label: string; url: string; author?: string; license?: string }[];

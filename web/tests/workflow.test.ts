@@ -131,7 +131,7 @@ test("authorized cases retain complete source text through Assets and Canvas", (
             for (const step of entry.steps) {
                 const node = graph.nodes.find(n => n.metadata?.workflowStage?.id === step.id)!;
                 expect(node.metadata?.prompt).toBe(step.prompts[language]);
-                expect(node.metadata?.prompt?.trim().length).toBeGreaterThan(500);
+                expect(node.metadata?.prompt?.trim()).toBeTruthy();
                 expect(node.type).toBe(step.mode!);
             }
             expect(graph.nodes.filter(n => n.metadata?.workflowStage)).toHaveLength(entry.steps.length);
@@ -163,7 +163,7 @@ test("author images survive Assets round-trip, keep aspect ratios and enable the
     for (const entry of overseasPromptCatalog.filter(e => e.contentKind === "case")) {
         const w = JSON.parse(JSON.stringify(workflowAsset(catalogWorkflow(entry)))).data;
         const graph = instantiateWorkflow(w);
-        for (const ref of w.references) {
+        for (const ref of w.references.filter((r: any) => r.image)) {
             const node = graph.nodes.find(n => n.title.includes(ref.title))!;
             expect(node.metadata?.status).toBe("success");
             expect(node.metadata?.content).toBe(ref.image.url);
@@ -175,9 +175,49 @@ test("author images survive Assets round-trip, keep aspect ratios and enable the
             expect(node.metadata?.prompt).toBe(stage.prompt);
             expect(node.width / node.height).toBeCloseTo(stage.image.width / stage.image.height);
         }
-        if (!entry.id.includes("apartment")) {
+        if (!entry.id.includes("apartment") && !w.references.some((r: any) => r.required && !r.image)) {
             const video = graph.nodes.find(n => n.type === "video")!;
             expect(workflowGenerationError(video, graph.nodes, video.metadata!.prompt!, graph.connections)).toBeUndefined();
         }
     }
+});
+
+test("all 27 linked cases are covered without losing existing cases or filling source gaps", async () => {
+    const coverage = (await import("../../docs/template-case-coverage.json")).default;
+    const cases = overseasPromptCatalog.filter(e => e.contentKind === "case");
+    expect(cases).toHaveLength(29);
+    expect(coverage.entries).toHaveLength(27);
+    for (const record of coverage.entries) {
+        const entry = cases.find(e => e.id === record.caseId)!;
+        expect(entry).toBeDefined();
+        expect(entry.relatedIds).toContain(record.templateId);
+        if ("promptSha256" in record) {
+            const original = entry.steps.find(s => s.id === "video")!.prompts.original!;
+            expect(createHash("sha256").update(original).digest("hex")).toBe(record.promptSha256!);
+        }
+        if (record.status === "missing-original-inputs") {
+            expect(entry.availabilityNote).toContain("not found");
+            const graph = instantiateWorkflow(catalogWorkflow(entry));
+            const video = graph.nodes.find(n => n.type === "video")!;
+            expect(workflowGenerationError(video, graph.nodes, video.metadata!.prompt!, graph.connections)).toContain("required");
+        }
+    }
+    const seoul = cases.find(e => e.id.endsWith("c8171f712492"))!;
+    expect(seoul.steps[0].prompts.original).toContain("imperfect camcorder operation.");
+    expect(seoul.steps[0].prompts.zh).toContain("不完美的摄像机操作");
+    const alphabet = cases.find(e => e.id.endsWith("73b10f69e32a"))!;
+    expect(alphabet.sourceCompleteness).toBe("truncated");
+    expect(alphabet.steps[0].prompts.original).toEndWith("children'");
+});
+
+test("UGC portrait and product restore as distinct inputs without portrait overlap", () => {
+    const entry = overseasPromptCatalog.find(e => e.id.endsWith("1aec9fd3f3c1"))!;
+    const graph = instantiateWorkflow(JSON.parse(JSON.stringify(workflowAsset(catalogWorkflow(entry)))).data);
+    const video = graph.nodes.find(n => n.metadata?.workflowStage?.id === "video")!;
+    const upstream = graph.connections.filter(c => c.toNodeId === video.id).map(c => graph.nodes.find(n => n.id === c.fromNodeId)!);
+    expect(upstream.map(n => n.metadata?.workflowStage?.id || n.metadata?.workflowReference?.role)).toEqual(["character-image", "Exact packaging and label"]);
+    expect(workflowGenerationError(video, graph.nodes, video.metadata!.prompt!, graph.connections)).toBeUndefined();
+    const references = graph.nodes.filter(n => n.metadata?.workflowReference);
+    expect(references[0].position.y + references[0].height).toBeLessThan(references[1].position.y);
+    for (const node of graph.nodes.slice(1)) expect(node.position.y + node.height).toBeLessThan(graph.nodes[0].height);
 });

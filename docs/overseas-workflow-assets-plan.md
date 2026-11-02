@@ -153,3 +153,14 @@ Edit in Canvas 默认新建画布副本；从现有画布素材面板选择流�
 - 发布归档需包含 `web/public/case-references/` 的 6 张 JPG；`docs/case-reference-images.json` 提供每张图片的字节数、尺寸、原帖和 SHA-256，已重新逐文件核验。
 - 后端保持 workflow schemaVersion=1，保留 stages[].image、references[].image 与 inputOrder 可选字段；image 包含 url/storageKey/width/height。已有递归 storageKey 上传机制处理编辑稿中的媒体；source 快照保留原始来源，不改写为上传地址。
 - 不归档临时本机媒体适配器、/tmp 下载缓存、浏览器个人 Assets ZIP 或本地数据库。源码中的案例图片仅使用随包静态文件和已有账户媒体接口；生产账户媒体上传仍需由发布方使用真实存储配置验收。
+
+
+## 26 例扩充交接
+
+此节替代上文“新增案例尚未导入”的状态。新增 26 个条目在 `web/src/services/api/overseas-expanded-cases.json`，与原 3 例和 27 个模板合并展示；不会覆盖用户已保存副本。用户已明确授权新增全文、翻译及原图，并授权完成后提交推送 dev；本会话不部署。
+
+当前是 29 个已录入案例，不是 29 个已无缺项的可复现案例。6 例原始必需参考图缺失，1 例原帖句尾截断，1 例账号被冻结采用归档。卡片、详情和编辑器显示来源限制；缺失必需图片继续由现有画布输入检查阻止生成。TODO 保留具体缺项，不使用样例封面代替原图。
+
+本次新增唯一可选目录字段 `availabilityNote`，属于 source 快照，后端按既有结构保留即可；workflow schemaVersion、必填校验器及媒体字段无变更。媒体归档总计 10 张原始 JPG；新增护肤角色、护肤产品、地牢场景总览、蓝夹克角色图。未提交本机适配器、个人素材 ZIP、测试数据库或 /tmp 研究缓存。
+
+最终浏览器记录：`/tmp/expanded-ugc-canvas.png`；本地测试项目角色与产品图保存／刷新均成功，0 points，未生成。本轮未构建、未部署。

@@ -52,5 +52,41 @@
     "height": 1520,
     "sha256": "439cec0f7406653f497bd362219c9cd2501514a0b8695754218df56af2567364",
     "bytes": 594786
+  },
+  {
+    "file": "web/public/case-references/ugc-character.jpg",
+    "source": "https://x.com/abxxai/status/2095179678214725989",
+    "url": "https://pbs.twimg.com/media/HROSz7kbYAAX4zU?format=jpg&name=orig",
+    "width": 1856,
+    "height": 2304,
+    "sha256": "29097be9227206d48ce50b9e1b53bf96c3eb4566ed24032c1f68e633bb11b88d",
+    "bytes": 2904156
+  },
+  {
+    "file": "web/public/case-references/ugc-product.jpg",
+    "source": "https://x.com/abxxai/status/2095179694476050600",
+    "url": "https://pbs.twimg.com/media/HROS1EuawAAMRh4?format=jpg&name=orig",
+    "width": 1200,
+    "height": 1440,
+    "sha256": "5dd5d4da59e70399ec9bfd1d13884fa3b88e9dcc454b20dd894d80dbbe23af38",
+    "bytes": 65560
+  },
+  {
+    "file": "web/public/case-references/dragon-dungeon-sheet.jpg",
+    "source": "https://x.com/Adnan_Ai2/status/2113945937370390650",
+    "url": "https://pbs.twimg.com/media/HVY6dWqaYAAtBuv?format=jpg&name=orig",
+    "width": 1672,
+    "height": 941,
+    "sha256": "8ac5ea28a770de8c1c65bf4e38a6ad1fcdcc0096f1f32999fc38967fef1e8469",
+    "bytes": 421042
+  },
+  {
+    "file": "web/public/case-references/frame-break-blue.jpg",
+    "source": "https://x.com/aimikoda/status/2106044848310452333",
+    "url": "https://pbs.twimg.com/media/HTosmzyXYAAJj7M?format=jpg&name=orig",
+    "width": 1792,
+    "height": 2688,
+    "sha256": "34b360ad88720474c2d5bcd8c76aced31002fd29aa24d22d937dc4469308d81f",
+    "bytes": 443632
   }
 ]
