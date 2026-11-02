@@ -21,6 +21,7 @@
 
 - [国内 Workbench Canvas 本地适配](./domestic-workbench.md)
 - [海外 Workbench 集成](/docs/development/overseas-workbench)
+- [海外公共参考素材与流程协议](./public-gallery-contract.md)
 - [海外公共案例媒体七牛转存协议](./catalog-media-storage.md)
 - [海外公共提示词目录开发与验收](./overseas-prompt-catalog.md)
 - [海外完整流程素材改造与覆盖验收方案](./overseas-workflow-assets-plan.md)

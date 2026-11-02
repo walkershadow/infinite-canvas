@@ -1,3 +1,4 @@
+import { catalogCover } from "@/pages/prompts/catalog-cover";
 import { expect, test } from "bun:test";
 import { filterCatalog } from "@/pages/prompts/catalog-filter";
 import { overseasPromptCatalog } from "@/services/api/overseas-prompt-catalog";
@@ -45,4 +46,22 @@ test("public catalog has valid related entries, explicit excerpt/adaptation labe
             }
         }
     }
+});
+
+
+test("overseas template covers follow actual related cases without using video URLs or changing other modes", () => {
+    const templates = overseasPromptCatalog.filter(item => item.contentKind === "template");
+    expect(templates).toHaveLength(27);
+    for (const template of templates) {
+        const cover = catalogCover(template, overseasPromptCatalog, true);
+        expect(template.relatedIds).toContain(cover.relatedCase);
+        const related = overseasPromptCatalog.find(item => item.id === cover.relatedCase)!;
+        expect(related.contentKind).toBe("case");
+        expect([...related.outputMedia, ...related.referenceMedia].some(media => !media.unavailable && (media.kind === "image" ? media.url === cover.url : media.poster === cover.url))).toBe(true);
+        expect(catalogCover(template, overseasPromptCatalog, false).relatedCase).toBeUndefined();
+    }
+    const videoOnly = { ...caseEntry, outputMedia: [{ kind: "video" as const, url: "https://example.com/video.mp4", caption: "Video" }] };
+    const linked = { ...entry, relatedIds: [videoOnly.id] };
+    expect(catalogCover(linked, [videoOnly], true).url).toBeUndefined();
+    expect(catalogCover({ ...linked, relatedIds: ["missing"] }, [videoOnly], true).relatedCase).toBeUndefined();
 });

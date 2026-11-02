@@ -1,3 +1,5 @@
+import { ReferenceImagePicker } from "@/components/public-library/reference-image-picker";
+import { replaceReferenceImage } from "@/lib/canvas/replace-reference-image";
 import { resolveWorkflowImages } from "@/services/workflow-images";
 import { catalogText } from "@/lib/prompt-catalog-locale";
 import { instantiateWorkflow, workflowGenerationError, workflowNodeMetadata } from "@/lib/workflow";
@@ -8,7 +10,7 @@ import { isVideoRecoveryTarget, recoverVideoNodes } from "@/lib/canvas/workbench
 import { assertWorkbenchReferences, isCompatibleReference, referenceKindsForNode } from "@/lib/canvas/canvas-reference-selection";
 import { isWorkbenchTaskPending } from "@/services/api/workbench-ai-tasks";
 import { useWorkbenchAiRecovery } from "./hooks/use-workbench-ai-recovery";
-import { isWorkbench } from "@/constant/integration";
+import { isWorkbench, isOverseas } from "@/constant/integration";
 import { workbenchVideoEstimateText, workbenchVideoInput } from "@/services/workbench/video";
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ChangeEvent as ReactChangeEvent, DragEvent as ReactDragEvent, MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from "react";
@@ -274,6 +276,7 @@ function InfiniteCanvasPage() {
     const [showImageInfo, setShowImageInfo] = useState(false);
     const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
     const [assetPickerOpen, setAssetPickerOpen] = useState(false);
+    const [referencePicker, setReferencePicker] = useState<{ nodeId: string; kind: import("@/types/public-gallery").GalleryCategory } | null>(null);
     const [projectLoaded, setProjectLoaded] = useState(false);
     const [toolbarNodeId, setToolbarNodeId] = useState<string | null>(null);
     const [nodeImageSettingsOpen, setNodeImageSettingsOpen] = useState(false);
@@ -3506,7 +3509,7 @@ function InfiniteCanvasPage() {
                     onIncreaseFont={(node) => handleFontSizeChange(node.id, Math.min(32, (node.metadata?.fontSize || 14) + 2))}
                     onToggleDialog={(node) => setDialogNodeId((current) => (current === node.id ? null : node.id))}
                     onGenerateImage={generateImageFromTextNode}
-                    onUpload={(node) => handleUploadRequest(node.id)}
+                    onUpload={(node) => { const kind = node.metadata?.workflowReference?.galleryCategory; if (isOverseas && kind) setReferencePicker({ nodeId: node.id, kind }); else handleUploadRequest(node.id); }}
                     onDownload={downloadNodeImage}
                     onSaveAsset={(node) => void saveNodeAsset(node)}
                     onMaskEdit={(node) => setMaskEditNodeId(node.id)}
@@ -3645,6 +3648,7 @@ function InfiniteCanvasPage() {
                     <p className="text-sm opacity-60">{t("canvas.projectPage.clearDescription")}</p>
                 </Modal>
 
+                {referencePicker && <ReferenceImagePicker kind={referencePicker.kind} onClose={() => setReferencePicker(null)} onSelect={image => setNodes(previous => previous.map(node => node.id === referencePicker.nodeId ? replaceReferenceImage(node, image) : node))} />}
                 <AssetPickerModal open={assetPickerOpen} onInsert={handleAssetInsert} onClose={() => setAssetPickerOpen(false)} />
             </section>
         </main>

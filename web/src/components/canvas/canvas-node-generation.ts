@@ -1,3 +1,5 @@
+import { isOverseas } from "@/constant/integration";
+import { isPublicLibraryUrl } from "@/lib/public-library";
 import type { AiTextMessage } from "@/services/api/image";
 import i18n from "@/i18n";
 import { imageReferenceLabel } from "@/lib/image-reference-prompt";
@@ -171,7 +173,7 @@ export function buildNodeResponseMessages(context: NodeGenerationContext): AiTex
 
 export async function hydrateNodeGenerationContext(context: NodeGenerationContext) {
     const { imageToDataUrl } = await import("@/services/image-storage");
-    return { ...context, referenceImages: await Promise.all(context.referenceImages.map(async (image) => ({ ...image, dataUrl: await imageToDataUrl(image) }))) };
+    return { ...context, referenceImages: await Promise.all(context.referenceImages.map(async (image) => ({ ...image, dataUrl: isOverseas && isPublicLibraryUrl(image.dataUrl) ? image.dataUrl : await imageToDataUrl(image) }))) };
 }
 
 function readNodeTextInput(node: CanvasNodeData) {

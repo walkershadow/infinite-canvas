@@ -1,10 +1,11 @@
+import { canUsePublicLibrary } from "@/services/api/public-library";
 import i18n from "@/i18n";
 import { catalogSummary } from "@/lib/prompt-catalog-locale";
 import { isWorkbench } from "@/constant/integration";
 import { WorkflowEditor } from "@/components/prompts/workflow-editor";
 import { Copy, Download, PencilLine, Search, Trash2, Upload } from "lucide-react";
-import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { App, Button, Card, Drawer, Empty, Form, Image, Input, Modal, Pagination, Select, Space, Tag, Typography } from "antd";
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { App, Button, Card, Drawer, Empty, Form, Image, Input, Modal, Pagination, Select, Space, Spin, Tag, Typography } from "antd";
 import { saveAs } from "file-saver";
 import { useTranslation } from "react-i18next";
 
@@ -16,6 +17,8 @@ import { getImageBlob, getImagePreviewRevision, subscribeImagePreviews, uploadIm
 import { cn } from "@/lib/utils";
 import { assetCoverUrl, useAssetStore, type Asset, type AssetKind, type ImageAsset } from "@/stores/use-asset-store";
 import { exportAssets, readAssetPackage } from "./asset-transfer";
+
+const PublicLibrary = lazy(() => import("@/components/public-library/public-library"));
 
 type AssetFormValues = {
     kind: AssetKind;
@@ -35,6 +38,8 @@ export default function AssetsPage() {
     const { message } = App.useApp();
     const { t } = useTranslation();
     const copyText = useCopyText();
+    const publicLibrary = canUsePublicLibrary();
+    const [showPublicLibrary, setShowPublicLibrary] = useState(false);
     const [form] = Form.useForm<AssetFormValues>();
     const coverInputRef = useRef<HTMLInputElement>(null);
     const imageInputRef = useRef<HTMLInputElement>(null);
@@ -201,7 +206,11 @@ export default function AssetsPage() {
 
     return (
         <div className="flex h-full flex-col overflow-hidden bg-background text-stone-900 dark:text-stone-100">
-            <main className="min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-6 py-8 [background-size:16px_16px] dark:bg-[radial-gradient(rgba(245,245,244,.14)_1px,transparent_1px)]">
+            {publicLibrary && <nav aria-label={t("assets.title")} className="flex shrink-0 gap-2 border-b border-border px-4 py-3 sm:px-6">
+                <Button type={showPublicLibrary ? "text" : "primary"} aria-pressed={!showPublicLibrary} onClick={() => setShowPublicLibrary(false)}>{t("assets.title")}</Button>
+                <Button type={showPublicLibrary ? "primary" : "text"} aria-pressed={showPublicLibrary} onClick={() => setShowPublicLibrary(true)}>{t("publicLibrary.title")}</Button>
+            </nav>}
+            {publicLibrary && showPublicLibrary ? <Suspense fallback={<div className="grid flex-1 place-items-center"><Spin /></div>}><PublicLibrary /></Suspense> : <main className="min-h-0 flex-1 overflow-y-auto bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-6 py-8 [background-size:16px_16px] dark:bg-[radial-gradient(rgba(245,245,244,.14)_1px,transparent_1px)]">
                 <div className="pb-8">
                     <div className="mx-auto max-w-5xl text-center">
                         <h1 className="text-4xl font-semibold tracking-tight text-stone-950 dark:text-stone-100">{t("assets.title")}</h1>
@@ -297,7 +306,7 @@ export default function AssetsPage() {
                         />
                     </div>
                 </div>
-            </main>
+            </main>}
 
             {previewAsset?.kind === "workflow" && isWorkbench && <WorkflowEditor key={previewAsset.id} document={previewAsset.data} asset={previewAsset} onClose={() => setPreviewAsset(null)} />}
             <Modal title={editingAsset ? t("assets.edit") : t("assets.add")} open={isAssetOpen} width={980} onCancel={() => setIsAssetOpen(false)} onOk={() => void saveAsset()} okText={t("common.save")} cancelText={t("common.cancel")} destroyOnHidden>

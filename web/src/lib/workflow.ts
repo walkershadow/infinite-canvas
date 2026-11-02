@@ -28,7 +28,7 @@ export function instantiateWorkflow(document: WorkflowDocument, origin = { x: 0,
     let referenceY = origin.y + 90;
     document.references.forEach(ref => {
         const height = ref.image ? 280 * ref.image.height / ref.image.width : 220;
-        nodes.push({ id: refIds.get(ref.id)!, type: ref.kind, title: `${catalogText("Input material", document.language)} · ${ref.title} · ${ref.role}${ref.required ? ` (${catalogText("Required", document.language)})` : ""}`, position: { x: origin.x + 40, y: referenceY }, width: 280, height, metadata: { groupId, status: ref.image ? "success" : "idle", ...(ref.image ? { content: ref.image.url, storageKey: ref.image.storageKey } : {}), workflowReference: { role: ref.role, required: ref.required } } });
+        nodes.push({ id: refIds.get(ref.id)!, type: ref.kind, title: `${catalogText("Input material", document.language)} · ${ref.title} · ${ref.role}${ref.required ? ` (${catalogText("Required", document.language)})` : ""}`, position: { x: origin.x + 40, y: referenceY }, width: 280, height, metadata: { groupId, status: ref.image ? "success" : "idle", ...(ref.image ? { content: ref.image.url, storageKey: ref.image.storageKey } : {}), workflowReference: { role: ref.role, required: ref.required, ...(ref.galleryCategory ? { galleryCategory: ref.galleryCategory } : {}) } } });
         referenceY += height + 60;
     });
     document.stages.forEach((stage, i) => {
@@ -36,7 +36,7 @@ export function instantiateWorkflow(document: WorkflowDocument, origin = { x: 0,
         const manual = stage.mode === "manual";
         const mode = stage.mode === "planning" || stage.mode === "manual" ? "text" : stage.mode;
         nodes.push({ id, type: mode, title: stage.title, position: { x: origin.x + 380 + i * 400, y: origin.y + 90 }, width: 320, height: stage.image ? 320 * stage.image.height / stage.image.width : 260,
-            metadata: { groupId, status: manual || stage.image ? "success" : "idle", generationMode: mode, prompt: manual ? "" : stage.prompt, content: stage.image?.url || (manual || stage.mode === "planning" ? stage.prompt : ""), ...(stage.image ? { storageKey: stage.image.storageKey } : {}), workflowStage: { id: stage.id, mode: stage.mode }, workflowRequiredInputs: stage.dependsOn.map(dep => stageIds.get(dep)!).concat(document.references.filter(r => r.required && r.stageIds.includes(stage.id)).map(r => refIds.get(r.id)!)) } });
+            metadata: { groupId, ...(document.source.publicLibrary && mode === "image" ? { count: 1 } : {}), status: manual || stage.image ? "success" : "idle", generationMode: mode, prompt: manual ? "" : stage.prompt, content: stage.image?.url || (manual || stage.mode === "planning" ? stage.prompt : ""), ...(stage.image ? { storageKey: stage.image.storageKey } : {}), workflowStage: { id: stage.id, mode: stage.mode }, workflowRequiredInputs: stage.dependsOn.map(dep => stageIds.get(dep)!).concat(document.references.filter(r => r.required && r.stageIds.includes(stage.id)).map(r => refIds.get(r.id)!)) } });
         const inputs = [...document.references.filter(r => r.stageIds.includes(stage.id)).map(r => r.id), ...stage.dependsOn];
         const ordered = stage.inputOrder ? [...stage.inputOrder.filter(input => inputs.includes(input)), ...inputs.filter(input => !stage.inputOrder!.includes(input))] : inputs;
         if (ordered.length !== inputs.length || new Set(ordered).size !== inputs.length || ordered.some(input => !inputs.includes(input))) throw new Error("Invalid workflow input order.");

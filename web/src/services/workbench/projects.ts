@@ -1,3 +1,5 @@
+import { isOverseas } from "@/constant/integration";
+import { isPublicLibraryUrl } from "@/lib/public-library";
 import { initializeWorkbenchConfig } from "./config";
 import { initializeCloudLibrary, prepareCloudLibrary } from "./library";
 import { useWorkbenchStore, type WorkbenchRecovery as Recovery } from "@/stores/use-workbench-store";
@@ -176,7 +178,7 @@ export async function workbenchReference(reference: { storageKey?: string; url?:
     if (reference.storageKey) return (await cloudAsset(reference.storageKey)).url;
     const source = reference.url || reference.dataUrl || "";
     const url = source.startsWith("blob:") || /^data:(image|video|audio)\//.test(source) ? source : ownedAssetUrl(source);
-    if (url.startsWith("/api/canvas/assets/") || url.startsWith("/api/images/")) return url;
+    if ((isOverseas && isPublicLibraryUrl(url)) || url.startsWith("/api/canvas/assets/") || url.startsWith("/api/images/")) return url;
     const existing = assets.get(url);
     if (existing) return existing.url;
     const response = await fetch(url, { credentials: "same-origin" });

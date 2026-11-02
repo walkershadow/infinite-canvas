@@ -23,7 +23,7 @@ export type WorkbenchBootstrap = {
     models: WorkbenchModel[];
     aiModels?: { id: string; name: string; capability: "image" | "text" | "audio"; price: number; constraints?: { textOnly?: boolean; maxImages?: number; maxVideos?: number; referenceAudio?: boolean; maxAudios?: number; referenceKinds?: ("text" | "image" | "video" | "audio")[] } }[];
     quota: { points: number; daily: { remaining: number } };
-    capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean; legacyImport?: boolean };
+    capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean; publicLibrary?: boolean; publicLibraryAdmin?: boolean; legacyImport?: boolean };
     currency: string;
     pointsPerUsd?: number;
     pointsPerYuan?: number;

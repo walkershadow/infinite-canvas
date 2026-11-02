@@ -12,6 +12,7 @@ export type WorkflowStage = {
     dependsOn: string[];
 };
 export type WorkflowReference = {
+    galleryCategory?: import("./public-gallery").GalleryCategory;
     image?: WorkflowImage;
     id: string;
     title: string;

@@ -1,3 +1,5 @@
+import { isOverseas } from "@/constant/integration";
+import { isPublicLibraryUrl } from "@/lib/public-library";
 import { resolveCatalogWorkflowMedia } from "./api/overseas-prompt-catalog";
 import { resolveImageUrl, uploadImage } from "@/services/image-storage";
 import { validateWorkflow } from "@/lib/workflow-validation";
@@ -16,6 +18,7 @@ export async function resolveWorkflowImages(document: WorkflowDocument, importFi
         const image = item.image;
         if (!Number.isFinite(image.width) || !Number.isFinite(image.height) || image.width <= 0 || image.height <= 0 || typeof image.url !== "string") throw new Error("Invalid workflow image.");
         if (image.localPath && !/^case-references\/[a-z0-9-]+\.jpg$/.test(image.localPath)) throw new Error("Invalid workflow image path.");
+        if (isOverseas && isPublicLibraryUrl(image.url) && !image.storageKey) return;
         const key = image.storageKey || image.localPath || image.url;
         let request = pending.get(key);
         if (!request) {

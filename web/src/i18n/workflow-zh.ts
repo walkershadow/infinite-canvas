@@ -1,4 +1,7 @@
 export default {
+    "Related case illustration": "关联案例示意",
+    "Replace each reference from its public category, My Assets or an uploaded image. The workflow keeps its original input order and your edited prompt.": "可从对应公共分类、我的图片资产或上传图片更换参考。流程会保留原有输入顺序及已编辑的提示词。",
+    "Replace reference image": "更换参考图片",
     "Delete personal prompt?": "删除个人提示词？",
     "Delete": "删除",
     "Workbench models use your account balance. Custom providers bill you directly, outside Workbench. Custom keys and preferences stay on this device, scoped to your account.": "平台模型使用工作台账号余额；自配渠道由提供方直接计费。自配密钥和偏好按账号保存在当前设备。",

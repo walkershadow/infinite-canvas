@@ -1,3 +1,4 @@
+import { canUsePublicLibrary } from "@/services/api/public-library";
 import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { useSearchParams } from "react-router-dom";
 import { isWorkbench } from "@/constant/integration";
@@ -17,13 +18,15 @@ import { cn } from "@/lib/utils";
 import { useAssetStore } from "@/stores/use-asset-store";
 import { ALL_PROMPTS_OPTION, type Prompt } from "@/services/api/prompts";
 
+const PublicLibrary = lazy(() => import("@/components/public-library/public-library"));
 const OverseasCatalog = lazy(() => import("./components/overseas-catalog"));
 
 export default function PromptsPage() {
     const { message, modal } = App.useApp();
     const [searchParams, setSearchParams] = useSearchParams();
     const collection = searchParams.get("collection");
-    const library = isWorkbench ? (collection === "template" || collection === "prompts" ? collection : "case") : "prompts";
+    const publicLibrary = canUsePublicLibrary();
+    const library = publicLibrary && collection === "public-library" ? "public-library" : isWorkbench ? (collection === "template" || collection === "prompts" ? collection : "case") : "prompts";
     const setLibrary = (value: string) => setSearchParams((previous) => { const next = new URLSearchParams(previous); next.set("collection", value); next.delete("id"); return next; });
     const client = useQueryClient();
     const [editing, setEditing] = useState<{ prompt?: Prompt } | null>(null);
@@ -68,8 +71,8 @@ export default function PromptsPage() {
 
     return (
         <div className="flex h-full flex-col overflow-hidden bg-background text-stone-800 dark:text-stone-100">
-            {isWorkbench && <nav aria-label={text("Prompt library collections")} className="flex shrink-0 flex-wrap gap-2 border-b border-border px-4 py-3 sm:px-6">{([ ["case", "Case studies"], ["template", "Workflow templates"], ["prompts", "Image & personal prompts"] ] as const).map(([value, label]) => <Button key={value} type={library === value ? "primary" : "text"} aria-pressed={library === value} onClick={() => setLibrary(value)}>{text(label)}</Button>)}</nav>}
-            {isWorkbench && library !== "prompts" ? <Suspense fallback={<div className="grid flex-1 place-items-center"><Spin /></div>}><OverseasCatalog key={library} contentKind={library} /></Suspense> : <main className="min-h-0 flex-1 overflow-y-auto bg-background bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-4 py-6 [background-size:16px_16px] sm:px-6 lg:py-8 dark:bg-[radial-gradient(rgba(245,245,244,.16)_1px,transparent_1px)]" onScroll={handleListScroll}>
+            {isWorkbench && <nav aria-label={text("Prompt library collections")} className="flex shrink-0 flex-wrap gap-2 border-b border-border px-4 py-3 sm:px-6">{([ ["case", "Case studies"], ["template", "Workflow templates"], ["prompts", "Image & personal prompts"] ] as const).map(([value, label]) => <Button key={value} type={library === value ? "primary" : "text"} aria-pressed={library === value} onClick={() => setLibrary(value)}>{text(label)}</Button>)}{publicLibrary && <Button type={library === "public-library" ? "primary" : "text"} aria-pressed={library === "public-library"} onClick={() => setLibrary("public-library")}>{t("publicLibrary.title")}</Button>}</nav>}
+            {isWorkbench && library !== "prompts" ? <Suspense fallback={<div className="grid flex-1 place-items-center"><Spin /></div>}>{library === "public-library" ? <PublicLibrary /> : <OverseasCatalog key={library} contentKind={library} />}</Suspense> : <main className="min-h-0 flex-1 overflow-y-auto bg-background bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] px-4 py-6 [background-size:16px_16px] sm:px-6 lg:py-8 dark:bg-[radial-gradient(rgba(245,245,244,.16)_1px,transparent_1px)]" onScroll={handleListScroll}>
                 <div className="mx-auto max-w-7xl">
                     <div className="text-center">
                         {isWorkbench && <Button className="float-right" onClick={() => setEditing({})}>New prompt</Button>}

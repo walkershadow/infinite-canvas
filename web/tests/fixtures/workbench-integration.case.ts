@@ -584,3 +584,21 @@ test("ali reference contracts preserve owned media, frame roles and multimodal m
         expect(requests).toHaveLength(before);
     } finally { globalThis.setTimeout = originalTimer; }
 });
+
+test("protected public library images remain authenticated paths during persistence and generation", async () => {
+    const { workbenchReference, durableDocument } = await import("@/services/workbench/projects");
+    const urls = ["face", "pose", "outfit"].map(id => `/api/canvas/public-library/${id}/content`);
+    const before = requests.length;
+    const { hydrateNodeGenerationContext } = await import("@/components/canvas/canvas-node-generation");
+    const context = await hydrateNodeGenerationContext({ prompt: "Keep case order", referenceImages: urls.map((dataUrl, i) => ({ id: String(i), dataUrl, name: String(i), type: "image/png" })), referenceVideos: [], referenceAudios: [], imageCount: 3, textCount: 0, videoCount: 0, audioCount: 0 });
+    expect(context.referenceImages.map(ref => ref.dataUrl)).toEqual(urls);
+    expect(await Promise.all(context.referenceImages.map(workbenchReference))).toEqual(urls);
+    expect(await Promise.all(urls.map(url => workbenchReference({ url })))).toEqual(urls);
+    expect(await durableDocument({ references: urls.map(url => ({ image: { url, width: 800, height: 1200 } })) })).toEqual({ references: urls.map(url => ({ image: { url, width: 800, height: 1200 } })) });
+    expect(requests.length).toBe(before);
+    const { resolveWorkflowImages } = await import("@/services/workflow-images");
+    const document: any = { schemaVersion: 1, language: "en", source: { id: "public-test", title: "Test", summary: "Test", category: "Test", contentKind: "template", tags: [], steps: [], sources: [], referenceMedia: [], outputMedia: [] }, stages: [], references: urls.map((url, i) => ({ id: String(i), title: "Input", role: "Test", kind: "image", required: true, stageIds: [], image: { url, width: 800, height: 1200 } })) };
+    const restored = await resolveWorkflowImages(document, true);
+    expect(restored.references.map(ref => ref.image)).toEqual(document.references.map((ref: any) => ref.image));
+    expect(requests.length).toBe(before);
+});
