@@ -4,6 +4,9 @@ import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 
+import { rawOverseasPromptCatalog } from "./src/services/api/overseas-prompt-catalog";
+import { validateCatalogMediaMap, type CatalogMediaMap } from "./src/lib/catalog-media";
+
 import { parseChangelog } from "./src/lib/release";
 
 const webDir = dirname(fileURLToPath(import.meta.url));
@@ -38,9 +41,20 @@ function localPluginsManifest(base: string): Plugin {
     };
 }
 
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
     const env = { ...loadEnv(mode, webDir, ""), ...process.env };
     const overseas = env.VITE_APP_MODE === "overseas";
+    let catalogMediaMap: CatalogMediaMap | null = null;
+    if (overseas) {
+        if (env.CATALOG_MEDIA_MAP_FILE) {
+            catalogMediaMap = JSON.parse(readFileSync(resolve(webDir, env.CATALOG_MEDIA_MAP_FILE), "utf8"));
+            validateCatalogMediaMap(rawOverseasPromptCatalog, catalogMediaMap!);
+        } else if (command === "build") {
+            throw new Error("Overseas builds require CATALOG_MEDIA_MAP_FILE. See docs/catalog-media-storage.md.");
+        } else {
+            catalogMediaMap = { version: 1, allowedOrigins: [], media: {} };
+        }
+    }
     const base = overseas ? "/canvas/" : env.VITE_BASE || "/";
     return {
         base,
@@ -58,6 +72,7 @@ export default defineConfig(({ mode }) => {
             },
         },
         define: {
+            __CATALOG_MEDIA_MAP__: JSON.stringify(catalogMediaMap),
             __APP_VERSION__: JSON.stringify(localVersion),
             __APP_RELEASES__: JSON.stringify(parseChangelog(localChangelog)),
         },

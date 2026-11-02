@@ -31,9 +31,9 @@ export default function OverseasCatalog({ contentKind }: { contentKind: Overseas
             <div className="my-5 grid gap-4 sm:grid-cols-3">{([{ label: text("Category"), value: category, options: categories, change: setCategory }, { label: text("Source"), value: source, options: sources, change: setSource }, { label: text("Tag"), value: tag, options: tags, change: setTag }]).map((filter) => <div key={filter.label}><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">{filter.label}</p><div className="flex flex-wrap gap-1.5">{["", ...filter.options].map((option) => <Tag.CheckableTag key={option} checked={filter.value === option} onChange={() => filter.change(option)}>{option ? text(option) : filter.label === text("Category") ? text("All categories") : filter.label === text("Source") ? text("All sources") : text("All tags")}</Tag.CheckableTag>)}</div></div>)}</div>
             <p className="mb-4 text-xs text-muted-foreground">{items.length} {text(contentKind === "template" ? "Workflow templates" : "Case studies")}</p>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{items.map((entry) => {
-                const cover = entry.outputMedia.find((media) => media.kind === "image")?.url || entry.outputMedia.find((media) => media.poster)?.poster || entry.referenceMedia.find((media) => media.kind === "image")?.url;
+                const cover = entry.outputMedia.find((media) => !media.unavailable && media.kind === "image")?.url || entry.outputMedia.find((media) => !media.unavailable && media.poster)?.poster || entry.referenceMedia.find((media) => !media.unavailable && media.kind === "image")?.url;
                 return <button key={entry.id} type="button" onClick={() => openEntry(entry)} className="group flex min-w-0 cursor-pointer flex-col overflow-hidden rounded-xl border border-border bg-background text-left transition-colors hover:bg-muted/30">
-                    {cover ? <img src={cover} alt={catalogTitle(entry, language)} loading="lazy" className="aspect-video w-full object-cover" /> : <div className="grid aspect-video w-full place-items-center bg-muted/30"><Clapperboard className="size-9 text-muted-foreground" /></div>}
+                    <CatalogCover key={cover || entry.id} url={cover} title={catalogTitle(entry, language)} unavailable={entry.outputMedia.some(media => media.unavailable)} />
                     <div className="flex flex-1 flex-col p-5"><span className="text-xs text-muted-foreground">{text(entry.category)} · {entry.contentKind === "case" ? text(entry.sourceCompleteness === "complete" ? "Full case prompts" : "Partial source · verified steps only") : text("Planning template")}</span>{entry.availabilityNote && <span className="mt-1 text-xs">{text("Source limitation · see details")}</span>}<h2 className="mt-2 text-base font-semibold">{catalogTitle(entry, language)}</h2><p className="mt-2 line-clamp-3 text-sm leading-6 text-muted-foreground">{catalogSummary(entry, language)}</p><div className="my-4 flex flex-wrap gap-1">{entry.tags.map((tag) => <Tag key={tag}>{text(tag)}</Tag>)}</div><span className="mt-auto flex items-center justify-between text-xs"><span>{entry.sourceModel ? `${text("Source model")}: ${text(entry.sourceModel)}` : text("Editable workflow")}</span><ArrowUpRight className="size-4 shrink-0" /></span></div>
                 </button>;
             })}</div>
@@ -42,4 +42,11 @@ export default function OverseasCatalog({ contentKind }: { contentKind: Overseas
         </div>
         {selected && <CatalogDetailDialog key={selected.id} entry={selected} related={overseasPromptCatalog.filter((entry) => selected.relatedIds?.includes(entry.id))} onOpenRelated={openEntry} onClose={closeEntry} />}
     </main>;
+}
+
+function CatalogCover({ url, title, unavailable }: { url?: string; title: string; unavailable: boolean }) {
+    const [failed, setFailed] = useState(false);
+    const { text } = useWorkflowLocale();
+    return url && !failed ? <img src={url} alt={title} loading="lazy" onError={() => setFailed(true)} className="aspect-video w-full object-cover" />
+        : <div className="grid aspect-video w-full place-items-center bg-muted/30">{failed || unavailable ? <span className="text-xs text-muted-foreground">{text("Media unavailable")}</span> : <Clapperboard className="size-9 text-muted-foreground" />}</div>;
 }

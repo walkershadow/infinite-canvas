@@ -1,5 +1,5 @@
 import type { WorkflowImage, WorkflowReference } from "./workflow";
-export type CatalogMedia = { kind: "image" | "video"; url: string; caption: string; localPath?: string; poster?: string };
+export type CatalogMedia = { kind: "image" | "video"; url: string; caption: string; localPath?: string; poster?: string; originalUrl?: string; originalPoster?: string; unavailable?: boolean };
 export type OverseasPromptEntry = {
     id: string;
     contentKind: "template" | "case";

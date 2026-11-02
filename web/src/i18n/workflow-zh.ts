@@ -1,4 +1,5 @@
 export default {
+    "Media unavailable": "媒体暂不可用",
     "Source limitation · see details": "来源尚有缺项 · 查看详情",
     "Seedance (archived source)": "Seedance（归档来源）",
     "Original reference images were not found in the published source. You can use your own images: save to Assets, open in Canvas, and upload an image into each required reference node before generating. Original attachments can be added later.": "原始来源未提供参考图，可使用自己的图片：保存到 Assets 后在画布打开，向各个必需参考节点上传图片即可继续生成。作者原图可在后续补充。",

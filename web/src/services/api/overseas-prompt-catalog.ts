@@ -1,3 +1,4 @@
+import { mapCatalogMedia } from "../../lib/catalog-media";
 import templates from "./overseas-workflow-templates.json";
 import expandedCases from "./overseas-expanded-cases.json";
 import type { OverseasPromptEntry } from "@/types/prompt-catalog";
@@ -489,4 +490,7 @@ const seedCatalog: OverseasPromptEntry[] = [
   }
 ];
 
-export const overseasPromptCatalog: OverseasPromptEntry[] = [...templates as OverseasPromptEntry[], ...seedCatalog.filter(entry => entry.contentKind === "case"), ...expandedCases as OverseasPromptEntry[]];
+export const rawOverseasPromptCatalog: OverseasPromptEntry[] = [...templates as OverseasPromptEntry[], ...seedCatalog.filter(entry => entry.contentKind === "case"), ...expandedCases as OverseasPromptEntry[]];
+
+export const overseasPromptCatalog = typeof __CATALOG_MEDIA_MAP__ !== "undefined" && __CATALOG_MEDIA_MAP__
+    ? mapCatalogMedia(rawOverseasPromptCatalog, __CATALOG_MEDIA_MAP__) : rawOverseasPromptCatalog;

@@ -12,3 +12,5 @@ interface ImportMetaEnv {
     // Baidu Analytics site ID
     readonly VITE_ANALYTICS_BAIDU_ID?: string;
 }
+
+declare const __CATALOG_MEDIA_MAP__: import("./lib/catalog-media").CatalogMediaMap | null;

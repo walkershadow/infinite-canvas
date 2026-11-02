@@ -1,0 +1,2960 @@
+{
+  "version": 1,
+  "media": [
+    {
+      "key": "web/public/case-references/meilin-character.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HINXRi_W0AAdKMV?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/meilin-character.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:real-case-06-aimikoda",
+          "role": "referenceMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2054460932068200517",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-06-aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054460996119314453",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054461166022214117",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Character sheet and author permission",
+              "url": "https://x.com/aimikoda/status/2054582032454295963",
+              "author": "@aimikoda",
+              "license": "Author permits personal and commercial use"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:real-case-06-aimikoda",
+          "role": "referenceInputs[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2054460932068200517",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-06-aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054460996119314453",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054461166022214117",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Character sheet and author permission",
+              "url": "https://x.com/aimikoda/status/2054582032454295963",
+              "author": "@aimikoda",
+              "license": "Author permits personal and commercial use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/meilin-storyboard.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HILpYZZWwAA41ul?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/meilin-storyboard.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:real-case-06-aimikoda",
+          "role": "referenceMedia[1]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2054460932068200517",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-06-aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054460996119314453",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054461166022214117",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Character sheet and author permission",
+              "url": "https://x.com/aimikoda/status/2054582032454295963",
+              "author": "@aimikoda",
+              "license": "Author permits personal and commercial use"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:real-case-06-aimikoda",
+          "role": "steps[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2054460932068200517",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-06-aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054460996119314453",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054461166022214117",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Character sheet and author permission",
+              "url": "https://x.com/aimikoda/status/2054582032454295963",
+              "author": "@aimikoda",
+              "license": "Author permits personal and commercial use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://goodcase.ai/media/goodcase/aimikoda-2054460932068200517-01.mp4",
+      "kind": "video",
+      "urls": [
+        "https://goodcase.ai/media/goodcase/aimikoda-2054460932068200517-01.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:real-case-06-aimikoda",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2054460932068200517",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-06-aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054460996119314453",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054461166022214117",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Character sheet and author permission",
+              "url": "https://x.com/aimikoda/status/2054582032454295963",
+              "author": "@aimikoda",
+              "license": "Author permits personal and commercial use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://goodcase.ai/media/goodcase/aimikoda-2054460932068200517-01.jpg",
+      "kind": "image",
+      "urls": [
+        "https://goodcase.ai/media/goodcase/aimikoda-2054460932068200517-01.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:real-case-06-aimikoda",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2054460932068200517",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-06-aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054460996119314453",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2054461166022214117",
+              "author": "@aimikoda",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Character sheet and author permission",
+              "url": "https://x.com/aimikoda/status/2054582032454295963",
+              "author": "@aimikoda",
+              "license": "Author permits personal and commercial use"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/croissant-storyboard.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HH-U_z7XkAAUii6?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/croissant-storyboard.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:real-case-07-techiebysa",
+          "role": "referenceMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@TechieBySA",
+              "url": "https://x.com/TechieBySA/status/2053523775702925768",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-07-techiebysa"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523784481554759",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523788336087071",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:real-case-07-techiebysa",
+          "role": "steps[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@TechieBySA",
+              "url": "https://x.com/TechieBySA/status/2053523775702925768",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-07-techiebysa"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523784481554759",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523788336087071",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/real-case-07-techiebysa.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/real-case-07-techiebysa.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:real-case-07-techiebysa",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@TechieBySA",
+              "url": "https://x.com/TechieBySA/status/2053523775702925768",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-07-techiebysa"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523784481554759",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523788336087071",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/real-case-07-techiebysa.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/real-case-07-techiebysa.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:real-case-07-techiebysa",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@TechieBySA",
+              "url": "https://x.com/TechieBySA/status/2053523775702925768",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/real-case-07-techiebysa"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Image prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523784481554759",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Video prompt · original reply",
+              "url": "https://x.com/TechieBySA/status/2053523788336087071",
+              "author": "@TechieBySA",
+              "license": "Full prompt use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/apartment-character.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HOuLu5obgAABQ-y?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/apartment-character.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "referenceMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "referenceInputs[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/apartment-environment.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HOuLtcSbIAAZ6QE?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/apartment-environment.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "referenceMedia[1]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "referenceInputs[1].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/apartment-overview.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HOuLl9gaoAAMsgk?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/apartment-overview.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "referenceMedia[2]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "referenceInputs[2].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/apartment-arrival-storyboard-animation.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/apartment-arrival-storyboard-animation.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/apartment-arrival-storyboard-animation.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/apartment-arrival-storyboard-animation.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:apartment-arrival-storyboard-animation",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083912532692001128",
+              "license": "Full prompt use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record",
+              "url": "https://goodcase.ai/cases/apartment-arrival-storyboard-animation"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            },
+            {
+              "role": "original",
+              "label": "Original storyboard prompts and overview",
+              "url": "https://x.com/Just_sharon7/status/2083912751647498379",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original character and apartment sheets",
+              "url": "https://x.com/Just_sharon7/status/2083912931419582465",
+              "author": "@Just_sharon7",
+              "license": "Use authorized by the user"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/a7b8f489f870.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/a7b8f489f870.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-prompt-the-dragon-and-the-roasted-turkey-78a39f6877d8",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Alishba_Ai",
+              "url": "https://x.com/Arzoo12sh/status/2113215535706198293",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Alishba_Ai/status/2113215539057439151",
+              "author": "@Alishba_Ai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-prompt-the-dragon-and-the-roasted-turkey-78a39f6877d8"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/a90b03a3a757.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/a90b03a3a757.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-prompt-the-dragon-and-the-roasted-turkey-78a39f6877d8",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Alishba_Ai",
+              "url": "https://x.com/Arzoo12sh/status/2113215535706198293",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Alishba_Ai/status/2113215539057439151",
+              "author": "@Alishba_Ai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-prompt-the-dragon-and-the-roasted-turkey-78a39f6877d8"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/36f22cca79c0.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/36f22cca79c0.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-create-a-cinematic-photorealistic-30-second-vertical-video-using-the-provided-9668ab5250ad",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@sophiaparkerr_",
+              "url": "https://x.com/sophiaparkerr_/status/2107096810783461509",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-create-a-cinematic-photorealistic-30-second-vertical-video-using-the-provided-9668ab5250ad"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/ae2aea3e33c4.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/ae2aea3e33c4.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-create-a-cinematic-photorealistic-30-second-vertical-video-using-the-provided-9668ab5250ad",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@sophiaparkerr_",
+              "url": "https://x.com/sophiaparkerr_/status/2107096810783461509",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-create-a-cinematic-photorealistic-30-second-vertical-video-using-the-provided-9668ab5250ad"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/seedance-25-minidv-coffee-asmr-vlog.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/seedance-25-minidv-coffee-asmr-vlog.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-25-minidv-coffee-asmr-vlog",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Strength04_X",
+              "url": "https://x.com/Strength04_X/status/2083094742682787939",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-25-minidv-coffee-asmr-vlog"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/seedance-25-minidv-coffee-asmr-vlog.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/seedance-25-minidv-coffee-asmr-vlog.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-25-minidv-coffee-asmr-vlog",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Strength04_X",
+              "url": "https://x.com/Strength04_X/status/2083094742682787939",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-25-minidv-coffee-asmr-vlog"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/seedance-2-5-gopro-94a73eef1dbf.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/seedance-2-5-gopro-94a73eef1dbf.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-gopro-94a73eef1dbf",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2087189194720657649",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-gopro-94a73eef1dbf"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/seedance-2-5-gopro-94a73eef1dbf.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/seedance-2-5-gopro-94a73eef1dbf.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-gopro-94a73eef1dbf",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2087189194720657649",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-gopro-94a73eef1dbf"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/vlog-c8171f712492.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/vlog-c8171f712492.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:vlog-c8171f712492",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@AIwithkhan",
+              "url": "https://x.com/AIwithkhan/status/2092971211169100048",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/vlog-c8171f712492"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/vlog-c8171f712492.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/vlog-c8171f712492.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:vlog-c8171f712492",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@AIwithkhan",
+              "url": "https://x.com/AIwithkhan/status/2092971211169100048",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/vlog-c8171f712492"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/d6d6d722a55c.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/d6d6d722a55c.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-grandma-is-out-here-for-the-shopping-with-her-pet-sparrow-d6d07e610943",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2103503970815930610",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-grandma-is-out-here-for-the-shopping-with-her-pet-sparrow-d6d07e610943"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/8162eeaeac45.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/8162eeaeac45.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-grandma-is-out-here-for-the-shopping-with-her-pet-sparrow-d6d07e610943",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2103503970815930610",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-grandma-is-out-here-for-the-shopping-with-her-pet-sparrow-d6d07e610943"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/ugc-character.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HROSz7kbYAAX4zU?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/ugc-character.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:ugc-15-1aec9fd3f3c1",
+          "role": "referenceMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2095179656802844727",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original product reference",
+              "url": "https://x.com/abxxai/status/2095179694476050600",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Character image prompt and portrait",
+              "url": "https://x.com/abxxai/status/2095179678214725989",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/abxxai/status/2095179707767767109",
+              "author": "@abxxai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:ugc-15-1aec9fd3f3c1",
+          "role": "steps[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2095179656802844727",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original product reference",
+              "url": "https://x.com/abxxai/status/2095179694476050600",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Character image prompt and portrait",
+              "url": "https://x.com/abxxai/status/2095179678214725989",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/abxxai/status/2095179707767767109",
+              "author": "@abxxai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:ugc-15-1aec9fd3f3c1",
+          "role": "referenceInputs[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2095179656802844727",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original product reference",
+              "url": "https://x.com/abxxai/status/2095179694476050600",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Character image prompt and portrait",
+              "url": "https://x.com/abxxai/status/2095179678214725989",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/abxxai/status/2095179707767767109",
+              "author": "@abxxai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/ugc-product.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HROS1EuawAAMRh4?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/ugc-product.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:ugc-15-1aec9fd3f3c1",
+          "role": "referenceMedia[1]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2095179656802844727",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original product reference",
+              "url": "https://x.com/abxxai/status/2095179694476050600",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Character image prompt and portrait",
+              "url": "https://x.com/abxxai/status/2095179678214725989",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/abxxai/status/2095179707767767109",
+              "author": "@abxxai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:ugc-15-1aec9fd3f3c1",
+          "role": "referenceInputs[1].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2095179656802844727",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original product reference",
+              "url": "https://x.com/abxxai/status/2095179694476050600",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Character image prompt and portrait",
+              "url": "https://x.com/abxxai/status/2095179678214725989",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/abxxai/status/2095179707767767109",
+              "author": "@abxxai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/ca821d486c65.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/ca821d486c65.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:ugc-15-1aec9fd3f3c1",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2095179656802844727",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original product reference",
+              "url": "https://x.com/abxxai/status/2095179694476050600",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Character image prompt and portrait",
+              "url": "https://x.com/abxxai/status/2095179678214725989",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/abxxai/status/2095179707767767109",
+              "author": "@abxxai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/c28b3bfa6a04.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/c28b3bfa6a04.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:ugc-15-1aec9fd3f3c1",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@abxxai",
+              "url": "https://x.com/abxxai/status/2095179656802844727",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Original product reference",
+              "url": "https://x.com/abxxai/status/2095179694476050600",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Character image prompt and portrait",
+              "url": "https://x.com/abxxai/status/2095179678214725989",
+              "author": "@abxxai"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/abxxai/status/2095179707767767109",
+              "author": "@abxxai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/ugc-15-1aec9fd3f3c1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/c239065ae53a.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/c239065ae53a.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:juliaevee-seedance-ai-ae713e2e2dbc",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@juliaevee",
+              "url": "https://x.com/juliaevee/status/2092783528887083290",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/juliaevee-seedance-ai-ae713e2e2dbc"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/cde7c7488c1e.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/cde7c7488c1e.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:juliaevee-seedance-ai-ae713e2e2dbc",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@juliaevee",
+              "url": "https://x.com/juliaevee/status/2092783528887083290",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/juliaevee-seedance-ai-ae713e2e2dbc"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/yesandyou-seedance-ai-2a9dc20c947d.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/yesandyou-seedance-ai-2a9dc20c947d.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:yesandyou-seedance-ai-2a9dc20c947d",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Yesandyou_",
+              "url": "https://x.com/Yesandyou_/status/2090075447195480403",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/yesandyou-seedance-ai-2a9dc20c947d"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/yesandyou-seedance-ai-2a9dc20c947d.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/yesandyou-seedance-ai-2a9dc20c947d.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:yesandyou-seedance-ai-2a9dc20c947d",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Yesandyou_",
+              "url": "https://x.com/Yesandyou_/status/2090075447195480403",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/yesandyou-seedance-ai-2a9dc20c947d"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/2792b7b678a6.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/2792b7b678a6.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-i-came-like-a-storm-d30f955b4248",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@AIwithkhan",
+              "url": "https://x.com/AIwithkhan/status/2099707375943066094",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-i-came-like-a-storm-d30f955b4248"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/8ca97a85493c.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/8ca97a85493c.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-i-came-like-a-storm-d30f955b4248",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@AIwithkhan",
+              "url": "https://x.com/AIwithkhan/status/2099707375943066094",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-i-came-like-a-storm-d30f955b4248"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/52ed4ff0dd97.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/52ed4ff0dd97.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-create-a-30-second-fast-paced-cinematic-japanese-anime-cooking-video-showing-th-236ad940a8f1",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Goodmanprotocol",
+              "url": "https://x.com/Goodmanprotocol/status/2098845134326808734",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-create-a-30-second-fast-paced-cinematic-japanese-anime-cooking-video-showing-th-236ad940a8f1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/785fe38465cc.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/785fe38465cc.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-create-a-30-second-fast-paced-cinematic-japanese-anime-cooking-video-showing-th-236ad940a8f1",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Goodmanprotocol",
+              "url": "https://x.com/Goodmanprotocol/status/2098845134326808734",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-create-a-30-second-fast-paced-cinematic-japanese-anime-cooking-video-showing-th-236ad940a8f1"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/5ce15bf8a0ca.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/5ce15bf8a0ca.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-photorealistic-medieval-fantasy-film-8ed9c8bbccd4",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@ElsaSofia__AI",
+              "url": "https://x.com/ElsaSofia__AI/status/2113089111699673461",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/ElsaSofia__AI/status/2113089114585350168",
+              "author": "@ElsaSofia__AI"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-photorealistic-medieval-fantasy-film-8ed9c8bbccd4"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/d8c6515c3939.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/d8c6515c3939.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-photorealistic-medieval-fantasy-film-8ed9c8bbccd4",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@ElsaSofia__AI",
+              "url": "https://x.com/ElsaSofia__AI/status/2113089111699673461",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/ElsaSofia__AI/status/2113089114585350168",
+              "author": "@ElsaSofia__AI"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-photorealistic-medieval-fantasy-film-8ed9c8bbccd4"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/dragon-dungeon-sheet.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HVY6dWqaYAAtBuv?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/dragon-dungeon-sheet.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-long-detailed-prompt-66ee33ce05b6",
+          "role": "referenceMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Adnan_Ai2",
+              "url": "https://x.com/Adnan_Ai2/status/2113945930185732358",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Adnan_Ai2/status/2113945937370390650",
+              "author": "@Adnan_Ai2"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-long-detailed-prompt-66ee33ce05b6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:seedance-2-5-long-detailed-prompt-66ee33ce05b6",
+          "role": "referenceInputs[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Adnan_Ai2",
+              "url": "https://x.com/Adnan_Ai2/status/2113945930185732358",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Adnan_Ai2/status/2113945937370390650",
+              "author": "@Adnan_Ai2"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-long-detailed-prompt-66ee33ce05b6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/8cbcfeb03aeb.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/8cbcfeb03aeb.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-long-detailed-prompt-66ee33ce05b6",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Adnan_Ai2",
+              "url": "https://x.com/Adnan_Ai2/status/2113945930185732358",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Adnan_Ai2/status/2113945937370390650",
+              "author": "@Adnan_Ai2"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-long-detailed-prompt-66ee33ce05b6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/cda25299498a.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/cda25299498a.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-long-detailed-prompt-66ee33ce05b6",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Adnan_Ai2",
+              "url": "https://x.com/Adnan_Ai2/status/2113945930185732358",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Adnan_Ai2/status/2113945937370390650",
+              "author": "@Adnan_Ai2"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-long-detailed-prompt-66ee33ce05b6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/d8db56ed03b0.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/d8db56ed03b0.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-a-cinematic-30-second-tropical-travel-vlog-montage-featuring-a-beautiful-20-yea-6af38a792806",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@eshal__ai",
+              "url": "https://x.com/eshal__ai/status/2096840505355370629",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-a-cinematic-30-second-tropical-travel-vlog-montage-featuring-a-beautiful-20-yea-6af38a792806"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/39b33ab9f88e.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/39b33ab9f88e.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-a-cinematic-30-second-tropical-travel-vlog-montage-featuring-a-beautiful-20-yea-6af38a792806",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@eshal__ai",
+              "url": "https://x.com/eshal__ai/status/2096840505355370629",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-a-cinematic-30-second-tropical-travel-vlog-montage-featuring-a-beautiful-20-yea-6af38a792806"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/3611dc73a4c9.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/3611dc73a4c9.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-create-a-live-action-cinematic-revenge-comedy-video-set-in-a-seoul-subway-stati-ce9067a15dcc",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@AIwithSynthia",
+              "url": "https://x.com/AIwithSynthia/status/2108760866422415701",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-create-a-live-action-cinematic-revenge-comedy-video-set-in-a-seoul-subway-stati-ce9067a15dcc"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/e7a04f6d6d46.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/e7a04f6d6d46.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-create-a-live-action-cinematic-revenge-comedy-video-set-in-a-seoul-subway-stati-ce9067a15dcc",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@AIwithSynthia",
+              "url": "https://x.com/AIwithSynthia/status/2108760866422415701",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-create-a-live-action-cinematic-revenge-comedy-video-set-in-a-seoul-subway-stati-ce9067a15dcc"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/e364f1b8b354.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/e364f1b8b354.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-cinematic-sci-fi-horror-action-short-film-set-in-a-research-laboratory-opens-w-9661cd7bd95d",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@auqibhabib",
+              "url": "https://x.com/auqibhabib/status/2099725768310009982",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-cinematic-sci-fi-horror-action-short-film-set-in-a-research-laboratory-opens-w-9661cd7bd95d"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/5929c428cd08.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/5929c428cd08.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-cinematic-sci-fi-horror-action-short-film-set-in-a-research-laboratory-opens-w-9661cd7bd95d",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@auqibhabib",
+              "url": "https://x.com/auqibhabib/status/2099725768310009982",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-cinematic-sci-fi-horror-action-short-film-set-in-a-research-laboratory-opens-w-9661cd7bd95d"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/4ce232c0fbe6.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/4ce232c0fbe6.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-ai-cabf3749d5b6",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "木马人",
+              "url": "https://x.com/cnyzgkc/status/2099029556434985065",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/cnyzgkc/status/2099029559601688593",
+              "author": "木马人"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-ai-cabf3749d5b6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/f16c9f956a8d.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/f16c9f956a8d.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-ai-cabf3749d5b6",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "木马人",
+              "url": "https://x.com/cnyzgkc/status/2099029556434985065",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/cnyzgkc/status/2099029559601688593",
+              "author": "木马人"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-ai-cabf3749d5b6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "web/public/case-references/frame-break-blue.jpg",
+      "kind": "image",
+      "urls": [
+        "https://pbs.twimg.com/media/HTosmzyXYAAJj7M?format=jpg&name=orig"
+      ],
+      "repositoryPath": "web/public/case-references/frame-break-blue.jpg",
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4",
+          "role": "referenceMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2106044483863191748",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2106044848310452333",
+              "author": "@aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        },
+        {
+          "caseId": "seedance:seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4",
+          "role": "referenceInputs[0].image",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2106044483863191748",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2106044848310452333",
+              "author": "@aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/ed34358af895.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/ed34358af895.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2106044483863191748",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2106044848310452333",
+              "author": "@aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/4e5f9347c75d.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/4e5f9347c75d.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@aimikoda",
+              "url": "https://x.com/aimikoda/status/2106044483863191748",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/aimikoda/status/2106044848310452333",
+              "author": "@aimikoda"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-seedance-2-5-prompt-drop-7b233ffed1d4"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/erling-haaland-525acabe78da.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/erling-haaland-525acabe78da.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:erling-haaland-525acabe78da",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@noorwithwifi",
+              "url": "https://x.com/noorwithwifi/status/2079818537137475762",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/erling-haaland-525acabe78da"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/erling-haaland-525acabe78da.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/erling-haaland-525acabe78da.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:erling-haaland-525acabe78da",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@noorwithwifi",
+              "url": "https://x.com/noorwithwifi/status/2079818537137475762",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/erling-haaland-525acabe78da"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/a5c7b401dc7a.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/a5c7b401dc7a.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-made-with-seedance-2-5-73b10f69e32a",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Zarnab_with_Ai",
+              "url": "https://x.com/Zarnab_with_Ai/status/2104764823091490851",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-made-with-seedance-2-5-73b10f69e32a"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/88ca30c0568f.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/88ca30c0568f.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-made-with-seedance-2-5-73b10f69e32a",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Zarnab_with_Ai",
+              "url": "https://x.com/Zarnab_with_Ai/status/2104764823091490851",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-made-with-seedance-2-5-73b10f69e32a"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/8db33b2fe654.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/8db33b2fe654.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-prompt-video-178003b0959b",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Alina_with_Ai",
+              "url": "https://x.com/Alina_with_Ai/status/2113816556140675163",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Alina_with_Ai/status/2113816560486010958",
+              "author": "@Alina_with_Ai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-prompt-video-178003b0959b"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/57607a8a1552.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/57607a8a1552.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-prompt-video-178003b0959b",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Alina_with_Ai",
+              "url": "https://x.com/Alina_with_Ai/status/2113816556140675163",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "original",
+              "label": "Complete prompt · original reply",
+              "url": "https://x.com/Alina_with_Ai/status/2113816560486010958",
+              "author": "@Alina_with_Ai"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-prompt-video-178003b0959b"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/seedance-25-kpop-mv-dual-idol.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/seedance-25-kpop-mv-dual-idol.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-25-kpop-mv-dual-idol",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083422886686031982",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-25-kpop-mv-dual-idol"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/seedance-25-kpop-mv-dual-idol.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/seedance-25-kpop-mv-dual-idol.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-25-kpop-mv-dual-idol",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@Just_sharon7",
+              "url": "https://x.com/Just_sharon7/status/2083422886686031982",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-25-kpop-mv-dual-idol"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/seedance-25-diner-frozen-time-rewind.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/seedance-25-diner-frozen-time-rewind.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-25-diner-frozen-time-rewind",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@techhalla",
+              "url": "https://x.com/techhalla/status/2083389002552664385",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-25-diner-frozen-time-rewind"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/seedance-25-diner-frozen-time-rewind.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/seedance-25-diner-frozen-time-rewind.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-25-diner-frozen-time-rewind",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@techhalla",
+              "url": "https://x.com/techhalla/status/2083389002552664385",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-25-diner-frozen-time-rewind"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/750a092b1670.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/750a092b1670.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-cinematic-photorealistic-sci-fi-action-sequence-moody-desaturated-color-grade-edfd133b78ea",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@itsSaira_1",
+              "url": "https://x.com/itsSaira_1/status/2104064261005709551",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-cinematic-photorealistic-sci-fi-action-sequence-moody-desaturated-color-grade-edfd133b78ea"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/1917351d85cd.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/1917351d85cd.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-cinematic-photorealistic-sci-fi-action-sequence-moody-desaturated-color-grade-edfd133b78ea",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@itsSaira_1",
+              "url": "https://x.com/itsSaira_1/status/2104064261005709551",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-cinematic-photorealistic-sci-fi-action-sequence-moody-desaturated-color-grade-edfd133b78ea"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/ead498a1b98b.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/cases/ead498a1b98b.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-cinematic-dark-fantasy-battle-16-9-photoreal-shallow-depth-of-field-anamorp-a90377df74d6",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@itsSaira_1",
+              "url": "https://x.com/itsSaira_1/status/2107685928647160275",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-cinematic-dark-fantasy-battle-16-9-photoreal-shallow-depth-of-field-anamorp-a90377df74d6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/cases/4a7f9d53f8c5.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/cases/4a7f9d53f8c5.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-2-5-cinematic-dark-fantasy-battle-16-9-photoreal-shallow-depth-of-field-anamorp-a90377df74d6",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@itsSaira_1",
+              "url": "https://x.com/itsSaira_1/status/2107685928647160275",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-2-5-cinematic-dark-fantasy-battle-16-9-photoreal-shallow-depth-of-field-anamorp-a90377df74d6"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/video/seedance-269d1fc95820.mp4",
+      "kind": "video",
+      "urls": [
+        "https://media.goodcase.ai/media/video/seedance-269d1fc95820.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-269d1fc95820",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@johnAGI168",
+              "url": "https://x.com/johnAGI168/status/2095025524586193105",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-269d1fc95820"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://media.goodcase.ai/media/poster/seedance-269d1fc95820.jpg",
+      "kind": "image",
+      "urls": [
+        "https://media.goodcase.ai/media/poster/seedance-269d1fc95820.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "seedance:seedance-269d1fc95820",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "original",
+              "label": "Original post on X",
+              "author": "@johnAGI168",
+              "url": "https://x.com/johnAGI168/status/2095025524586193105",
+              "license": "Full prompt and original image use authorized by the user"
+            },
+            {
+              "role": "curation",
+              "label": "GoodCase · case record and translation",
+              "url": "https://goodcase.ai/cases/seedance-269d1fc95820"
+            },
+            {
+              "role": "curation",
+              "label": "Awesome Seedance · case index",
+              "url": "https://github.com/LearnPrompt/awesome-seedance/blob/main/data/cases.json"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
