@@ -63,6 +63,16 @@ test("folder deletion preserves assets; batch move, legacy local cache and ZIP r
     expect(legacy.folders).toEqual([]);
     store().importAssets(legacy.assets, legacy.folders);
     expect(store().assets[0].folderId).toBeUndefined();
+    const destination = store().addFolder("Import here");
+    const existingFolders = store().folders;
+    const originalPackage = JSON.stringify(imported);
+    const existingAssets = store().assets;
+    store().importAssets([...imported.assets, asset], imported.folders, destination);
+    expect(store().folders).toEqual(existingFolders);
+    expect(store().assets.slice(0, imported.assets.length + 1).every(a => a.folderId === destination)).toBe(true);
+    expect(store().assets.slice(imported.assets.length + 1)).toEqual(existingAssets);
+    expect(JSON.stringify(imported)).toBe(originalPackage);
+    expect(() => store().importAssets([asset], [], "deleted-folder")).toThrow("Folder not found");
     cache.set("infinite-canvas:asset_store", JSON.stringify({ state: { assets: [asset] }, version: 0 }));
     await useAssetStore.persist.rehydrate();
     expect(store().folders).toEqual([]);

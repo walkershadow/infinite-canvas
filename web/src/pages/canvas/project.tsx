@@ -1,3 +1,4 @@
+import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { ReferenceImagePicker } from "@/components/public-library/reference-image-picker";
 import { replaceReferenceImage } from "@/lib/canvas/replace-reference-image";
 import { resolveWorkflowImages } from "@/services/workflow-images";
@@ -244,6 +245,7 @@ function InfiniteCanvasPage() {
     const isAiConfigReady = useConfigStore((state) => state.isAiConfigReady);
     const openConfigDialog = useConfigStore((state) => state.openConfigDialog);
     const addAsset = useAssetStore((state) => state.addAsset);
+    const chooseDestination = useAssetDestination();
     const cleanupAssetImages = useAssetStore((state) => state.cleanupImages);
     const hydrated = useCanvasStore((state) => state.hydrated);
     const createProject = useCanvasStore((state) => state.createProject);
@@ -1938,16 +1940,18 @@ function InfiniteCanvasPage() {
 
     const saveNodeAsset = useCallback(
         async (node: CanvasNodeData) => {
+            const folderId = await chooseDestination();
+            if (folderId === null) return;
             if (node.type === CanvasNodeType.Text) {
                 const content = node.metadata?.content?.trim();
                 if (!content) return message.error(t("canvas.projectPage.noTextToSave"));
-                addAsset({ kind: "text", title: node.metadata?.prompt?.slice(0, 24) || t("canvas.projectPage.canvasText"), coverUrl: "", tags: [], source: "Canvas", data: { content }, metadata: { source: "canvas", nodeId: node.id } });
+                addAsset({ folderId: folderId || undefined, kind: "text", title: node.metadata?.prompt?.slice(0, 24) || t("canvas.projectPage.canvasText"), coverUrl: "", tags: [], source: "Canvas", data: { content }, metadata: { source: "canvas", nodeId: node.id } });
                 message.success(t("common.addedToAssets"));
                 return;
             }
             if (node.type === CanvasNodeType.Video) {
                 if (!node.metadata?.content) return message.error(t("canvas.projectPage.noVideoToSave"));
-                addAsset({
+                addAsset({ folderId: folderId || undefined,
                     kind: "video",
                     title: node.metadata?.prompt?.slice(0, 24) || t("canvas.projectPage.canvasVideo"),
                     coverUrl: "",
@@ -1961,7 +1965,7 @@ function InfiniteCanvasPage() {
             }
             if (!node.metadata?.content) return message.error(t("canvas.projectPage.noImageToSave"));
             const dataUrl = node.metadata.storageKey ? "" : node.metadata.content;
-            addAsset({
+            addAsset({ folderId: folderId || undefined,
                 kind: "image",
                 title: node.metadata?.prompt?.slice(0, 24) || t("canvas.projectPage.canvasImage"),
                 coverUrl: node.metadata.content,
@@ -1979,7 +1983,7 @@ function InfiniteCanvasPage() {
             });
             message.success(t("common.addedToAssets"));
         },
-        [addAsset, message, t],
+        [addAsset, chooseDestination, message, t],
     );
 
     const createImageReversePromptNodes = useCallback(

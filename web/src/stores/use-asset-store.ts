@@ -43,7 +43,7 @@ type AssetStore = {
     renameFolder: (id: string, title: string) => void;
     removeFolder: (id: string) => void;
     moveAssets: (ids: string[], folderId?: string) => void;
-    importAssets: (assets: Asset[], folders?: AssetFolder[]) => void;
+    importAssets: (assets: Asset[], folders?: AssetFolder[], destination?: string) => void;
     addAsset: (asset: Omit<Asset, "id" | "createdAt" | "updatedAt">) => string;
     updateAsset: (id: string, patch: Partial<Omit<Asset, "id" | "createdAt">>) => void;
     removeAsset: (id: string) => void;
@@ -123,13 +123,14 @@ export const useAssetStore = create<AssetStore>()(
                 const selected = new Set(ids), now = new Date().toISOString();
                 set(state => ({ assets: state.assets.map(asset => selected.has(asset.id) && asset.folderId !== folderId ? { ...asset, folderId, updatedAt: now } : asset) }));
             },
-            importAssets: (assets, folders = []) => {
+            importAssets: (assets, folders = [], destination) => {
                 validateAssetFolders(folders);
-                if (folders.length) requireFolderSupport();
+                if (folders.length || destination) requireFolderSupport();
+                if (destination && !get().folders.some(folder => folder.id === destination)) throw new Error("Folder not found");
                 const ids = new Map(folders.map(folder => [folder.id, nanoid()])), now = new Date().toISOString();
                 set(state => ({
-                    folders: [...state.folders, ...folders.map(folder => ({ ...folder, id: ids.get(folder.id)!, createdAt: now, updatedAt: now }))],
-                    assets: [...assets.map(asset => ({ ...asset, id: nanoid(), folderId: asset.folderId ? ids.get(asset.folderId) : undefined, createdAt: now, updatedAt: now })), ...state.assets],
+                    folders: [...state.folders, ...(destination ? [] : folders.map(folder => ({ ...folder, id: ids.get(folder.id)!, createdAt: now, updatedAt: now })))],
+                    assets: [...assets.map(asset => ({ ...asset, id: nanoid(), folderId: destination || (asset.folderId ? ids.get(asset.folderId) : undefined), createdAt: now, updatedAt: now })), ...state.assets],
                 }));
             },
             addAsset: (asset) => {

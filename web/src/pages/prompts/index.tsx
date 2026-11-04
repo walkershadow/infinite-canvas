@@ -1,3 +1,4 @@
+import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { canUsePublicLibrary } from "@/services/api/public-library";
 import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { useSearchParams } from "react-router-dom";
@@ -37,6 +38,7 @@ export default function PromptsPage() {
     const [selectedCategory, setSelectedCategory] = useState(ALL_PROMPTS_OPTION);
     const [selectedPrompt, setSelectedPrompt] = useState<Prompt | null>(null);
     const addAsset = useAssetStore((state) => state.addAsset);
+    const chooseDestination = useAssetDestination();
     const copyText = useCopyText();
     const { query, items: promptItems, tags: promptTags, categories: promptCategoryOptions, total: totalPrompts } = usePromptList({ keyword: titleKeyword, tags: selectedTags, category: selectedCategory, enabled: library === "prompts" });
 
@@ -59,8 +61,10 @@ export default function PromptsPage() {
         setSelectedTags((items) => (items.includes(tag) ? items.filter((item) => item !== tag) : [...items, tag]));
     };
 
-    const savePromptAsset = (item: Prompt) => {
-        addAsset({ kind: "text", title: item.title, coverUrl: item.coverUrl, tags: item.tags, source: item.category, data: { content: item.prompt }, metadata: { source: "prompt-library", promptId: item.id, githubUrl: item.githubUrl } });
+    const savePromptAsset = async (item: Prompt) => {
+        const folderId = await chooseDestination();
+        if (folderId === null) return;
+        addAsset({ folderId: folderId || undefined, kind: "text", title: item.title, coverUrl: item.coverUrl, tags: item.tags, source: item.category, data: { content: item.prompt }, metadata: { source: "prompt-library", promptId: item.id, githubUrl: item.githubUrl } });
         message.success(t("common.addedToAssets"));
     };
 

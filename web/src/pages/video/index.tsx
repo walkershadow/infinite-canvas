@@ -1,3 +1,4 @@
+import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { ensureAssetVideoCover } from "@/services/asset-video-cover";
 import { canResumePlatformVideo, pollVideoTaskWindow } from "./poll-video-task";
 import { workbenchVideoEstimateText, workbenchVideoInput, workbenchVideoSelection } from "@/services/workbench/video";
@@ -92,6 +93,7 @@ export default function VideoPage() {
     const isAiConfigReady = useConfigStore((state) => state.isAiConfigReady);
     const openConfigDialog = useConfigStore((state) => state.openConfigDialog);
     const addAsset = useAssetStore((state) => state.addAsset);
+    const chooseDestination = useAssetDestination();
     const [prompt, setPrompt] = useState("");
     const [references, setReferences] = useState<ReferenceImage[]>([]);
     const [results, setResults] = useState<GenerationResult[]>([]);
@@ -301,8 +303,11 @@ export default function VideoPage() {
         saveAs(video.url, "video.mp4");
     };
 
-    const saveResultToAssets = (video: GeneratedVideo) => {
+    const saveResultToAssets = async (video: GeneratedVideo) => {
+        const folderId = await chooseDestination();
+        if (folderId === null) return;
         const id = addAsset({
+            folderId: folderId || undefined,
             kind: "video",
             title: t("videoWorkbench.resultTitle"),
             coverUrl: "",

@@ -1,3 +1,4 @@
+import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { acknowledgeAiTask, isWorkbenchTaskPending, WorkbenchTaskPendingError } from "@/services/api/workbench-ai-tasks";
 import { isWorkbenchModel } from "@/stores/use-config-store";
 import { isWorkbench } from "@/constant/integration";
@@ -91,6 +92,7 @@ export default function ImagePage() {
     const isAiConfigReady = useConfigStore((state) => state.isAiConfigReady);
     const openConfigDialog = useConfigStore((state) => state.openConfigDialog);
     const addAsset = useAssetStore((state) => state.addAsset);
+    const chooseDestination = useAssetDestination();
     const [prompt, setPrompt] = useState("");
     const [references, setReferences] = useState<ReferenceImage[]>([]);
     const [results, setResults] = useState<GenerationResult[]>([]);
@@ -254,8 +256,11 @@ export default function ImagePage() {
     };
 
     const saveResultToAssets = async (image: GeneratedImage, index: number) => {
+        const folderId = await chooseDestination();
+        if (folderId === null) return;
         const stored = await uploadImage(image.dataUrl);
         addAsset({
+            folderId: folderId || undefined,
             kind: "image",
             title: t("imageWorkbench.resultTitle", { count: index + 1 }),
             coverUrl: stored.url,

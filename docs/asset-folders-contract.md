@@ -43,3 +43,24 @@ VITE_APP_MODE=overseas CATALOG_MEDIA_MAP_FILE=/tmp/catalog-qiniu-map.json bun ru
 目录对应压缩包为 `/tmp/infinite-canvas-asset-folders-domestic.tar.gz`、`/tmp/infinite-canvas-asset-folders-overseas.tar.gz`，解压即静态站根目录，部署在 `/canvas/`。生产构建的 config.js 外置和大 chunk 提示沿用现有配置，不影响构建完成。
 
 验证：类型检查通过；`bun test --cwd web tests/asset-folders.test.ts tests/workbench-integration.test.ts tests/workbench-modes.test.ts` 通过，覆盖文件夹四种模式共 123 断言、Workbench 集成 21 项／207 断言及三模式检查。浏览器连接本机内存 API 夹具，验证创建、重命名、12 项资产跨页批量归类、刷新后恢复及文件夹与搜索组合筛选，页面显示 Documents saved；截图 `/tmp/asset-folders-verified.png`。这是前端及夹具验证，不代表真实双端浏览器验收；真实账号跨设备、移动端、画布选择器交互和发布验证由接入会话继续完成。删除保留资产、旧数据及 ZIP 和冲突恢复由定向测试覆盖。
+
+## 卡片目录与统一保存入口
+
+我的资产根目录显示文件夹卡片（图标、资产数及标题预览）和未归类资产；新建文件夹后留在根目录显示新卡片，点击卡片进入，面包屑返回根目录。卡片更多菜单提供改名和删除。全部资产检索是独立入口，不再使用下拉框浏览目录；移动目标与素材选择器仍可用紧凑下拉。
+
+文件夹内新增素材默认归当前文件夹。导入 ZIP 前说明归类规则：在文件夹内导入，所有新资产副本归入当前目录，不创建包内文件夹或嵌套；在根目录导入，保留包内文件夹及空文件夹并重新映射 ID。原 ZIP、已有目录和资产不修改；如需保留空目录必须从根目录导入。
+
+统一目标选择覆盖以下 UI 入口，默认根目录，集成模式先完成云端 library 初始化；加载失败或取消不新增资产、不开始输入媒体上传：
+
+- 提示词库列表及详情中的普通提示词。
+- 提示词来源内容弹窗的列表与详情。
+- 完整模板、案例及公共库 workflow 的直接保存和编辑器新副本保存；始终整体保存。
+- 图片／视频 Studio 成功结果。
+- 画布文本、图片、视频节点保存。
+- 画布侧栏图片／视频上传（本批次共用一个目标）。
+
+已有 workflow 的“保存修改”保留原目录；“创建画布副本”仅创建画布，不暗中保存到 My Assets。相同 workflow 仅在相同目标目录去重，保存到其他目录创建独立完整副本。Agent 程序化添加仍默认根目录，不弹交互窗口。
+
+本轮不改变 libraryVersion=2、单层 folder 文档、revision、删除保留资产或计费协议。交付清单写入 `/tmp/asset-grid-delivery.json`；构建目录和压缩包使用 `/tmp/infinite-canvas-asset-grid-domestic`、`/tmp/infinite-canvas-asset-grid-overseas` 及对应 `.tar.gz`，使用同一七牛媒体映射。
+
+本轮验证：23 项外层定向回归及隔离子进程通过，覆盖四模式目录、目标默认值／取消／失效／云端加载失败、各 UI 入口接入和 workflow 往返；类型检查和双端构建通过。浏览器本机夹具验证新卡片展示、进入目录新增、普通提示词及 workflow 取消无新增、整体 workflow 保存到指定目录及 390px 中文卡片布局。ZIP 浏览器上传受扩展文件网址权限阻挡（审批后复试仍返回权限未开启），未改该设置；ZIP 归类与空目录保留由自动测试验证。真实生成结果及跨账号发布验收由双端接入会话完成。

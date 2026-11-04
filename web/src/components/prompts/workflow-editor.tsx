@@ -1,3 +1,4 @@
+import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { isOverseas } from "@/constant/integration";
 import { ReferenceImagePicker } from "@/components/public-library/reference-image-picker";
 import { resolveCatalogWorkflowMedia } from "@/services/api/overseas-prompt-catalog";
@@ -26,21 +27,23 @@ export function WorkflowActions({ document }: { document: WorkflowDocument }) {
     const saving = useRef(false);
     const [busy, setBusy] = useState(false);
     const { message } = App.useApp();
-    const assets = useAssetStore(s => s.assets);
-    const exists = assets.some(a => a.kind === "workflow" && workflowIdentity(a.data) === workflowIdentity(document));
+    const chooseDestination = useAssetDestination();
     const save = async () => {
         if (saving.current) return;
         saving.current = true; setBusy(true);
         try {
             await initializeCloudLibrary();
-            if (!useAssetStore.getState().assets.some(a => a.kind === "workflow" && workflowIdentity(a.data) === workflowIdentity(document))) useAssetStore.getState().addAsset(workflowAsset(await resolveWorkflowImages(document, true)));
+            const folderId = await chooseDestination();
+            if (folderId === null) return;
+            if (useAssetStore.getState().assets.some(a => a.kind === "workflow" && (a.folderId || "") === folderId && workflowIdentity(a.data) === workflowIdentity(document))) { message.info(text("Saved to My Assets")); return; }
+            useAssetStore.getState().addAsset({ ...workflowAsset(await resolveWorkflowImages(document, true)), folderId: folderId || undefined });
             await saveCloudLibrary();
             message.success(text("Entire workflow saved to My Assets."));
         } catch (error) { message.error(error instanceof Error ? text(error.message) : text("Unable to save workflow. Local edits are preserved.")); }
         finally { saving.current = false; setBusy(false); }
     };
     return <div className="my-4 flex flex-wrap gap-2">
-        <Button disabled={exists || busy} loading={busy} onClick={() => void save()}>{exists ? text("Saved to My Assets") : text("Save to My Assets")}</Button>
+        <Button disabled={busy} loading={busy} onClick={() => void save()}>{text("Save to My Assets")}</Button>
         <Button type="primary" onClick={() => setEditing(true)}>{text("Edit in Canvas")}</Button>
         {editing && <WorkflowEditor document={document} onClose={() => setEditing(false)} />}
     </div>;
@@ -54,12 +57,15 @@ export function WorkflowEditor({ document, asset, onClose }: { document: Workflo
     const saving = useRef(false);
     const [busy, setBusy] = useState(false);
     const { message } = App.useApp();
+    const chooseDestination = useAssetDestination();
     const navigate = useNavigate();
     const patchStage = (id: string, patch: Partial<WorkflowStage>) => setDraft(d => ({ ...d, stages: d.stages.map(s => s.id === id ? { ...s, ...patch, ...(patch.mode && patch.mode !== "image" ? { image: undefined } : {}) } : s) }));
     const act = async (canvas: boolean) => {
         if (saving.current) return;
         saving.current = true; setBusy(true);
         try {
+            const folderId = !canvas && !asset ? await chooseDestination() : undefined;
+            if (folderId === null) return;
             validateWorkflow(draft);
             const prepared = await resolveWorkflowImages(draft, true);
             if (canvas) {
@@ -71,7 +77,7 @@ export function WorkflowEditor({ document, asset, onClose }: { document: Workflo
             } else {
                 await initializeCloudLibrary();
                 const value = workflowAsset(prepared);
-                asset ? useAssetStore.getState().updateAsset(asset.id, { data: value.data }) : useAssetStore.getState().addAsset(value);
+                asset ? useAssetStore.getState().updateAsset(asset.id, { data: value.data }) : useAssetStore.getState().addAsset({ ...value, folderId: folderId || undefined });
                 await saveCloudLibrary();
                 message.success(text("Entire workflow saved. Original text is preserved.")); onClose();
             }

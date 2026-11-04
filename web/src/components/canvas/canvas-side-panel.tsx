@@ -1,3 +1,4 @@
+import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { AssetFolderSelect } from "@/components/assets/asset-folder-select";
 import { assetInFolder } from "@/lib/asset-folders";
 import { useAssetFoldersEnabled } from "@/hooks/use-asset-folders-enabled";
@@ -406,6 +407,7 @@ const CanvasAssetsTab = memo(function CanvasAssetsTab({ onInsert, theme }: { onI
     useEffect(() => { if (folderFilter && folderFilter !== "all" && !folders.some(folder => folder.id === folderFilter)) setFolderFilter(""); }, [folders, folderFilter]);
     const assets = useAssetStore((state) => state.assets);
     const addAsset = useAssetStore((state) => state.addAsset);
+    const chooseDestination = useAssetDestination();
     const removeAsset = useAssetStore((state) => state.removeAsset);
     const [keyword, setKeyword] = useState("");
     const [tagFilter, setTagFilter] = useState<string>("all");
@@ -425,6 +427,8 @@ const CanvasAssetsTab = memo(function CanvasAssetsTab({ onInsert, theme }: { onI
     const handleFiles = async (fileList: FileList | null) => {
         const files = Array.from(fileList || []);
         if (!files.length) return;
+        const folderId = await chooseDestination();
+        if (folderId === null) { if (fileInputRef.current) fileInputRef.current.value = ""; return; }
         setUploading(true);
         const hide = message.loading(t("canvas.sidePanel.addingAssets"), 0);
         let added = 0;
@@ -432,11 +436,11 @@ const CanvasAssetsTab = memo(function CanvasAssetsTab({ onInsert, theme }: { onI
             for (const file of files) {
                 if (file.type.startsWith("image/")) {
                     const image = await uploadImage(file);
-                    addAsset({ folderId: folders.some(folder => folder.id === folderFilter) ? folderFilter : undefined, kind: "image", title: file.name || t("assets.kinds.image"), coverUrl: image.url, tags: [], data: { dataUrl: image.url, storageKey: image.storageKey, width: image.width, height: image.height, bytes: image.bytes, mimeType: image.mimeType } });
+                    addAsset({ folderId: folderId || undefined, kind: "image", title: file.name || t("assets.kinds.image"), coverUrl: image.url, tags: [], data: { dataUrl: image.url, storageKey: image.storageKey, width: image.width, height: image.height, bytes: image.bytes, mimeType: image.mimeType } });
                     added += 1;
                 } else if (file.type.startsWith("video/")) {
                     const media = await uploadMediaFile(file, "video");
-                    addAsset({ folderId: folders.some(folder => folder.id === folderFilter) ? folderFilter : undefined, kind: "video", title: file.name || t("assets.kinds.video"), coverUrl: "", tags: [], data: { url: media.url, storageKey: media.storageKey, width: media.width || 0, height: media.height || 0, bytes: media.bytes, mimeType: media.mimeType } });
+                    addAsset({ folderId: folderId || undefined, kind: "video", title: file.name || t("assets.kinds.video"), coverUrl: "", tags: [], data: { url: media.url, storageKey: media.storageKey, width: media.width || 0, height: media.height || 0, bytes: media.bytes, mimeType: media.mimeType } });
                     added += 1;
                 }
             }
