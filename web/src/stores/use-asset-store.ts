@@ -1,3 +1,5 @@
+import { useWorkbenchStore } from "@/stores/use-workbench-store";
+import { validateAssetFolders } from "@/lib/asset-folders";
 import { validateWorkflow } from "@/lib/workflow-validation";
 import { isWorkbench } from "@/constant/integration";
 import { create } from "zustand";
@@ -14,6 +16,8 @@ export type WorkflowAsset = AssetBase<"workflow"> & { data: WorkflowDocument };
 export type TextAsset = AssetBase<"text"> & { data: { content: string } };
 export type ImageAsset = AssetBase<"image"> & { data: { dataUrl: string; storageKey?: string; width: number; height: number; bytes: number; mimeType: string } };
 export type VideoAsset = AssetBase<"video"> & { data: { url: string; storageKey?: string; width: number; height: number; bytes: number; mimeType: string } };
+export type AssetFolder = { id: string; kind: "folder"; title: string; data: Record<string, never>; createdAt: string; updatedAt: string };
+export type LibraryDocument = Asset | AssetFolder;
 export type Asset = TextAsset | ImageAsset | VideoAsset | WorkflowAsset;
 
 type AssetBase<T extends AssetKind> = {
@@ -21,6 +25,7 @@ type AssetBase<T extends AssetKind> = {
     kind: T;
     title: string;
     coverUrl: string;
+    folderId?: string;
     videoCover?: { url: string; storageKey?: string };
     tags: string[];
     source?: string;
@@ -33,6 +38,12 @@ type AssetBase<T extends AssetKind> = {
 type AssetStore = {
     hydrated: boolean;
     assets: Asset[];
+    folders: AssetFolder[];
+    addFolder: (title: string) => string;
+    renameFolder: (id: string, title: string) => void;
+    removeFolder: (id: string) => void;
+    moveAssets: (ids: string[], folderId?: string) => void;
+    importAssets: (assets: Asset[], folders?: AssetFolder[]) => void;
     addAsset: (asset: Omit<Asset, "id" | "createdAt" | "updatedAt">) => string;
     updateAsset: (id: string, patch: Partial<Omit<Asset, "id" | "createdAt">>) => void;
     removeAsset: (id: string) => void;
@@ -47,6 +58,10 @@ export function assetCoverUrl(asset: Asset) {
     return asset.kind === "image" && cover === own ? previewUrlFor(asset.data.storageKey) || cover : cover;
 }
 
+function requireFolderSupport() {
+    if (isWorkbench && useWorkbenchStore.getState().libraryVersion !== 2) throw new Error("Library folders require server version 2.");
+}
+
 const ASSET_STORE_KEY = "infinite-canvas:asset_store";
 
 const assetStorage: PersistStorage<AssetStore> = {
@@ -54,6 +69,8 @@ const assetStorage: PersistStorage<AssetStore> = {
         const value = await localForageStorage.getItem(name);
         if (!value) return null;
         const parsed = JSON.parse(value) as StorageValue<AssetStore>;
+        parsed.state.folders ??= [];
+        validateAssetFolders(parsed.state.folders);
         parsed.state.assets = await Promise.all(
             parsed.state.assets.map(async (asset) => {
                 if (asset.kind === "workflow") { validateWorkflow(asset.data); const { resolveWorkflowImages } = await import("@/services/workflow-images"); return { ...asset, data: await resolveWorkflowImages(asset.data) }; }
@@ -83,6 +100,38 @@ export const useAssetStore = create<AssetStore>()(
         (set, get) => ({
             hydrated: false,
             assets: [],
+            folders: [],
+            addFolder: (title) => {
+                requireFolderSupport();
+                const id = nanoid(), now = new Date().toISOString();
+                if (!title.trim()) throw new Error("Folder name is required");
+                set(state => ({ folders: [...state.folders, { id, kind: "folder", title: title.trim(), data: {}, createdAt: now, updatedAt: now }] }));
+                return id;
+            },
+            renameFolder: (id, title) => {
+                requireFolderSupport();
+                if (!title.trim()) throw new Error("Folder name is required");
+                set(state => ({ folders: state.folders.map(folder => folder.id === id ? { ...folder, title: title.trim(), updatedAt: new Date().toISOString() } : folder) }));
+            },
+            removeFolder: (id) => { requireFolderSupport(); set(state => ({
+                folders: state.folders.filter(folder => folder.id !== id),
+                assets: state.assets.map(asset => asset.folderId === id ? { ...asset, folderId: undefined, updatedAt: new Date().toISOString() } : asset),
+            })); },
+            moveAssets: (ids, folderId) => {
+                requireFolderSupport();
+                if (folderId && !get().folders.some(folder => folder.id === folderId)) throw new Error("Folder not found");
+                const selected = new Set(ids), now = new Date().toISOString();
+                set(state => ({ assets: state.assets.map(asset => selected.has(asset.id) && asset.folderId !== folderId ? { ...asset, folderId, updatedAt: now } : asset) }));
+            },
+            importAssets: (assets, folders = []) => {
+                validateAssetFolders(folders);
+                if (folders.length) requireFolderSupport();
+                const ids = new Map(folders.map(folder => [folder.id, nanoid()])), now = new Date().toISOString();
+                set(state => ({
+                    folders: [...state.folders, ...folders.map(folder => ({ ...folder, id: ids.get(folder.id)!, createdAt: now, updatedAt: now }))],
+                    assets: [...assets.map(asset => ({ ...asset, id: nanoid(), folderId: asset.folderId ? ids.get(asset.folderId) : undefined, createdAt: now, updatedAt: now })), ...state.assets],
+                }));
+            },
             addAsset: (asset) => {
                 const now = new Date().toISOString();
                 const id = nanoid();
@@ -113,7 +162,7 @@ export const useAssetStore = create<AssetStore>()(
             name: ASSET_STORE_KEY,
             skipHydration: isWorkbench,
             storage: assetStorage,
-            partialize: (state) => ({ assets: state.assets }) as StorageValue<AssetStore>["state"],
+            partialize: (state) => ({ assets: state.assets, folders: state.folders }) as StorageValue<AssetStore>["state"],
             onRehydrateStorage: () => () => {
                 useAssetStore.setState({ hydrated: true });
             },

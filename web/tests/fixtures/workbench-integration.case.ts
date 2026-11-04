@@ -14,7 +14,7 @@ mock.module("@/services/image-storage", () => ({ ensureImagePreview: async () =>
 mock.module("@/services/file-storage", () => ({ getMediaBlob: async () => null, resolveMediaUrl: async (_key: string, url: string) => url, uploadMediaFile: async (url: string) => ({ url, storageKey: "video:fixture", mimeType: "video/mp4", bytes: 1 }) }));
 
 const { create } = await import("zustand");
-const assetStore = Object.assign(create<any>((set) => ({ assets: [], addAsset: (asset: any) => set((state: any) => ({ assets: [...state.assets, { ...asset, id: crypto.randomUUID() }] })) })), { persist: { rehydrate: async () => {} } });
+const assetStore = Object.assign(create<any>((set) => ({ assets: [], folders: [], importAssets: (assets: any[], folders: any[] = []) => set((state: any) => ({ assets: [...state.assets, ...assets.map(asset => ({ ...asset, id: crypto.randomUUID() }))], folders: [...state.folders, ...folders] })), addAsset: (asset: any) => set((state: any) => ({ assets: [...state.assets, { ...asset, id: crypto.randomUUID() }] })) })), { persist: { rehydrate: async () => {} } });
 mock.module("@/stores/use-asset-store", () => ({ useAssetStore: assetStore }));
 const preferences = new Map<string, string>();
 Object.assign(globalThis, { localStorage: { getItem: (key: string) => preferences.get(key) || null, setItem: (key: string, value: string) => preferences.set(key, value), removeItem: (key: string) => preferences.delete(key) } });
@@ -72,7 +72,7 @@ globalThis.fetch = mock(async (url: string | URL | Request, init?: RequestInit) 
         if (library && libraryUnavailable) return Response.json({ error: "Collection offline" }, { status: 503 });
         const records = library ? libraryItems : promptItems;
         const base = library ? "/api/canvas/library" : "/api/canvas/prompts";
-        if (!init?.method || init.method === "GET") return Response.json(library ? { items: [...records.values()] } : { prompts: [...records.values()] });
+        if (!init?.method || init.method === "GET") return Response.json(library ? { items: [...records.values()], libraryVersion: 2 } : { prompts: [...records.values()] });
         if (library && libraryConflict) return Response.json({ error: "Collection conflict" }, { status: 409 });
         const id = path === base ? `cloud-${body.document.id}` : decodeURIComponent(path.slice(base.length + 1));
         const current = records.get(id);

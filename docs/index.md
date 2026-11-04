@@ -15,6 +15,8 @@
 
 ## Development and Data
 
+- [我的资产文件夹接入契约](asset-folders-contract.md)
+
 - [Local Development](/docs/development/local-development)
 - [Canvas Data Structure](/docs/development/canvas-data-structure)
 - [How the Local Codex Connection Works](/docs/development/local-codex-canvas)

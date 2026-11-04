@@ -1,3 +1,6 @@
+import { AssetFolderSelect } from "@/components/assets/asset-folder-select";
+import { assetInFolder } from "@/lib/asset-folders";
+import { useAssetFoldersEnabled } from "@/hooks/use-asset-folders-enabled";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { Empty, Input, Modal, Pagination, Tag } from "antd";
 import { Search } from "lucide-react";
@@ -60,6 +63,10 @@ function PickerCard({ asset, onClick }: { asset: Asset; onClick: () => void }) {
 export function MyAssetsTab({ onInsert, imageOnly = false }: { onInsert: (payload: InsertAssetPayload) => void; imageOnly?: boolean }) {
     const { t } = useTranslation();
     useSyncExternalStore(subscribeImagePreviews, getImagePreviewRevision);
+    const foldersEnabled = useAssetFoldersEnabled();
+    const folders = useAssetStore(state => state.folders);
+    const [folderFilter, setFolderFilter] = useState("all");
+    useEffect(() => { if (folderFilter && folderFilter !== "all" && !folders.some(folder => folder.id === folderFilter)) setFolderFilter(""); }, [folders, folderFilter]);
     const assets = useAssetStore((state) => state.assets);
     const [keyword, setKeyword] = useState("");
     const [kindFilter, setKindFilter] = useState("all");
@@ -68,10 +75,11 @@ export function MyAssetsTab({ onInsert, imageOnly = false }: { onInsert: (payloa
     const filtered = useMemo(() => {
         const query = keyword.trim().toLowerCase();
         return assets
+            .filter(a => assetInFolder(a, folderFilter, folders))
             .filter((a) => imageOnly ? a.kind === "image" : a.kind === "text" || a.kind === "image" || a.kind === "video")
             .filter((a) => kindFilter === "all" || a.kind === kindFilter)
             .filter((a) => !query || [a.title, ...(a.tags || [])].join(" ").toLowerCase().includes(query));
-    }, [assets, keyword, kindFilter, imageOnly]);
+    }, [assets, keyword, kindFilter, imageOnly, folderFilter, folders]);
 
     const visible = useMemo(() => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE), [filtered, page]);
 
@@ -91,6 +99,7 @@ export function MyAssetsTab({ onInsert, imageOnly = false }: { onInsert: (payloa
 
     return (
         <div className="space-y-4">
+            {foldersEnabled && <AssetFolderSelect browse value={folderFilter} onChange={id => { setFolderFilter(id); setPage(1); }} />}
             <div className="flex flex-wrap items-center gap-3">
                 <Input
                     className="w-56"

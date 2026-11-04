@@ -1,3 +1,4 @@
+import { validateAssetFolders } from "@/lib/asset-folders";
 import { resolveWorkflowImages } from "@/services/workflow-images";
 import { validateWorkflow } from "@/lib/workflow-validation";
 import { isWorkbench } from "@/constant/integration";
@@ -6,13 +7,14 @@ import { saveAs } from "file-saver";
 import { createZip, readZip } from "@/lib/zip";
 import { getMediaBlob, setMediaBlob } from "@/services/file-storage";
 import { collectImageStorageKeys, getImageBlob, resolveImageUrl, setImageBlob } from "@/services/image-storage";
-import type { Asset } from "@/stores/use-asset-store";
+import type { Asset, AssetFolder } from "@/stores/use-asset-store";
 
 type AssetExportFile = {
     app: "infinite-canvas";
     version: 1;
     exportedAt: string;
     assets: Asset[];
+    folders?: AssetFolder[];
     files: AssetExportItem[];
 };
 
@@ -23,7 +25,7 @@ type AssetExportItem = {
     bytes: number;
 };
 
-export async function exportAssets(assets: Asset[], filename: string) {
+export async function exportAssets(assets: Asset[], filename: string, folders: AssetFolder[] = []) {
     const files: AssetExportItem[] = [];
     const zipFiles: { name: string; data: BlobPart }[] = [];
     const workflowImageKeys = new Set<string>();
@@ -60,7 +62,7 @@ export async function exportAssets(assets: Asset[], filename: string) {
         }),
     );
 
-    const data: AssetExportFile = { app: "infinite-canvas", version: 1, exportedAt: new Date().toISOString(), assets, files };
+    const data: AssetExportFile = { app: "infinite-canvas", version: 1, exportedAt: new Date().toISOString(), assets, folders, files };
     const zip = await createZip([{ name: "assets.json", data: JSON.stringify(data, null, 2) }, ...zipFiles]);
     saveAs(zip, filename);
 }
@@ -70,6 +72,9 @@ export async function readAssetPackage(file: File) {
     const assetFile = zip.get("assets.json");
     if (!assetFile) throw new Error("missing assets.json");
     const data = JSON.parse(await assetFile.text()) as AssetExportFile;
+    const folders = data.folders || [];
+    validateAssetFolders(folders);
+    if (data.app !== "infinite-canvas" || data.version !== 1 || !Array.isArray(data.assets) || !Array.isArray(data.files)) throw new Error("Invalid asset package");
     for (const asset of data.assets) if (asset.kind === "workflow") { if (!isWorkbench) throw new Error("Workflow packages require Workbench."); validateWorkflow(asset.data); }
     for (const asset of data.assets) if (asset.kind === "workflow") {
         for (const key of collectImageStorageKeys(asset.data)) {
@@ -85,7 +90,8 @@ export async function readAssetPackage(file: File) {
             await (item.storageKey.startsWith("image:") ? setImageBlob(item.storageKey, typedBlob) : setMediaBlob(item.storageKey, typedBlob));
         }),
     );
-    return Promise.all(data.assets.map(async (asset) => asset.kind === "workflow" ? { ...asset, data: await resolveWorkflowImages(asset.data) } : asset.videoCover ? { ...asset, videoCover: { ...asset.videoCover, url: await resolveImageUrl(asset.videoCover.storageKey, asset.videoCover.url) } } : asset));
+    const assets = await Promise.all(data.assets.map(async (asset) => asset.kind === "workflow" ? { ...asset, data: await resolveWorkflowImages(asset.data) } : asset.videoCover ? { ...asset, videoCover: { ...asset.videoCover, url: await resolveImageUrl(asset.videoCover.storageKey, asset.videoCover.url) } } : asset));
+    return { assets, folders };
 }
 
 function safeFileName(value: string) {

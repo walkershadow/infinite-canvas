@@ -1,3 +1,6 @@
+import { useAssetFoldersEnabled } from "@/hooks/use-asset-folders-enabled";
+import { AssetFolderSelect } from "@/components/assets/asset-folder-select";
+import { assetInFolder } from "@/lib/asset-folders";
 import { canUsePublicLibrary } from "@/services/api/public-library";
 import i18n from "@/i18n";
 import { catalogSummary } from "@/lib/prompt-catalog-locale";
@@ -5,7 +8,7 @@ import { isWorkbench } from "@/constant/integration";
 import { WorkflowEditor } from "@/components/prompts/workflow-editor";
 import { Copy, Download, PencilLine, Search, Trash2, Upload } from "lucide-react";
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { App, Button, Card, Drawer, Empty, Form, Image, Input, Modal, Pagination, Select, Space, Spin, Tag, Typography } from "antd";
+import { App, Button, Card, Checkbox, Drawer, Empty, Form, Image, Input, Modal, Pagination, Select, Space, Spin, Tag, Typography } from "antd";
 import { saveAs } from "file-saver";
 import { useTranslation } from "react-i18next";
 
@@ -35,8 +38,9 @@ type ImageDraft = ImageAsset["data"] | null;
 const kindOptions: (AssetKind | "all")[] = ["all", "text", "image", "video", ...(isWorkbench ? ["workflow" as const] : [])];
 
 export default function AssetsPage() {
-    const { message } = App.useApp();
+    const { message, modal } = App.useApp();
     const { t } = useTranslation();
+    const foldersEnabled = useAssetFoldersEnabled();
     const copyText = useCopyText();
     const publicLibrary = canUsePublicLibrary();
     const [showPublicLibrary, setShowPublicLibrary] = useState(false);
@@ -45,6 +49,15 @@ export default function AssetsPage() {
     const imageInputRef = useRef<HTMLInputElement>(null);
     const assetInputRef = useRef<HTMLInputElement>(null);
     const assets = useAssetStore((state) => state.assets);
+    const folders = useAssetStore(state => state.folders);
+    const [folderFilter, setFolderFilter] = useState("all");
+    const [folderEditor, setFolderEditor] = useState<{ id?: string; title: string } | null>(null);
+    const [selectedIds, setSelectedIds] = useState<string[]>([]);
+    const [movingIds, setMovingIds] = useState<string[]>([]);
+    const [destination, setDestination] = useState("");
+    const currentFolder = folders.find(folder => folder.id === folderFilter);
+    useEffect(() => { setSelectedIds([]); }, [folderFilter]);
+    useEffect(() => { if (folderFilter !== "all" && folderFilter && !currentFolder) setFolderFilter(""); }, [currentFolder, folderFilter]);
     const addAsset = useAssetStore((state) => state.addAsset);
     const updateAsset = useAssetStore((state) => state.updateAsset);
     const removeAsset = useAssetStore((state) => state.removeAsset);
@@ -67,11 +80,12 @@ export default function AssetsPage() {
     const filteredAssets = useMemo(() => {
         const query = keyword.trim().toLowerCase();
         return validAssets.filter((asset) => {
+            if (!assetInFolder(asset, folderFilter, folders)) return false;
             if (kindFilter !== "all" && asset.kind !== kindFilter) return false;
             if (!query) return true;
             return assetSearchText(asset).includes(query);
         });
-    }, [validAssets, keyword, kindFilter]);
+    }, [validAssets, keyword, kindFilter, folderFilter, folders]);
 
     const visibleAssets = useMemo(() => {
         const start = (page - 1) * pageSize;
@@ -111,6 +125,7 @@ export default function AssetsPage() {
     const saveAsset = async () => {
         const values = await form.validateFields();
         const base = {
+            folderId: editingAsset ? editingAsset.folderId : currentFolder?.id,
             title: values.title.trim(),
             coverUrl: values.coverUrl?.trim() || (values.kind === "image" && imageDraft ? imageDraft.dataUrl : ""),
             tags: values.tags || [],
@@ -171,25 +186,19 @@ export default function AssetsPage() {
     };
 
     const exportAllAssets = async () => {
-        if (!validAssets.length) {
+        if (!validAssets.length && !folders.length) {
             message.warning(t("assets.noneToExport"));
             return;
         }
-        await exportAssets(validAssets, t("assets.packageName"));
+        await exportAssets(validAssets, t("assets.packageName"), folders);
     };
 
     const importAssetZip = async (file?: File) => {
         if (!file) return;
         try {
-            const importedAssets = await readAssetPackage(file);
-            importedAssets.forEach((asset) => {
-                const payload = { ...asset } as Record<string, unknown>;
-                delete payload.id;
-                delete payload.createdAt;
-                delete payload.updatedAt;
-                addAsset(payload as Parameters<typeof addAsset>[0]);
-            });
-            message.success(t("assets.imported", { count: importedAssets.length }));
+            const imported = await readAssetPackage(file);
+            useAssetStore.getState().importAssets(imported.assets, imported.folders);
+            message.success(t("assets.imported", { count: imported.assets.length }));
         } catch {
             message.error(t("assets.importFailed"));
         } finally {
@@ -217,6 +226,14 @@ export default function AssetsPage() {
                         <p className="mt-3 text-sm text-stone-500 dark:text-stone-400">{t("assets.description")}</p>
                     </div>
 
+                    {foldersEnabled && <div className="mx-auto mt-6 flex max-w-6xl flex-wrap items-center gap-2">
+                        <AssetFolderSelect browse value={folderFilter} onChange={id => { setFolderFilter(id); setPage(1); }} />
+                        <Button type="text" onClick={() => setFolderEditor({ title: "" })}>{t("assetFolders.create")}</Button>
+                        {currentFolder && <>
+                            <Button type="text" onClick={() => setFolderEditor({ id: currentFolder.id, title: currentFolder.title })}>{t("assetFolders.rename")}</Button>
+                            <Button type="text" danger onClick={() => modal.confirm({ title: t("assetFolders.delete"), content: t("assetFolders.deleteHint"), okText: t("common.delete"), cancelText: t("common.cancel"), onOk: () => { useAssetStore.getState().removeFolder(currentFolder.id); setFolderFilter(""); } })}>{t("assetFolders.delete")}</Button>
+                        </>}
+                    </div>}
                     <div className="mx-auto mt-8 w-full max-w-2xl">
                         <Input.Search
                             className="w-full"
@@ -284,9 +301,18 @@ export default function AssetsPage() {
                 </div>
 
                 <div className="mx-auto flex max-w-7xl flex-col gap-5">
+                    {foldersEnabled && <div className="flex flex-wrap items-center gap-3">
+                        <Checkbox checked={visibleAssets.length > 0 && visibleAssets.every(asset => selectedIds.includes(asset.id))} indeterminate={visibleAssets.some(asset => selectedIds.includes(asset.id)) && !visibleAssets.every(asset => selectedIds.includes(asset.id))} onChange={event => setSelectedIds(ids => event.target.checked ? [...new Set([...ids, ...visibleAssets.map(asset => asset.id)])] : ids.filter(id => !visibleAssets.some(asset => asset.id === id)))}>{t("assetFolders.selectPage")}</Checkbox>
+                        <span className="text-sm text-muted-foreground">{t("assetFolders.selected", { count: selectedIds.filter(id => assets.some(asset => asset.id === id)).length })}</span>
+                        <Button type="text" disabled={!selectedIds.length} onClick={() => { setMovingIds(selectedIds); setDestination(""); }}>{t("assetFolders.move")}</Button>
+                        {!!selectedIds.length && <Button type="text" onClick={() => setSelectedIds([])}>{t("assetFolders.clear")}</Button>}
+                    </div>}
                     <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         {visibleAssets.map((asset) => (
-                            <AssetCard key={asset.id} asset={asset} onOpen={() => setPreviewAsset(asset)} onEdit={() => openEdit(asset)} onCopy={copyAssetText} onDownload={downloadImage} onDelete={() => setDeletingAsset(asset)} />
+                            <div key={asset.id} className="min-w-0 space-y-2">
+                                {foldersEnabled && <div className="flex items-center justify-between gap-2"><Checkbox aria-label={t("assetFolders.selectAsset", { title: asset.title })} checked={selectedIds.includes(asset.id)} onChange={event => setSelectedIds(ids => event.target.checked ? [...ids, asset.id] : ids.filter(id => id !== asset.id))} /><Button type="text" size="small" onClick={() => { setMovingIds([asset.id]); setDestination(folders.some(folder => folder.id === asset.folderId) ? asset.folderId! : ""); }}>{t("assetFolders.move")}</Button></div>}
+                                <AssetCard asset={asset} onOpen={() => setPreviewAsset(asset)} onEdit={() => openEdit(asset)} onCopy={copyAssetText} onDownload={downloadImage} onDelete={() => setDeletingAsset(asset)} />
+                            </div>
                         ))}
                     </div>
 
@@ -308,6 +334,12 @@ export default function AssetsPage() {
                 </div>
             </main>}
 
+            <Modal open={!!folderEditor} title={t(folderEditor?.id ? "assetFolders.rename" : "assetFolders.create")} onCancel={() => setFolderEditor(null)} okText={t("common.save")} cancelText={t("common.cancel")} okButtonProps={{ disabled: !folderEditor?.title.trim() }} onOk={() => { if (!folderEditor?.title.trim()) return; const store = useAssetStore.getState(); if (folderEditor.id) store.renameFolder(folderEditor.id, folderEditor.title); else setFolderFilter(store.addFolder(folderEditor.title)); setFolderEditor(null); }}>
+                <Input aria-label={t("assetFolders.name")} placeholder={t("assetFolders.name")} value={folderEditor?.title || ""} onChange={event => setFolderEditor(value => value && ({ ...value, title: event.target.value }))} />
+            </Modal>
+            <Modal open={movingIds.length > 0} title={t("assetFolders.move")} onCancel={() => setMovingIds([])} okText={t("common.save")} cancelText={t("common.cancel")} onOk={() => { useAssetStore.getState().moveAssets(movingIds, destination || undefined); setMovingIds([]); setSelectedIds([]); }}>
+                <AssetFolderSelect value={destination} onChange={setDestination} />
+            </Modal>
             {previewAsset?.kind === "workflow" && isWorkbench && <WorkflowEditor key={previewAsset.id} document={previewAsset.data} asset={previewAsset} onClose={() => setPreviewAsset(null)} />}
             <Modal title={editingAsset ? t("assets.edit") : t("assets.add")} open={isAssetOpen} width={980} onCancel={() => setIsAssetOpen(false)} onOk={() => void saveAsset()} okText={t("common.save")} cancelText={t("common.cancel")} destroyOnHidden>
                 <div className="grid gap-6 pt-1 lg:grid-cols-[minmax(0,1fr)_320px]">
