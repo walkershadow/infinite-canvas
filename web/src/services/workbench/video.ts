@@ -43,7 +43,7 @@ export function workbenchVideoReferenceMode(model: import("@/types/workbench").W
 export function workbenchVideoEstimateText(estimate: ReturnType<typeof workbenchVideoInput>, language: string) {
     const amount = new Intl.NumberFormat(language, { style: "currency", currency: estimate.currency, minimumFractionDigits: 4 }).format(estimate.amount);
     const videoNote = estimate.multiplier > 1
-        ? (language.startsWith("zh") ? `含视频参考，整条任务按${estimate.multiplier}倍单价计费；图片和音频不加价。` : `Video references: ${estimate.multiplier}× rate for the entire task; image and audio references do not increase the rate. `)
+        ? (language.startsWith("zh") ? `含视频参考；图片和音频不加价。` : `Includes video references; image and audio references do not increase the rate. `)
         : "";
     return videoNote + (language.startsWith("zh")
         ? `${estimate.model.name} · ${estimate.duration}秒 · ${estimate.ratio}。预计 ${estimate.points} 点（${amount}）。${estimate.model.freeQuota ? "工作台将按资格使用每日免费额度。" : "此模型不使用每日免费额度。"}停止等待不会取消计费。`

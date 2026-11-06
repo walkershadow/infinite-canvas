@@ -14,7 +14,7 @@ test("video add/remove changes whole-task fee and keeps half-point rounding", ()
  const withVideo = workbenchVideoInput(config, true);
  expect(withVideo.points).toBe(73.5);
  expect(withVideo.amount).toBe(7.35);
- expect(workbenchVideoEstimateText(withVideo, "zh-CN")).toContain("整条任务按3倍");
+ expect(workbenchVideoEstimateText(withVideo, "zh-CN")).toContain("含视频参考");
  expect(workbenchVideoInput(config, false).points).toBe(24.5);
 });
 test("missing overseas metadata preserves existing fee", () => {
