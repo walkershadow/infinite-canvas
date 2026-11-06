@@ -6,6 +6,8 @@ export type WorkbenchModel = {
     price: number;
     billingUnit: "request" | "second";
     prices?: Record<number, number>;
+    videoReferenceMultiplier?: number;
+    priceRoundingStep?: number;
     durations: number[];
     defaultDuration: number;
     ratios: { value: string; label: string; size: string }[];

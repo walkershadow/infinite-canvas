@@ -351,8 +351,8 @@ function InfiniteCanvasPage() {
         if (request?.controller === controller) generationRequestsRef.current.delete(targetNodeId);
     }, []);
 
-    const confirmVideoGeneration = useCallback(async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], signal: AbortSignal) => {
-        const estimate = workbenchVideoInput(config);
+    const confirmVideoGeneration = useCallback(async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], signal: AbortSignal, hasVideoReference = false) => {
+        const estimate = workbenchVideoInput(config, hasVideoReference);
         const confirmed = await new Promise<boolean>((resolve) => {
             const dialog = modal.confirm({
                 title: t("workbench.generate"),
@@ -375,8 +375,8 @@ function InfiniteCanvasPage() {
         async (nodeId: string, config: Parameters<typeof buildGenerationConfig>[0], prompt: string, images: Parameters<typeof createVideoGenerationTask>[2], signal: AbortSignal, extra: CanvasNodeData["metadata"] = {}, videos: ReferenceVideo[] = [], audios: ReferenceAudio[] = [], alreadyConfirmed = false) => {
             let requestKey: string | undefined;
             if (isWorkbenchModel(config, config.model || config.videoModel)) {
-                const estimate = workbenchVideoInput(config);
-                if (!alreadyConfirmed) await confirmVideoGeneration(nodeId, config, signal);
+                const estimate = workbenchVideoInput(config, videos.length > 0);
+                if (!alreadyConfirmed) await confirmVideoGeneration(nodeId, config, signal, videos.length > 0);
                 const target = nodesRef.current.find((item) => item.id === nodeId);
                 const signature = JSON.stringify({ model: config.model, prompt, duration: estimate.duration, ratio: estimate.ratio, videoMode: config.videoMode, images: (images || []).map((item) => item.storageKey || item.dataUrl), videos: videos.map((item) => item.storageKey || item.url), audios: audios.map((item) => item.storageKey || item.url) });
                 const pendingKey = !target?.metadata?.content && target?.metadata?.workbenchRequestKey;
@@ -2916,7 +2916,8 @@ function InfiniteCanvasPage() {
                         controller = startGenerationRequest(node.id, sourceNode.id, node.id);
                         setRunningNodeId(node.id);
                         setNodes((prev) => prev.map((item) => item.id === node.id ? { ...item, metadata: { ...item.metadata, status: NODE_STATUS_LOADING, errorDetails: undefined } } : item));
-                        await confirmVideoGeneration(node.id, generationConfig, controller.signal);
+                        const previewContext = buildNodeGenerationContext(sourceNode.id, nodesRef.current, connectionsRef.current, sourceNode.metadata?.prompt || node.metadata?.prompt || "");
+                        await confirmVideoGeneration(node.id, generationConfig, controller.signal, previewContext.referenceVideos.length > 0);
                     }, async () => {
                         const signal = controller!.signal;
                         signal.throwIfAborted();

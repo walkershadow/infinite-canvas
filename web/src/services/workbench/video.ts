@@ -11,7 +11,7 @@ export function workbenchVideoSelection(config: AiConfig, model: import("@/types
     return { ratio, duration };
 }
 
-export function workbenchVideoInput(config: AiConfig) {
+export function workbenchVideoInput(config: AiConfig, hasVideoReference = false) {
     const session = workbenchSession();
     const model = session.models.find((item) => item.id === modelOptionName(config.model || config.videoModel));
     if (!session.capabilities.video || !model) throw new Error("Select an available Workbench video model.");
@@ -19,10 +19,13 @@ export function workbenchVideoInput(config: AiConfig) {
     if (!model.durations.includes(duration)) throw new Error(`Choose a supported duration: ${model.durations.join(", ")} seconds.`);
     if (!model.ratios.some((item) => item.value === ratio)) throw new Error("Choose an aspect ratio supported by this model.");
     const unitPrice = model.prices?.[duration] ?? model.price;
-    const points = unitPrice * (model.billingUnit === "second" ? duration : 1);
+    const multiplier = hasVideoReference ? model.videoReferenceMultiplier ?? 1 : 1;
+    const rawPoints = unitPrice * (model.billingUnit === "second" ? duration : 1) * multiplier;
+    const step = model.priceRoundingStep;
+    const points = step ? Math.ceil(Math.round(rawPoints * 100) / Math.round(step * 100)) * step : rawPoints;
     const pointsPerCurrency = session.currency === "CNY" ? session.pointsPerYuan : session.pointsPerUsd;
     if (!Number.isFinite(points) || points < 0 || !(Number(pointsPerCurrency) > 0)) throw new Error("Workbench pricing is unavailable. Refresh the model catalog before generating.");
-    return { model, duration, ratio, points, currency: session.currency, amount: points / Number(pointsPerCurrency) };
+    return { model, duration, ratio, points, hasVideoReference, multiplier, currency: session.currency, amount: points / Number(pointsPerCurrency) };
 }
 
 /** Keep frame and ordinary references mutually exclusive; never discard excess inputs. */
@@ -39,7 +42,10 @@ export function workbenchVideoReferenceMode(model: import("@/types/workbench").W
 
 export function workbenchVideoEstimateText(estimate: ReturnType<typeof workbenchVideoInput>, language: string) {
     const amount = new Intl.NumberFormat(language, { style: "currency", currency: estimate.currency, minimumFractionDigits: 4 }).format(estimate.amount);
-    return language.startsWith("zh")
+    const videoNote = estimate.multiplier > 1
+        ? (language.startsWith("zh") ? `含视频参考，整条任务按${estimate.multiplier}倍单价计费；图片和音频不加价。` : `Video references: ${estimate.multiplier}× rate for the entire task; image and audio references do not increase the rate. `)
+        : "";
+    return videoNote + (language.startsWith("zh")
         ? `${estimate.model.name} · ${estimate.duration}秒 · ${estimate.ratio}。预计 ${estimate.points} 点（${amount}）。${estimate.model.freeQuota ? "工作台将按资格使用每日免费额度。" : "此模型不使用每日免费额度。"}停止等待不会取消计费。`
-        : `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points (${amount} ${estimate.currency}). ${estimate.model.freeQuota ? "Eligible daily free quota is applied by Workbench." : "This model does not use daily free quota."} Stopping the wait does not cancel billing.`;
+        : `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points (${amount} ${estimate.currency}). ${estimate.model.freeQuota ? "Eligible daily free quota is applied by Workbench." : "This model does not use daily free quota."} Stopping the wait does not cancel billing.`);
 }

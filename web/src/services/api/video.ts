@@ -78,7 +78,7 @@ function videoTaskFailed(message: string) {
 export async function createVideoGenerationTask(config: AiConfig, prompt: string, references: ReferenceImage[] = [], options?: VideoMediaOptions): Promise<VideoGenerationTask> {
     if (isWorkbenchModel(config, config.model || config.videoModel)) {
         if (!options?.requestKey) throw new Error("Workbench generation requires a stable request key.");
-        const { model, duration, ratio } = workbenchVideoInput(config);
+        const { model, duration, ratio } = workbenchVideoInput(config, (options.videos?.length ?? 0) > 0);
         const referenceMode = workbenchVideoReferenceMode(model, config.videoMode, { images: references.length, videos: options.videos?.length || 0, audios: options.audios?.length || 0 });
         const [images, videos, audios] = await Promise.all([Promise.all(references.map(workbenchReference)), Promise.all((options.videos || []).map(workbenchReference)), Promise.all((options.audios || []).map(workbenchReference))]);
         const media = referenceMode === "first" ? { input_reference: images[0] }
