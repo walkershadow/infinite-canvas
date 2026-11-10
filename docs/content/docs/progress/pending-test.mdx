@@ -256,4 +256,6 @@ The Chinese version contains the complete item-by-item acceptance checklist.
 ### 海外视频参考整数 quota 估价
 
 - 海外支持 bootstrap quotaPerPoint 与模型 unitQuota／unitQuotas，使用服务端已截断基础 quota 后再乘时长和视频参考倍率；不套国内 0.5／0.1 point 步进。国内原逻辑、自配渠道和资产目录保留。
-- 新整数契约缺项阻止估价，旧海外无该字段保持展示价格兼容；美元最多六位小数，英文确认不展示倍率数字。定向覆盖有无视频、按秒／按次／特殊价格、零值和错误数据，契约见 `docs/workbench-video-pricing-contract.md`。本会话不构建、不部署、不发起收费生成；线上 bootstrap 及扣费对齐待海外接入会话验收。
+- 新整数契约缺项阻止估价，旧海外无该字段保持展示价格兼容；美元最多六位小数，英文确认不展示倍率数字。定向覆盖有无视频、按秒／按次／特殊价格、零值和错误数据，契约见 `docs/workbench-video-pricing-contract.md`。本会话不构建、不部署、不发起收费生成；发布结果见下条；实际上游扣费与退款仍待验收。
+
+- 海外接入会话回报已发布：Canvas `4918ae0`、后端 `432f1cc`，入口 https://ai-creator.xprismai.com/canvas/ ，release.json 及 bootstrap 整数 quota 契约已核实。95 项后端单测、10 项隔离 DB 测试和生产认证 HTTP 报价／权限／分页检查通过，验证账号已清理、业务数据摘要一致。未进行真实收费生成／支付，不标记实际上游扣费验收；国内／new-api／独立画布容器未变。jp1 1024MB heap 明确 OOM，恢复 2048MB 后 48.39 秒构建成功，临时 swap 已移除；详见估价契约文档的发布记录。

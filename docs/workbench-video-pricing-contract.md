@@ -22,3 +22,17 @@
 画布确认、重试以及 API 提交前校验均使用 workbenchVideoInput；视频参考由实际 videos 列表决定。Video Studio 当前仅支持图片参考，因此按无视频估价；不在此任务扩展上传类型。
 
 定向测试覆盖国内原费率、旧海外兼容、基础截断顺序、无视频／视频、秒计费／按次、特殊时长及零价格、缺失与非法 quota、英文说明及美元精度。Workbench 集成和三模式回归另行执行；不发起收费生成，不在本会话部署，海外接入会话从稳定提交在 jp1 构建并核对真实 bootstrap 与扣费账单。
+
+
+## 海外发布与构建记录
+
+以下为海外接入会话回报，本源码会话未重复操作生产环境：
+
+- Canvas `4918ae02e559a06d30a2510eca93ad31355c2e35` 已在 jp1 以 overseas 模式构建，发布至 https://ai-creator.xprismai.com/canvas/ ，release.json 已核实。
+- Workbench 后端 `432f1cc`，镜像 `seedance-cheap:release-20261110-sync`；bootstrap 已提供整数 unitQuota／unitQuotas、quotaPerPoint=50000 和 videoReferenceMultiplier。保留 22 个可用模型；新增两个 GM 模型的单位 quota 分别为 20000／12500。
+- 后端 95 项单测、10 项隔离数据库测试、本地认证 HTTP 及生产认证 HTTP 报价／权限／分页检查通过，临时验证账号已清理，业务数据摘要保持一致。未发起真实收费生成或支付，实际上游扣费、退款仍未验收。
+- 国内、new-api、独立画布容器未变；本次未在源码会话部署。
+
+本次 jp1 构建使用 1024MB Node heap 时，在 8635 modules transformed 后明确出现 `Reached heap limit`／`JavaScript heap out of memory`，最后一次 Mark-Compact 为 1009.4 → 1006.3MB，耗时 325 秒，退出 139。因此本次失败已确认为 V8 heap 不足，不能只归为打包缓慢。
+
+代码不变，恢复旧脚本的 2048MB Node heap 后，构建 48.39 秒成功。当次容器物理内存上限 1280MB、soft reservation 1024MB、memory+swap 3072MB，使用临时 swap，完成后已移除。这是该主机本次实测配置，不是所有环境的硬性要求；heap 上限不等于进程总内存。后续在同机重建可参考该成功记录，资源设置变更仍由发布会话确认，不自动修改线上配置。
