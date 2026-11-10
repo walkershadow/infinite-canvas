@@ -8,6 +8,8 @@ export type WorkbenchModel = {
     prices?: Record<number, number>;
     videoReferenceMultiplier?: number;
     priceRoundingStep?: number;
+    unitQuota?: number;
+    unitQuotas?: Record<number, number>;
     durations: number[];
     defaultDuration: number;
     ratios: { value: string; label: string; size: string }[];
@@ -28,6 +30,7 @@ export type WorkbenchBootstrap = {
     capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean; publicLibrary?: boolean; publicLibraryAdmin?: boolean; legacyImport?: boolean };
     currency: string;
     pointsPerUsd?: number;
+    quotaPerPoint?: number;
     pointsPerYuan?: number;
     region?: "overseas" | "domestic";
     locale?: "en-US" | "zh-CN";

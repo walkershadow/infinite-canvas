@@ -15,6 +15,8 @@
 
 ## Development and Data
 
+- [海外视频参考估价契约](workbench-video-pricing-contract.md)
+
 - [我的资产文件夹接入契约](asset-folders-contract.md)
 
 - [Local Development](/docs/development/local-development)

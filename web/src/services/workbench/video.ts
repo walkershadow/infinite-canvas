@@ -20,11 +20,23 @@ export function workbenchVideoInput(config: AiConfig, hasVideoReference = false)
     if (!model.ratios.some((item) => item.value === ratio)) throw new Error("Choose an aspect ratio supported by this model.");
     const unitPrice = model.prices?.[duration] ?? model.price;
     const multiplier = hasVideoReference ? model.videoReferenceMultiplier ?? 1 : 1;
-    const rawPoints = unitPrice * (model.billingUnit === "second" ? duration : 1) * multiplier;
-    const step = model.priceRoundingStep;
-    const points = step ? Math.ceil(Math.round(rawPoints * 100) / Math.round(step * 100)) * step : rawPoints;
+    const units = model.billingUnit === "second" ? duration : 1;
+    const overseas = session.region === "overseas" || session.currency === "USD";
+    const integerPricing = overseas && (session.quotaPerPoint !== undefined || model.unitQuota !== undefined || model.unitQuotas !== undefined);
+    let points: number;
+    if (integerPricing) {
+        // The server has already truncated the account's base quota, before duration and reference pricing.
+        const unitQuota = model.unitQuotas?.[duration] ?? (model.prices?.[duration] == null ? model.unitQuota : undefined);
+        const quota = Number(unitQuota) * units * multiplier;
+        if (!Number.isSafeInteger(unitQuota) || Number(unitQuota) < 0 || !Number.isSafeInteger(session.quotaPerPoint) || Number(session.quotaPerPoint) <= 0 || !Number.isSafeInteger(quota) || quota < 0) throw new Error("Workbench pricing is unavailable. Refresh the model catalog before generating.");
+        points = quota / Number(session.quotaPerPoint);
+    } else {
+        const rawPoints = unitPrice * units * multiplier;
+        const step = overseas ? undefined : model.priceRoundingStep;
+        points = step ? Math.ceil(Math.round(rawPoints * 100) / Math.round(step * 100)) * step : rawPoints;
+    }
     const pointsPerCurrency = session.currency === "CNY" ? session.pointsPerYuan : session.pointsPerUsd;
-    if (!Number.isFinite(points) || points < 0 || !(Number(pointsPerCurrency) > 0)) throw new Error("Workbench pricing is unavailable. Refresh the model catalog before generating.");
+    if (!Number.isFinite(multiplier) || multiplier <= 0 || !Number.isFinite(points) || points < 0 || !(Number(pointsPerCurrency) > 0)) throw new Error("Workbench pricing is unavailable. Refresh the model catalog before generating.");
     return { model, duration, ratio, points, hasVideoReference, multiplier, currency: session.currency, amount: points / Number(pointsPerCurrency) };
 }
 
@@ -41,7 +53,7 @@ export function workbenchVideoReferenceMode(model: import("@/types/workbench").W
 }
 
 export function workbenchVideoEstimateText(estimate: ReturnType<typeof workbenchVideoInput>, language: string) {
-    const amount = new Intl.NumberFormat(language, { style: "currency", currency: estimate.currency, minimumFractionDigits: 4 }).format(estimate.amount);
+    const amount = new Intl.NumberFormat(language, { style: "currency", currency: estimate.currency, minimumFractionDigits: 4, maximumFractionDigits: estimate.currency === "USD" ? 6 : 4 }).format(estimate.amount);
     const videoNote = estimate.multiplier > 1
         ? (language.startsWith("zh") ? `含视频参考；图片和音频不加价。` : `Includes video references; image and audio references do not increase the rate. `)
         : "";

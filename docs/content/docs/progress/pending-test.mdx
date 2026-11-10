@@ -252,3 +252,8 @@ The Chinese version contains the complete item-by-item acceptance checklist.
 - 浏览器补充：普通提示词与完整 workflow 的目标弹窗默认根目录，取消后只读检查夹具确认无对应新增；workflow 保存到指定目录后保留完整步骤。390px 中文手机卡片双列、标题截断、数量及更多按钮可见。截图 `/tmp/asset-grid-mobile.png`。扩展文件网址权限复试仍未开启，ZIP 浏览器导入不标记通过。
 
 - 工作台视频确认不再显示“整条任务3倍”，预估及计费不变。
+
+### 海外视频参考整数 quota 估价
+
+- 海外支持 bootstrap quotaPerPoint 与模型 unitQuota／unitQuotas，使用服务端已截断基础 quota 后再乘时长和视频参考倍率；不套国内 0.5／0.1 point 步进。国内原逻辑、自配渠道和资产目录保留。
+- 新整数契约缺项阻止估价，旧海外无该字段保持展示价格兼容；美元最多六位小数，英文确认不展示倍率数字。定向覆盖有无视频、按秒／按次／特殊价格、零值和错误数据，契约见 `docs/workbench-video-pricing-contract.md`。本会话不构建、不部署、不发起收费生成；线上 bootstrap 及扣费对齐待海外接入会话验收。
