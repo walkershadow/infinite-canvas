@@ -265,3 +265,12 @@ The Chinese version contains the complete item-by-item acceptance checklist.
 - 平台视频选择器读取 recommended／recommendationLabel，显示推荐星标；New／Special price 提供中英文标签。每日免费与赠送抵扣资格独立显示，海外 giftQuota 必须明确为 true；旧国内缺字段仅保留原 Fast 兼容，显式 false 生效。
 - 积分菜单读取赠送总次数、永久／限期次数及最早到期时间，不将总数标为永久。生成确认按资格列出每日免费 → 赠送次数 → 赠送积分 → 付费积分，实际结算交由后端；无支付改动，资产目录与个人数据保留。
 - 定向测试覆盖后台开关、两新模型推荐标签、独立资格、国内兼容、抵扣顺序、双语和到期缺项／非法时间；连同估价、Workbench 集成及三模式回归共 12 项外层测试通过（隔离 Workbench 集成另有 21 项／207 断言）。尚未浏览器验收或真实收费生成，海外发布由根会话协调，国内／独立不部署。
+
+
+### 平台原创案例协议准备（dev，未发布案例）
+
+- 来源新增 `inspiration`，详情和来源快照显示“灵感来源”，不将视频作者当作提示词作者；步骤 `textKind: "platform-tested"` 按 `originalLanguage` 区分实测原创提示词和译文。
+- 来源步骤和编辑步骤支持可选 `settings: { model?: string, seconds?: string, size?: string }`，沿用画布参数格式。保存 Assets 后保留参数和独立来源快照，创建画布写入节点同名 metadata，可在现有参数面板编辑；流程编辑器显示保存的参数。没有 settings 的旧流程保持现有默认行为，schemaVersion 仍为 1。
+- Workbench 的 `native-canvas-workflow.ts` 需同步本仓库 `workflow-validation.ts`：来源角色接受 inspiration，source.steps 与 stages 的 settings 可省略；存在时只允许 model、seconds、size，值须为非空字符串，不接受其他键。后端需原样保存这些字段。
+- 21 项定向回归、1675 断言通过，覆盖旧目录往返、新参数编辑及来源隔离、非法参数拒绝。未执行构建、浏览器验收或收费生成，未新增尚未成功的案例媒体。
+- 待验收：后端校验同步后，以真实成功案例执行保存 Assets、重开和画布参数编辑；国内与独立版旧流程继续保持原有默认值。

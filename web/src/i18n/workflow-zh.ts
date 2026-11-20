@@ -1,4 +1,7 @@
 export default {
+    "Platform-tested original prompt": "平台实测原创提示词",
+    "Translation of platform-tested prompt": "平台实测提示词译文",
+    "Inspiration source": "灵感来源",
     "Related case illustration": "关联案例示意",
     "Replace each reference from its public category, My Assets or an uploaded image. The workflow keeps its original input order and your edited prompt.": "可从对应公共分类、我的图片资产或上传图片更换参考。流程会保留原有输入顺序及已编辑的提示词。",
     "Replace reference image": "更换参考图片",

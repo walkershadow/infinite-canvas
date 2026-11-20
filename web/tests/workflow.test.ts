@@ -225,3 +225,28 @@ test("UGC portrait and product restore as distinct inputs without portrait overl
     expect(references[0].position.y + references[0].height).toBeLessThan(references[1].position.y);
     for (const node of graph.nodes.slice(1)) expect(node.position.y + node.height).toBeLessThan(graph.nodes[0].height);
 });
+
+
+test("platform-tested workflows preserve inspiration and editable generation settings without importing results", () => {
+    const entry = structuredClone(grid);
+    entry.contentKind = "case";
+    entry.sources = [{ role: "inspiration", label: "Inspiration only", url: "https://example.com/inspiration" }];
+    entry.steps = [{ id: "video", title: "Original video", instruction: "", mode: "video", prompts: { en: "Original test prompt", zh: "测试译文", original: "Original test prompt" }, originalLanguage: "en", textKind: "platform-tested", settings: { model: "wb-seedance-2-15s", seconds: "15", size: "9:16" } }];
+    const saved = JSON.parse(JSON.stringify(workflowAsset(catalogWorkflow(entry)))).data;
+    validateWorkflow(saved);
+    expect(saved.source.sources[0].role).toBe("inspiration");
+    expect(saved.stages[0].settings).toEqual(entry.steps[0].settings);
+    saved.stages[0].settings.size = "16:9";
+    const node = instantiateWorkflow(saved).nodes.find(n => n.metadata?.workflowStage)!;
+    expect(node.metadata).toMatchObject({ model: "wb-seedance-2-15s", seconds: "15", size: "16:9", content: "", status: "idle" });
+    expect(entry.steps[0].settings?.size).toBe("9:16");
+    expect(saved.source.steps[0].settings.size).toBe("9:16");
+    for (const settings of [{ model: "" }, { seconds: 15 }, { apiKey: "not-allowed" }, null]) {
+        const invalid = structuredClone(saved);
+        invalid.stages[0].settings = settings;
+        expect(() => validateWorkflow(invalid)).toThrow();
+        const invalidSource = structuredClone(saved);
+        invalidSource.source.steps[0].settings = settings;
+        expect(() => validateWorkflow(invalidSource)).toThrow();
+    }
+});

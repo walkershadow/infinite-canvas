@@ -1,3 +1,4 @@
+import { platformPromptLabel } from "@/lib/prompt-catalog-locale";
 import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { catalogTitle, catalogSummary } from "@/lib/prompt-catalog-locale";
 import { useState } from "react";
@@ -40,7 +41,7 @@ export function CatalogDetailDialog({ entry, related, onOpenRelated, onClose }: 
                 <h3 className="mb-3 text-base font-semibold">{text("Sources & attribution")}</h3>
                 <p className="mb-3 text-xs text-muted-foreground">{text("Original authors are listed first. Curated collections are credited separately. Links open in a new tab and keep this detail open.")}</p>
                 {[...entry.sources.filter((source) => source.role === "original"), ...entry.sources.filter((source) => source.role === "curation")].map((source) => <a key={`${source.role}:${source.url}`} href={source.url} target="_blank" rel="noopener noreferrer" className="mb-3 flex items-start justify-between gap-3 rounded-lg border border-border p-3 text-sm hover:bg-muted/40">
-                    <span><span className="block text-xs text-muted-foreground">{source.role === "original" ? entry.contentKind === "case" ? text("Original source") : text("Original source") : text("Curated collection")}{source.author ? ` · ${source.author}` : ""}</span><span className="mt-1 block break-words">{text(source.label)}{source.license ? ` · ${text(source.license)}` : ""}</span></span><ExternalLink className="mt-1 size-4 shrink-0" />
+                    <span><span className="block text-xs text-muted-foreground">{source.role === "inspiration" ? text("Inspiration source") : source.role === "original" ? entry.contentKind === "case" ? text("Original source") : text("Original source") : text("Curated collection")}{source.author ? ` · ${source.author}` : ""}</span><span className="mt-1 block break-words">{text(source.label)}{source.license ? ` · ${text(source.license)}` : ""}</span></span><ExternalLink className="mt-1 size-4 shrink-0" />
                 </a>)}
             </section>
         </div>
@@ -74,7 +75,7 @@ function PromptStep({ step, index, entry }: { step: OverseasPromptEntry["steps"]
         <p className="my-3 text-sm leading-6 text-muted-foreground">{text(step.instruction)}</p>
         <Tabs key={language} defaultActiveKey={language} items={(["en", "zh", "original"] as const).filter((language) => step.prompts[language]?.trim()).map((language) => {
             const label = language === "en" ? text("English") : language === "zh" ? text("Chinese") : text("Original");
-            const kindLabel = step.textKind === "licensed-case" ? text(language === "original" || language === step.originalLanguage ? "Original case prompt" : language === "zh" ? "Chinese translation" : "English translation") : step.textKind === "source-excerpt" ? (language === "zh" ? text("Translation of original excerpt") : text("Original excerpt")) : language === "original" ? step.originalKind === "full" ? text("Licensed template") : text("Original excerpt") : step.textKind === "licensed-template" ? text("Licensed template") : text("Adapted example");
+            const kindLabel = step.textKind === "platform-tested" ? text(platformPromptLabel(step, language)) : step.textKind === "licensed-case" ? text(language === "original" || language === step.originalLanguage ? "Original case prompt" : language === "zh" ? "Chinese translation" : "English translation") : step.textKind === "source-excerpt" ? (language === "zh" ? text("Translation of original excerpt") : text("Original excerpt")) : language === "original" ? step.originalKind === "full" ? text("Licensed template") : text("Original excerpt") : step.textKind === "licensed-template" ? text("Licensed template") : text("Adapted example");
             return { key: language, label, children: <div>
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2"><span className="text-xs font-medium">{kindLabel}{language === "original" && step.originalLanguage ? ` · ${step.originalLanguage}` : ""}</span><Button size="small" type="text" icon={<Copy className="size-3.5" />} aria-label={`${text("Copy")} ${text("Step")} ${index + 1} ${label} ${kindLabel}`} onClick={() => copyText(step.prompts[language]!)}>{text("Copy")} {label} · {kindLabel}</Button></div>
                 <pre className="max-h-72 overflow-y-auto whitespace-pre-wrap break-words rounded-lg bg-muted/40 p-3 font-mono text-xs leading-6" lang={language === "original" ? undefined : language}>{step.prompts[language]}</pre>

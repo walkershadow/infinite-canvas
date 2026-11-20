@@ -1,4 +1,4 @@
-import type { WorkflowImage, WorkflowReference } from "./workflow";
+import type { WorkflowImage, WorkflowReference, WorkflowSettings } from "./workflow";
 export type CatalogMedia = { kind: "image" | "video"; url: string; caption: string; captionZh?: string; localPath?: string; poster?: string; originalUrl?: string; originalPoster?: string; unavailable?: boolean };
 export type OverseasPromptEntry = {
     publicLibrary?: boolean;
@@ -17,8 +17,8 @@ export type OverseasPromptEntry = {
     availabilityNote?: string;
     sourceCompleteness?: "complete" | "excerpt" | "truncated";
     mediaRights?: "pending" | "licensed";
-    sources: { role: "original" | "curation"; label: string; url: string; author?: string; license?: string }[];
-    steps: { image?: WorkflowImage; inputOrder?: string[]; mode?: "image" | "video"; dependsOn?: string[]; id: string; title: string; titleZh?: string; instruction: string; prompts: { en?: string; zh?: string; original?: string }; originalLanguage?: string; textKind?: "licensed-template" | "licensed-case" | "adaptation" | "source-excerpt"; originalKind?: "excerpt" | "full"; originalZh?: string }[];
+    sources: { role: "original" | "curation" | "inspiration"; label: string; url: string; author?: string; license?: string }[];
+    steps: { settings?: WorkflowSettings; image?: WorkflowImage; inputOrder?: string[]; mode?: "image" | "video"; dependsOn?: string[]; id: string; title: string; titleZh?: string; instruction: string; prompts: { en?: string; zh?: string; original?: string }; originalLanguage?: string; textKind?: "platform-tested" | "licensed-template" | "licensed-case" | "adaptation" | "source-excerpt"; originalKind?: "excerpt" | "full"; originalZh?: string }[];
     referenceInputs?: WorkflowReference[];
     referenceMedia: CatalogMedia[];
     outputMedia: CatalogMedia[];

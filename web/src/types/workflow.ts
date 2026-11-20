@@ -2,7 +2,10 @@ import type { OverseasPromptEntry } from "./prompt-catalog";
 
 export type WorkflowImage = { url: string; storageKey?: string; localPath?: string; width: number; height: number };
 
+export type WorkflowSettings = { model?: string; seconds?: string; size?: string };
+
 export type WorkflowStage = {
+    settings?: WorkflowSettings;
     image?: WorkflowImage;
     inputOrder?: string[];
     id: string;

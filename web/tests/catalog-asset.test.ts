@@ -32,3 +32,15 @@ test("templates and original excerpts retain their distinct intended uses", () =
     expect(catalogTextAsset(entry, "storyboard", "original").data.content).toBe(entry.steps[0].prompts.original!);
     expect(() => catalogTextAsset(entry, "unknown", "en")).toThrow("unavailable");
 });
+
+test("platform originals and translations never attribute prompt authorship to inspiration", () => {
+    const entry = structuredClone(overseasPromptCatalog.find(e => e.contentKind === "case")!);
+    const step = entry.steps[0];
+    step.textKind = "platform-tested";
+    step.originalLanguage = "en";
+    entry.sources = [{ role: "inspiration", label: "Inspiration video", url: "https://example.com/video", author: "Video creator" }];
+    expect(catalogTextAsset(entry, step.id, "en").metadata?.variant).toBe("Platform-tested original prompt");
+    expect(catalogTextAsset(entry, step.id, "zh").metadata?.variant).toBe("Translation of platform-tested prompt");
+    expect(catalogTextAsset(entry, step.id, "original").note).not.toContain("Original source:");
+    expect(catalogTextAsset(entry, step.id, "en").source).not.toBe("Video creator");
+});
