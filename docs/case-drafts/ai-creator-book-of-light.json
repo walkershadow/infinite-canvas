@@ -1,0 +1,66 @@
+{
+  "status": "awaiting-successful-media",
+  "author": "AI Creator (platform test)",
+  "taskId": "cmwom81lo0003nv01jvan6rh9",
+  "publishScope": "overseas-only",
+  "deepLink": "/canvas/prompts?collection=case&id=ai-creator-book-of-light",
+  "entry": {
+    "id": "ai-creator-book-of-light",
+    "contentKind": "case",
+    "title": "The Book of Light",
+    "titleZh": "光之书",
+    "summary": "An original five-shot fantasy short, submitted as one text-to-video generation: a traveler finds reassurance in a luminous celestial library.",
+    "summaryZh": "一次文生视频请求中的五镜头原创奇幻短片：旅人在发光的天界图书馆中获得安慰。",
+    "category": "Narrative and continuity",
+    "tags": [
+      "Fantasy",
+      "Text to video"
+    ],
+    "sourceModel": "wb-seedance-2-15s",
+    "sourceCompleteness": "complete",
+    "notes": [
+      "Created by AI Creator (platform test). The English prompt is the exact submitted text; Chinese is a translation.",
+      "Inspired by the visual narrative of Earth To Eternity’s video. The original creator’s prompt and production model are unknown. This is an original scene, not a recovered creator prompt.",
+      "One generation stage contains all five shots. No reference images, videos or audio were submitted. Regeneration may vary in shot timing and motion."
+    ],
+    "notesZh": [
+      "创作者：AI Creator（平台实测）。英文为实际提交的完整提示词，中文为译文。",
+      "视觉叙事灵感来自 Earth To Eternity 的视频。原作者提示词及制作模型未知；本案例为原创场景，不是还原出的作者提示词。",
+      "一次生成包含全部五个镜头，未提交参考图片、视频或音频。再次生成的镜头时点与动作可能不同。"
+    ],
+    "sources": [
+      {
+        "role": "inspiration",
+        "label": "Is YOUR NAME written in the Book of Life???",
+        "url": "https://www.youtube.com/shorts/Ejog3je9Ivo",
+        "author": "Earth To Eternity"
+      }
+    ],
+    "steps": [
+      {
+        "id": "video",
+        "title": "Generate the five-shot short",
+        "titleZh": "生成五镜头短片",
+        "instruction": "",
+        "mode": "video",
+        "dependsOn": [],
+        "prompts": {
+          "en": "Create a 15-second vertical 9:16 cinematic fantasy short, five deliberate shots, emotionally coherent and visually consistent. An original adult woman traveler, about 30, short auburn hair, simple teal linen cloak, stands before an immense open illuminated book in a luminous celestial library. Across the lectern is a serene androgynous guardian with an antique gold face, finely engraved golden robes, and sculpted feather-like wings. This is a fictional original scene, no recognizable actor or copyrighted character. Warm volumetric sunlight, ivory columns, gold dust, realistic material detail, restrained epic atmosphere. Maintain the same traveler, guardian, costume, book and room across all shots.\n0–3 seconds: medium over-the-shoulder view behind the guardian, the anxious traveler visible across the massive book. The guardian carefully turns one heavy parchment page. Slow camera push in.\n3–6 seconds: extreme close-up of the guardian's articulated gold fingertip tracing one line of delicate abstract calligraphy across the parchment. A small warm point of light blooms beside the fingertip. No legible names or generated captions.\n6–9 seconds: symmetrical medium close-up of the guardian behind the open book. The guardian looks up gently and gives a small reassuring nod; reflected light brightens the engraved face.\n9–12 seconds: close-up of the same traveler. Her worried expression softens, her eyes glisten, she exhales and forms a subtle relieved smile. Natural facial movement, no exaggerated crying.\n12–15 seconds: wide establishing view of the luminous hall. The guardian makes a calm welcoming gesture toward a bright open archway, and the traveler takes one step toward the light. Slow backward camera movement, dignified quiet ending.\nUse clean cinematic cuts between shots, stable anatomy and hands, believable page motion and consistent geography. Full-frame vertical composition, no black bars, no split screen, no text overlays, no logos, no watermark. If audio is generated, use only soft original ambient choir texture, a subtle page rustle and gentle chime; no borrowed music and no spoken dialogue.",
+          "original": "Create a 15-second vertical 9:16 cinematic fantasy short, five deliberate shots, emotionally coherent and visually consistent. An original adult woman traveler, about 30, short auburn hair, simple teal linen cloak, stands before an immense open illuminated book in a luminous celestial library. Across the lectern is a serene androgynous guardian with an antique gold face, finely engraved golden robes, and sculpted feather-like wings. This is a fictional original scene, no recognizable actor or copyrighted character. Warm volumetric sunlight, ivory columns, gold dust, realistic material detail, restrained epic atmosphere. Maintain the same traveler, guardian, costume, book and room across all shots.\n0–3 seconds: medium over-the-shoulder view behind the guardian, the anxious traveler visible across the massive book. The guardian carefully turns one heavy parchment page. Slow camera push in.\n3–6 seconds: extreme close-up of the guardian's articulated gold fingertip tracing one line of delicate abstract calligraphy across the parchment. A small warm point of light blooms beside the fingertip. No legible names or generated captions.\n6–9 seconds: symmetrical medium close-up of the guardian behind the open book. The guardian looks up gently and gives a small reassuring nod; reflected light brightens the engraved face.\n9–12 seconds: close-up of the same traveler. Her worried expression softens, her eyes glisten, she exhales and forms a subtle relieved smile. Natural facial movement, no exaggerated crying.\n12–15 seconds: wide establishing view of the luminous hall. The guardian makes a calm welcoming gesture toward a bright open archway, and the traveler takes one step toward the light. Slow backward camera movement, dignified quiet ending.\nUse clean cinematic cuts between shots, stable anatomy and hands, believable page motion and consistent geography. Full-frame vertical composition, no black bars, no split screen, no text overlays, no logos, no watermark. If audio is generated, use only soft original ambient choir texture, a subtle page rustle and gentle chime; no borrowed music and no spoken dialogue.",
+          "zh": "制作一部15秒、竖屏9:16的电影感奇幻短片，包含五个有意设计的镜头，情绪连贯、视觉一致。一位原创成年女性旅人，约30岁，赤褐色短发，穿简洁的青绿色亚麻斗篷，站在发光的天界图书馆中一本巨大的摊开书籍前。讲台另一侧是一位神情平静、性别中性的守卫，拥有古金色面容、精细雕刻的金色长袍和雕塑般的羽翼。这是虚构原创场景，不使用可辨认的演员或受版权保护的角色。温暖的体积光、象牙色巨柱、金色尘埃、真实材质细节，整体氛围宏大而克制。全部镜头保持同一旅人、守卫、服装、书籍和房间。\n0–3秒：从守卫身后拍摄过肩中景，焦虑的旅人在巨型书籍对面可见。守卫小心地翻过一张厚重的羊皮纸书页，摄影机缓慢推进。\n3–6秒：极近特写，守卫有活动关节的金色指尖沿着羊皮纸上一行精致的抽象书法移动。指尖旁亮起一个温暖的小光点。不要出现可读姓名或生成字幕。\n6–9秒：对称构图的守卫中近景，摊开的书籍在前景。守卫轻柔地抬头，略微点头安抚，反射光照亮雕刻的面容。\n9–12秒：同一旅人的面部特写。她担忧的神情逐渐放松，眼中泛起光泽，呼出一口气，露出轻微释然的笑容。面部运动自然，不夸张哭泣。\n12–15秒：发光大厅的建立远景。守卫平静地做出欢迎手势，指向明亮的敞开拱门，旅人向光迈出一步。摄影机缓慢后退，安静而庄重地结束。\n镜头之间使用干净的电影式切换，人体和手部稳定，翻页动作可信，场景空间关系一致。全画幅竖屏构图，不要黑边、分屏、文字叠加、标识或水印。如果生成音频，只使用轻柔的原创环境合唱质感、细微翻页声和柔和钟声；不要借用音乐，不要对白。"
+        },
+        "originalLanguage": "en",
+        "textKind": "platform-tested",
+        "originalKind": "full",
+        "settings": {
+          "model": "wb-seedance-2-15s",
+          "seconds": "15",
+          "size": "720x1280"
+        }
+      }
+    ],
+    "referenceInputs": [],
+    "referenceMedia": [],
+    "outputMedia": []
+  }
+}

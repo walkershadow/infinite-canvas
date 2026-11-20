@@ -274,3 +274,5 @@ The Chinese version contains the complete item-by-item acceptance checklist.
 - Workbench 的 `native-canvas-workflow.ts` 需同步本仓库 `workflow-validation.ts`：来源角色接受 inspiration，source.steps 与 stages 的 settings 可省略；存在时只允许 model、seconds、size，值须为非空字符串，不接受其他键。后端需原样保存这些字段。
 - 21 项定向回归、1675 断言通过，覆盖旧目录往返、新参数编辑及来源隔离、非法参数拒绝。未执行构建、浏览器验收或收费生成，未新增尚未成功的案例媒体。
 - 待验收：后端校验同步后，以真实成功案例执行保存 Assets、重开和画布参数编辑；国内与独立版旧流程继续保持原有默认值。
+
+- “光之书”实际请求已准备为 `docs/case-drafts/ai-creator-book-of-light.json`，未导入公开目录。单视频步骤保留全部五镜头英文原文及中文译文，参数为 wb-seedance-2-15s／15 秒／720x1280。任务仍待成功媒体，草稿中的实测标签须随成功结果核验后才可公开。最终深链接格式为 `/canvas/prompts?collection=case&id=ai-creator-book-of-light`；当前未接入时应显示条目不可用。
