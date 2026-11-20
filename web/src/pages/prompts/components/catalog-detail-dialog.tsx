@@ -1,7 +1,8 @@
+import { trackCanvasEvent } from "@/services/api/analytics";
 import { platformPromptLabel } from "@/lib/prompt-catalog-locale";
 import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { catalogTitle, catalogSummary } from "@/lib/prompt-catalog-locale";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Modal, Tag, Tabs } from "antd";
 import { Copy, ExternalLink, Play } from "lucide-react";
 import { WorkflowActions } from "@/components/prompts/workflow-editor";
@@ -12,6 +13,12 @@ import type { CatalogMedia, OverseasPromptEntry } from "@/types/prompt-catalog";
 export function CatalogDetailDialog({ entry, related, onOpenRelated, onClose }: { entry: OverseasPromptEntry; related: OverseasPromptEntry[]; onOpenRelated: (entry: OverseasPromptEntry) => void; onClose: () => void }) {
     const { text, language } = useWorkflowLocale();
     const copyText = useCopyText();
+    const viewed = useRef<string | null>(null);
+    useEffect(() => {
+        if (viewed.current === entry.id) return;
+        viewed.current = entry.id;
+        trackCanvasEvent("template_view", { templateId: entry.id, collection: entry.contentKind }, { page: "prompts" });
+    }, [entry.id, entry.contentKind]);
     const platformTested = entry.steps.some(step => step.textKind === "platform-tested");
     const original = entry.sources.find((source) => source.role === "original");
 

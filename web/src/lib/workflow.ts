@@ -29,7 +29,7 @@ export function instantiateWorkflow(document: WorkflowDocument, origin = { x: 0,
     let referenceY = origin.y + 90;
     document.references.forEach(ref => {
         const height = ref.image ? 280 * ref.image.height / ref.image.width : 220;
-        nodes.push({ id: refIds.get(ref.id)!, type: ref.kind, title: `${catalogText("Input material", document.language)} · ${ref.title} · ${ref.role}${ref.required ? ` (${catalogText("Required", document.language)})` : ""}`, position: { x: origin.x + 40, y: referenceY }, width: 280, height, metadata: { groupId, status: ref.image ? "success" : "idle", ...(ref.image ? { content: ref.image.url, storageKey: ref.image.storageKey } : {}), workflowReference: { role: ref.role, required: ref.required, ...(ref.galleryCategory ? { galleryCategory: ref.galleryCategory } : {}) } } });
+        nodes.push({ id: refIds.get(ref.id)!, type: ref.kind, title: `${catalogText("Input material", document.language)} · ${ref.title} · ${ref.role}${ref.required ? ` (${catalogText("Required", document.language)})` : ""}`, position: { x: origin.x + 40, y: referenceY }, width: 280, height, metadata: { groupId, workflowTemplateId: document.source.id, status: ref.image ? "success" : "idle", ...(ref.image ? { content: ref.image.url, storageKey: ref.image.storageKey } : {}), workflowReference: { role: ref.role, required: ref.required, ...(ref.galleryCategory ? { galleryCategory: ref.galleryCategory } : {}) } } });
         referenceY += height + 60;
     });
     document.stages.forEach((stage, i) => {
@@ -37,14 +37,14 @@ export function instantiateWorkflow(document: WorkflowDocument, origin = { x: 0,
         const manual = stage.mode === "manual";
         const mode = stage.mode === "planning" || stage.mode === "manual" ? "text" : stage.mode;
         nodes.push({ id, type: mode, title: stage.title, position: { x: origin.x + 380 + i * 400, y: origin.y + 90 }, width: 320, height: stage.image ? 320 * stage.image.height / stage.image.width : 260,
-            metadata: { ...stage.settings, groupId, ...(document.source.publicLibrary && mode === "image" ? { count: 1 } : {}), status: manual || stage.image ? "success" : "idle", generationMode: mode, prompt: manual ? "" : stage.prompt, content: stage.image?.url || (manual || stage.mode === "planning" ? stage.prompt : ""), ...(stage.image ? { storageKey: stage.image.storageKey } : {}), workflowStage: { id: stage.id, mode: stage.mode }, workflowRequiredInputs: stage.dependsOn.map(dep => stageIds.get(dep)!).concat(document.references.filter(r => r.required && r.stageIds.includes(stage.id)).map(r => refIds.get(r.id)!)) } });
+            metadata: { ...stage.settings, groupId, ...(document.source.publicLibrary && mode === "image" ? { count: 1 } : {}), status: manual || stage.image ? "success" : "idle", generationMode: mode, prompt: manual ? "" : stage.prompt, content: stage.image?.url || (manual || stage.mode === "planning" ? stage.prompt : ""), ...(stage.image ? { storageKey: stage.image.storageKey } : {}), workflowTemplateId: document.source.id, workflowStage: { id: stage.id, mode: stage.mode }, workflowRequiredInputs: stage.dependsOn.map(dep => stageIds.get(dep)!).concat(document.references.filter(r => r.required && r.stageIds.includes(stage.id)).map(r => refIds.get(r.id)!)) } });
         const inputs = [...document.references.filter(r => r.stageIds.includes(stage.id)).map(r => r.id), ...stage.dependsOn];
         const ordered = stage.inputOrder ? [...stage.inputOrder.filter(input => inputs.includes(input)), ...inputs.filter(input => !stage.inputOrder!.includes(input))] : inputs;
         if (ordered.length !== inputs.length || new Set(ordered).size !== inputs.length || ordered.some(input => !inputs.includes(input))) throw new Error("Invalid workflow input order.");
         ordered.forEach(input => addEdge(refIds.get(input) || stageIds.get(input)!, id));
     });
     // The immutable source snapshot lives on the group, not in a generation input node.
-    nodes.unshift({ id: groupId, type: CanvasNodeType.Group, title: catalogTitle(document.source, document.language), position: origin, width: Math.max(800, 440 + document.stages.length * 400), height: Math.max(420, ...nodes.map(node => node.position.y - origin.y + node.height + 60)), metadata: { workflow: structuredClone(document) } });
+    nodes.unshift({ id: groupId, type: CanvasNodeType.Group, title: catalogTitle(document.source, document.language), position: origin, width: Math.max(800, 440 + document.stages.length * 400), height: Math.max(420, ...nodes.map(node => node.position.y - origin.y + node.height + 60)), metadata: { workflowTemplateId: document.source.id, workflow: structuredClone(document) } });
     return { nodes, connections, groupId };
 }
 export function workflowGenerationError(node: CanvasNodeData | undefined, nodes: CanvasNodeData[], prompt: string, connections?: CanvasConnection[]): string | undefined {
@@ -56,6 +56,6 @@ export function workflowGenerationError(node: CanvasNodeData | undefined, nodes:
 }
 
 export function workflowNodeMetadata(node?: CanvasNodeData) {
-    if (!node?.metadata?.workflowStage) return {};
-    return { groupId: node.metadata.groupId, workflowStage: node.metadata.workflowStage, workflowRequiredInputs: node.metadata.workflowRequiredInputs };
+    if (!node?.metadata?.workflowStage) return node?.metadata?.workflowTemplateId ? { workflowTemplateId: node.metadata.workflowTemplateId } : {};
+    return { workflowTemplateId: node.metadata.workflowTemplateId, groupId: node.metadata.groupId, workflowStage: node.metadata.workflowStage, workflowRequiredInputs: node.metadata.workflowRequiredInputs };
 }

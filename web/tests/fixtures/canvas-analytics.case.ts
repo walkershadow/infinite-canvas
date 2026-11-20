@@ -1,0 +1,38 @@
+import { expect, mock, test } from "bun:test";
+let account = "first";
+let signedIn = false;
+mock.module("@/services/api/workbench", () => ({ workbenchSession: () => { if (!signedIn) throw new Error("signed out"); return { user: { id: account } }; } }));
+const calls: { url: string; init: RequestInit }[] = [];
+globalThis.fetch = mock(async (url: string, init: RequestInit) => { calls.push({ url, init }); throw new Error("offline"); }) as any;
+const { trackCanvasEvent, setAnalyticsContext } = await import("@/services/api/analytics");
+test("overseas analytics is authenticated, failure-safe, scoped per account and deduplicates app entry", async () => {
+    setAnalyticsContext({ page: "prompts" });
+    trackCanvasEvent("canvas_enter");
+    expect(calls).toHaveLength(0);
+    signedIn = true;
+    setAnalyticsContext({ page: "prompts" });
+    trackCanvasEvent("canvas_enter");
+    trackCanvasEvent("canvas_enter");
+    trackCanvasEvent("template_save", { templateId: "seedance:test", prompt: "private prompt" } as any);
+    await Promise.resolve();
+    if (process.env.VITE_APP_MODE !== "overseas") { expect(calls).toHaveLength(0); return; }
+    expect(calls).toHaveLength(2);
+    const [first, saved] = calls.map(call => JSON.parse(call.init.body as string).events[0]);
+    expect(first.page).toBe("prompts");
+    expect(first.sessionId).toMatch(/^[\da-f-]{36}$/);
+    expect(saved.id).not.toBe(first.id);
+    expect(saved.sessionId).toBe(first.sessionId);
+    expect(saved.properties).toEqual({ templateId: "seedance:test" });
+    expect(calls[0].url).toBe("/api/analytics/events");
+    expect(calls[0].init.credentials).toBe("same-origin");
+    expect(calls[0].init.keepalive).toBe(true);
+    account = "second";
+    trackCanvasEvent("template_save", { templateId: "stale-context" });
+    expect(calls).toHaveLength(2);
+    setAnalyticsContext({ page: "prompts" });
+    trackCanvasEvent("canvas_enter");
+    expect(JSON.parse(calls[2].init.body as string).events[0].sessionId).not.toBe(first.sessionId);
+    expect(new Headers(calls[2].init.headers).get("X-Canvas-Account")).toBe("second");
+    await Promise.resolve();
+    expect(calls).toHaveLength(3);
+});

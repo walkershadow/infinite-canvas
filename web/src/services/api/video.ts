@@ -1,3 +1,5 @@
+import { currentAnalyticsContext } from "./analytics";
+import { isOverseas } from "@/constant/integration";
 import { isWorkbenchModel } from "@/stores/use-config-store";
 import { isWorkbench } from "@/constant/integration";
 import { workbenchRequest } from "@/services/api/workbench";
@@ -86,7 +88,7 @@ export async function createVideoGenerationTask(config: AiConfig, prompt: string
             : referenceMode === "none" ? {} : { images, videos, audios };
         const input = { prompt, model: model.id, duration, ratio, ...media };
         if (!options.projectId) {
-            const { task } = await workbenchRequest<{ task: WorkbenchTask }>("/video/generate", { method: "POST", signal: options.signal, body: JSON.stringify({ requestKey: options.requestKey, input }) });
+            const { task } = await workbenchRequest<{ task: WorkbenchTask }>("/video/generate", { method: "POST", signal: options.signal, body: JSON.stringify({ requestKey: options.requestKey, input, ...(isOverseas ? { analyticsContext: currentAnalyticsContext() || { page: "video_studio" } } : {}) }) });
             void refreshWorkbenchBalance().catch(() => undefined);
             return { id: task.id, provider: "workbench", model: model.id };
         }

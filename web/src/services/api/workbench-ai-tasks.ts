@@ -1,3 +1,7 @@
+import { isOverseas } from "@/constant/integration";
+import type { AnalyticsContext } from "@/lib/canvas-analytics";
+import { currentAnalyticsContext } from "./analytics";
+import { projectAnalyticsContext } from "@/services/workbench/projects";
 import { useAiTasksStore } from "@/stores/use-workbench-ai-store";
 import { localForageStorage } from "@/lib/localforage-storage";
 import { workbenchRequest } from "./workbench";
@@ -8,8 +12,8 @@ export type AiTaskKind = "images" | "text" | "audio";
 export type AiTaskResult = { images?: { id: string; url: string }[]; text?: string; url?: string; mimeType?: string };
 export type AiTask = { id: string; requestKey: string; kind: AiTaskKind; model: string; status: "queued" | "running" | "completed" | "failed" | "unknown"; error: string | null; result: AiTaskResult | null; createdAt: string; updatedAt: string };
 export type AiTaskOwner = { projectId?: string; nodeId?: string; itemId?: string; slot?: number };
-export type PlatformRequestOptions = { signal?: AbortSignal; owner?: AiTaskOwner };
-export type AiTaskRecord = { requestKey: string; kind: AiTaskKind; body: Record<string, unknown>; owner?: AiTaskOwner; task?: AiTask; delivered?: boolean; error?: string };
+export type PlatformRequestOptions = { signal?: AbortSignal; owner?: AiTaskOwner; analyticsContext?: AnalyticsContext };
+export type AiTaskRecord = { requestKey: string; kind: AiTaskKind; body: Record<string, unknown>; analyticsContext?: AnalyticsContext; owner?: AiTaskOwner; task?: AiTask; delivered?: boolean; error?: string };
 const KEY = "workbench:ai-tasks:v1";
 let loading: Promise<void> | undefined;
 let queue: Promise<unknown> = Promise.resolve();
@@ -80,7 +84,7 @@ export async function runAiTask(kind: AiTaskKind, body: Record<string, unknown>,
         if (unfinished && JSON.stringify(unfinished.body) !== JSON.stringify(body)) throw new Error("An earlier operation is still unresolved. Open Points → AI tasks before starting a different request for this result.");
         if (options.owner?.nodeId && !options.owner.itemId && records.some((r) => !r.delivered && r.task?.status !== "failed" && r.owner?.projectId === options.owner?.projectId && r.owner?.nodeId === options.owner?.nodeId && r.owner?.itemId)) throw new Error("This node still has preserved result tasks. Open Points → AI tasks to resume those tasks.");
         record = records.find((r) => !r.delivered && r.task?.status !== "failed" && r.kind === kind && JSON.stringify(r.owner) === JSON.stringify(options.owner) && JSON.stringify(r.body) === JSON.stringify(body))
-            || { requestKey: crypto.randomUUID(), kind, body, owner: options.owner };
+            || { requestKey: crypto.randomUUID(), kind, body, owner: options.owner, ...(isOverseas ? { analyticsContext: options.analyticsContext || (options.owner?.projectId ? projectAnalyticsContext(options.owner.projectId, options.owner.nodeId) : currentAnalyticsContext()) } : {}) };
         return records.includes(record) ? records : [...records, record];
     });
     const existing = active.get(record.requestKey);
@@ -99,7 +103,7 @@ export async function resumeAiTask(record: AiTaskRecord, signal?: AbortSignal): 
         if (!task) {
             signal?.throwIfAborted();
             // Replaying the exact persisted body/key is idempotent even when the first response was lost.
-            task = (await workbenchRequest<{ task: AiTask }>(`/ai/${record.kind}`, { method: "POST", signal, body: JSON.stringify({ ...record.body, requestKey: record.requestKey }) })).task;
+            task = (await workbenchRequest<{ task: AiTask }>(`/ai/${record.kind}`, { method: "POST", signal, body: JSON.stringify({ ...record.body, requestKey: record.requestKey, ...(isOverseas && record.analyticsContext ? { analyticsContext: record.analyticsContext } : {}) }) })).task;
             if (task.requestKey !== record.requestKey) throw new Error("AI task identity mismatch.");
             await saveTask(task);
         }

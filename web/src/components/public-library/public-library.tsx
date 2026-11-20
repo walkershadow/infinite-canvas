@@ -1,3 +1,4 @@
+import { trackCanvasEvent } from "@/services/api/analytics";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Alert, App, Button, Empty, Modal, Spin, Tabs } from "antd";
@@ -22,7 +23,7 @@ export default function PublicLibrary() {
     if (!allowed) return <div className="p-6"><Alert type="info" title={t("publicLibrary.disabled")} /></div>;
     const open = async (id: string) => {
         setOpening(id);
-        try { setDocument(await openPublicWorkflow(id, language)); }
+        try { setDocument(await openPublicWorkflow(id, language)); trackCanvasEvent("template_view", { templateId: id, collection: "public-library" }, { page: "prompts" }); }
         catch (error) { void message.error(error instanceof Error ? error.message : t("publicLibrary.loadFailed")); }
         finally { setOpening(""); }
     };

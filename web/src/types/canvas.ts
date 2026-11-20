@@ -45,6 +45,7 @@ export type CanvasNodeText = {
 };
 
 export type CanvasNodeMetadata = {
+    workflowTemplateId?: string;
     workflow?: import("./workflow").WorkflowDocument;
     workflowStage?: { id: string; mode: import("./workflow").WorkflowStage["mode"] };
     workflowReference?: { role: string; required: boolean; galleryCategory?: import("./public-gallery").GalleryCategory };

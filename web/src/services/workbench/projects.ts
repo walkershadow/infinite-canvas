@@ -1,3 +1,4 @@
+import type { AnalyticsContext, AnalyticsPage } from "@/lib/canvas-analytics";
 import { isOverseas } from "@/constant/integration";
 import { isPublicLibraryUrl } from "@/lib/public-library";
 import { initializeWorkbenchConfig } from "./config";
@@ -168,7 +169,7 @@ export async function createWorkbenchVideo(projectId: string, nodeId: string, re
         await saveCurrentProjects();
         const current = envelopes.get(projectId);
         if (!current) throw new Error("Save this project before generating.");
-        const response = await workbenchRequest<{ task: WorkbenchTask; revision: number }>(`/projects/${encodeURIComponent(current.id)}/generate`, { method: "POST", body: JSON.stringify({ revision: current.revision, requestKey, nodeId, input }), signal });
+        const response = await workbenchRequest<{ task: WorkbenchTask; revision: number }>(`/projects/${encodeURIComponent(current.id)}/generate`, { method: "POST", body: JSON.stringify({ revision: current.revision, requestKey, nodeId, input, ...(isOverseas ? { analyticsContext: projectAnalyticsContext(projectId, nodeId) } : {}) }), signal });
         current.revision = response.revision;
         void refreshWorkbenchBalance().catch(() => undefined);
         return { ...response.task, projectId: current.id };
@@ -208,4 +209,11 @@ export async function dismissRecovery() {
 export async function durableDocument<T>(value: T): Promise<T> {
     await collectDurableUrls(value);
     return await durableValue(value) as T;
+}
+
+export function cloudProjectId(projectId?: string) { return projectId ? envelopes.get(projectId)?.id : undefined; }
+export function projectAnalyticsContext(projectId?: string, nodeId?: string, page: AnalyticsPage = "canvas"): AnalyticsContext | undefined {
+    if (!isOverseas) return;
+    const templateId = useCanvasStore.getState().projects.find(p => p.id === projectId)?.nodes.find(n => n.id === nodeId)?.metadata?.workflowTemplateId;
+    return { page, ...(cloudProjectId(projectId) ? { projectId: cloudProjectId(projectId) } : {}), ...(templateId ? { templateId } : {}) };
 }

@@ -1,3 +1,5 @@
+import { projectAnalyticsContext } from "@/services/workbench/projects";
+import { trackCanvasEvent } from "@/services/api/analytics";
 import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { ReferenceImagePicker } from "@/components/public-library/reference-image-picker";
 import { replaceReferenceImage } from "@/lib/canvas/replace-reference-image";
@@ -2125,7 +2127,7 @@ function InfiniteCanvasPage() {
                     position: { x: node.position.x + node.width + 96, y: node.position.y },
                     width: node.width,
                     height: node.height,
-                    metadata: childMetadata,
+                    metadata: { ...childMetadata, workflowTemplateId: node.metadata?.workflowTemplateId },
                 },
             ]);
             setConnections((prev) => [
@@ -2140,7 +2142,7 @@ function InfiniteCanvasPage() {
             setRunningNodeId(childId);
             const controller = startGenerationRequest(childId, node.id, childId);
             try {
-                const image = await requestEdit(generationConfig, prompt, references, { signal: controller.signal, owner: { projectId, nodeId: childId } }).then((items) => items[0]);
+                const image = await requestEdit(generationConfig, prompt, references, { signal: controller.signal, analyticsContext: { ...projectAnalyticsContext(projectId, node.id), page: "canvas", templateId: node.metadata?.workflowTemplateId }, owner: { projectId, nodeId: childId } }).then((items) => items[0]);
                 const uploaded = await uploadImage(image.dataUrl, { signal: controller.signal });
                 const size = fitNodeSize(uploaded.width, uploaded.height, node.width, node.height);
                 setNodes((prev) => prev.map((item) => (item.id === childId ? { ...item, width: size.width, height: size.height, metadata: { ...item.metadata, ...imageMetadata(uploaded), prompt, ...generationMetadata } } : item)));
@@ -2208,7 +2210,7 @@ function InfiniteCanvasPage() {
                     position: { x: node.position.x + node.width + 96, y: node.position.y },
                     width: imageConfig.width,
                     height: imageConfig.height,
-                    metadata: { prompt, status: NODE_STATUS_LOADING, ...generationMetadata },
+                    metadata: { prompt, status: NODE_STATUS_LOADING, ...generationMetadata, workflowTemplateId: node.metadata?.workflowTemplateId },
                 },
             ]);
             setConnections((prev) => [...prev, { id: nanoid(), fromNodeId: node.id, toNodeId: childId }]);
@@ -2220,7 +2222,7 @@ function InfiniteCanvasPage() {
                     generationConfig,
                     prompt,
                     [{ id: node.id, name: `${node.title || node.id}.png`, type: node.metadata.mimeType || "image/png", dataUrl: node.metadata.content, storageKey: node.metadata.storageKey }],
-                    { signal: controller.signal, owner: { projectId, nodeId: childId } },
+                    { signal: controller.signal, analyticsContext: { ...projectAnalyticsContext(projectId, node.id), page: "canvas", templateId: node.metadata?.workflowTemplateId }, owner: { projectId, nodeId: childId } },
                 ).then((items) => items[0]);
                 const uploaded = await uploadImage(image.dataUrl, { signal: controller.signal });
                 const size = fitNodeSize(uploaded.width, uploaded.height, imageConfig.width, imageConfig.height);
@@ -2576,8 +2578,8 @@ function InfiniteCanvasPage() {
                         imageIds.map(async (imageId) => {
                             try {
                                 const image = referenceImages.length
-                                    ? await requestEdit({ ...generationConfig, count: "1" }, effectivePrompt, referenceImages, { signal: controller.signal, owner: { projectId, nodeId: rootId, itemId: imageId } }).then((items) => items[0])
-                                    : await requestGeneration({ ...generationConfig, count: "1" }, effectivePrompt, { signal: controller.signal, owner: { projectId, nodeId: rootId, itemId: imageId } }).then((items) => items[0]);
+                                    ? await requestEdit({ ...generationConfig, count: "1" }, effectivePrompt, referenceImages, { signal: controller.signal, analyticsContext: { ...projectAnalyticsContext(projectId, nodeId), page: "canvas", templateId: sourceNode?.metadata?.workflowTemplateId }, owner: { projectId, nodeId: rootId, itemId: imageId } }).then((items) => items[0])
+                                    : await requestGeneration({ ...generationConfig, count: "1" }, effectivePrompt, { signal: controller.signal, analyticsContext: { ...projectAnalyticsContext(projectId, nodeId), page: "canvas", templateId: sourceNode?.metadata?.workflowTemplateId }, owner: { projectId, nodeId: rootId, itemId: imageId } }).then((items) => items[0]);
                                 const uploaded = await uploadImage(image.dataUrl, { signal: controller.signal });
                                 const imageSize = fitNodeSize(uploaded.width, uploaded.height, imageConfig.width, imageConfig.height);
                                 const item: CanvasNodeImage = { id: imageId, status: NODE_STATUS_SUCCESS, content: uploaded.url, storageKey: uploaded.storageKey, naturalWidth: uploaded.width, naturalHeight: uploaded.height, bytes: uploaded.bytes, mimeType: uploaded.mimeType };
@@ -2720,7 +2722,7 @@ function InfiniteCanvasPage() {
                     if (!reuseAudioNode) setConnections((prev) => [...prev, { id: nanoid(), fromNodeId: nodeId, toNodeId: audioId }]);
                     const controller = startGenerationRequest(audioId, nodeId, nodeId, runController);
                     try {
-                        const audio = await storeGeneratedAudio(await requestAudioGeneration(generationConfig, effectivePrompt, { signal: controller.signal, owner: { projectId, nodeId: audioId }, audios: generationContext.referenceAudios }), generationConfig.audioFormat);
+                        const audio = await storeGeneratedAudio(await requestAudioGeneration(generationConfig, effectivePrompt, { signal: controller.signal, analyticsContext: { ...projectAnalyticsContext(projectId, nodeId), page: "canvas", templateId: sourceNode?.metadata?.workflowTemplateId }, owner: { projectId, nodeId: audioId }, audios: generationContext.referenceAudios }), generationConfig.audioFormat);
                         setNodes((prev) => prev.map((node) => (node.id === audioId ? { ...node, metadata: { ...node.metadata, ...audioMetadata(audio), prompt: effectivePrompt, ...buildAudioGenerationMetadata(generationConfig) } } : node)));
                     } finally {
                         finishGenerationRequest(audioId, controller);
@@ -2792,7 +2794,7 @@ function InfiniteCanvasPage() {
                                         ),
                                     );
                                 },
-                                { signal: controller.signal, owner: { projectId, nodeId: rootId, itemId: textId }, videos: generationContext.referenceVideos },
+                                { signal: controller.signal, analyticsContext: { ...projectAnalyticsContext(projectId, nodeId), page: "canvas", templateId: sourceNode?.metadata?.workflowTemplateId }, owner: { projectId, nodeId: rootId, itemId: textId }, videos: generationContext.referenceVideos },
                             );
                             const content = answer || streamed;
                             setNodes((prev) =>
@@ -3181,6 +3183,7 @@ function InfiniteCanvasPage() {
                 setNodes(prev => [...prev, ...graph.nodes]);
                 setConnections(prev => [...prev, ...graph.connections]);
                 setSelectedNodeIds(new Set([graph.groupId]));
+                trackCanvasEvent("template_open", { templateId: payload.document.source.id, collection: payload.document.source.contentKind });
                 setViewport(focusViewportForNode(graph.nodes[0], size));
             } else if (payload.kind === "text") {
                 insertAssistantText(payload.content, payload.title);

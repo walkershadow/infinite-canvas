@@ -1,3 +1,4 @@
+import { trackCanvasEvent } from "@/services/api/analytics";
 import { platformPromptLabel } from "@/lib/prompt-catalog-locale";
 import { useAssetDestination } from "@/hooks/use-asset-destination";
 import { isOverseas } from "@/constant/integration";
@@ -39,6 +40,7 @@ export function WorkflowActions({ document }: { document: WorkflowDocument }) {
             if (useAssetStore.getState().assets.some(a => a.kind === "workflow" && (a.folderId || "") === folderId && workflowIdentity(a.data) === workflowIdentity(document))) { message.info(text("Saved to My Assets")); return; }
             useAssetStore.getState().addAsset({ ...workflowAsset(await resolveWorkflowImages(document, true)), folderId: folderId || undefined });
             await saveCloudLibrary();
+            trackCanvasEvent("template_save", { templateId: document.source.id, collection: document.source.contentKind });
             message.success(text("Entire workflow saved to My Assets."));
         } catch (error) { message.error(error instanceof Error ? text(error.message) : text("Unable to save workflow. Local edits are preserved.")); }
         finally { saving.current = false; setBusy(false); }
@@ -74,12 +76,14 @@ export function WorkflowEditor({ document, asset, onClose }: { document: Workflo
                 const panel = useCanvasSidePanelStore.getState();
                 const viewport = focusViewportForNode(graph.nodes[0], { width: window.innerWidth - (panel.panelOpen ? panel.width : 0), height: window.innerHeight });
                 const id = useCanvasStore.getState().importProject({ title: catalogTitle(draft.source, draft.language), nodes: graph.nodes, connections: graph.connections, viewport });
+                trackCanvasEvent("template_open", { templateId: prepared.source.id, collection: prepared.source.contentKind });
                 onClose(); navigate(`/canvas/${id}`);
             } else {
                 await initializeCloudLibrary();
                 const value = workflowAsset(prepared);
                 asset ? useAssetStore.getState().updateAsset(asset.id, { data: value.data }) : useAssetStore.getState().addAsset({ ...value, folderId: folderId || undefined });
                 await saveCloudLibrary();
+                trackCanvasEvent("template_save", { templateId: prepared.source.id, collection: prepared.source.contentKind });
                 message.success(text("Entire workflow saved. Original text is preserved.")); onClose();
             }
         } catch (error) { message.error(error instanceof Error ? text(error.message) : text("Unable to save workflow.")); } finally { saving.current = false; setBusy(false); }

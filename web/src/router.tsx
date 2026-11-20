@@ -1,3 +1,4 @@
+import { CanvasAnalyticsTracker } from "@/components/layout/canvas-analytics-tracker";
 import { lazy, Suspense } from "react";
 import { Spin } from "antd";
 import { isWorkbench } from "@/constant/integration";
@@ -30,7 +31,7 @@ const pages = [
 export const router = createBrowserRouter([
     {
         element: isWorkbench
-            ? <WorkbenchLayout><UserLayout><Suspense fallback={<div className="flex h-full items-center justify-center"><Spin /></div>}><Outlet /></Suspense></UserLayout></WorkbenchLayout>
+            ? <WorkbenchLayout><UserLayout><CanvasAnalyticsTracker /><Suspense fallback={<div className="flex h-full items-center justify-center"><Spin /></div>}><Outlet /></Suspense></UserLayout></WorkbenchLayout>
             : <UserLayout><AnalyticsTracker /><Suspense fallback={<div className="flex h-full items-center justify-center"><Spin /></div>}><Outlet /></Suspense></UserLayout>,
         children: [...pages, ...(isWorkbench ? [{ path: "/:id", element: <CanvasProjectPage /> }] : [])],
     },

@@ -180,6 +180,9 @@ test("generation retains the caller's stable request key and server project ID",
     const second = await projects.createWorkbenchVideo("native-1", "video", key, input);
     expect(first.id).toBe(second.id);
     expect(first.projectId).toBe("cloud-1");
+    const submitted = requests.find(r => r.path.includes("/projects/") && r.path.endsWith("/generate"))!.body;
+    expect(submitted.analyticsContext).toEqual({ page: "canvas", projectId: "cloud-1" });
+    expect(submitted.input).toEqual(input);
     expect(requests.filter((r) => r.path.includes("/projects/") && r.path.endsWith("/generate")).map((r) => r.body.requestKey)).toEqual([key, key]);
 });
 
@@ -365,6 +368,7 @@ test("AI tasks persist before submission and recover lost responses with the sam
         const saved = JSON.parse(cache.get("workbench:ai-tasks:v1")!)[0];
         expect(saved.owner).toEqual(owner);
         expect(saved.body).toEqual(input);
+        expect(saved.analyticsContext).toEqual({ page: "canvas", projectId: "cloud-1" });
         aiPending = 301; aiChecks = 0;
         expect(await runAiTask("text", input, { owner })).toEqual({ text: "Recovered text" });
         expect(aiChecks).toBe(302);

@@ -7,6 +7,7 @@ import { defineConfig, loadEnv, type Plugin } from "vite";
 import { catalogForAppMode } from "./src/services/api/overseas-prompt-catalog";
 import { validateCatalogMediaMap, type CatalogMediaMap } from "./src/lib/catalog-media";
 
+import { caseStudiesExport } from "./scripts/case-studies";
 import { overseasPublicAssets } from "./scripts/overseas-public-assets";
 
 import { parseChangelog } from "./src/lib/release";
@@ -66,7 +67,7 @@ export default defineConfig(({ mode, command }) => {
         base,
         build: { copyPublicDir: !integrated },
         server: integrated ? { proxy: { "/api": proxy } } : undefined,
-        plugins: [react(), localPluginsManifest(base), ...(integrated ? [overseasPublicAssets(), {
+        plugins: [react(), localPluginsManifest(base), ...(overseas && catalogMediaMap ? [caseStudiesExport(catalogMediaMap)] : []), ...(integrated ? [overseasPublicAssets(), {
             name: "overseas-html",
             transformIndexHtml: (html: string) => html
                 .replace('lang="zh-CN"', domestic ? 'lang="zh-CN"' : 'lang="en-US"')
