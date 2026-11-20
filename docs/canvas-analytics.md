@@ -10,8 +10,9 @@
 - page：canvases、canvas、image_studio、video_studio、prompts、assets、settings；不发送 URL 查询参数。
 - properties 只构造 projectId、templateId、collection、activeMs。collection 只允许 case、template、public-library。templateId 保留原目录 ID，包括冒号。
 - canvas_enter 指任意 Canvas 应用页面首次前台进入，每会话一次。查看详情记录 template_view，流程云端保存成功后记录 template_save；创建画布或成功插入节点后记录 template_open。取消、失败和重复保存提示不算新保存。
-- 当前基础事件逐项发送，不积压队列、不重试、不持久化行为记录；失败不提示、不阻断业务。请求使用 keepalive，离页也可提交。
-- page_active 分段时长及批量阈值等待用户确认，当前尚未启用活动计时，不能将接口字段支持视作停留统计已完成。
+- 按用户确认参数，每 30 秒提交一次，队列达到 20 条立即提交；失焦、隐藏、pagehide 和路由离开立即结算并提交。失败丢弃、不重试、不持久化行为队列；请求使用 keepalive，失败不提示、不阻断业务。账号切换丢弃旧账号未发送事件。
+- page_active 仅累计页面可见且聚焦时的 performance.now() 实际经过时间；失焦和隐藏均暂停，重新聚焦／显示后恢复。重复生命周期事件不重复累计，路由离开清理计时器和监听器。延迟计时器按后端单事件 60000ms 上限拆分，不丢失整段时长，也不将计时器触发次数当作时间。
+- 页面上下文在记录时解析服务端项目 ID；新项目保存前省略 projectId，服务端 ID 可用后才携带，不提交本地项目 ID。
 
 不发送提示词、媒体地址、邮箱、作品标题或错误正文。服务端必须继续校验账号、事件白名单、项目归属和模板 ID，不应直接信任浏览器上报。
 

@@ -289,4 +289,11 @@ The Chinese version contains the complete item-by-item acceptance checklist.
 - 新增登录同源事件接口；进入任意 Canvas 页面每会话记录一次，模板查看、云端保存成功和创建／插入画布成功分别记录，失败不阻断业务。账号切换隔离 sessionId 和页面上下文，国内／独立版不发送新事件。
 - 节点保存模板 ID；平台视频及 AI 请求携带独立 analyticsContext，项目 ID 映射为服务端 ID，AI 恢复沿用原键与上下文，不改变业务请求体和原幂等匹配。
 - 海外 CI 输出 case-studies.json，只有公开双语标题、摘要、分类、标签、CDN 封面及详情链接，未输出提示词、用户素材或其他私人信息。
-- 协议见 `docs/canvas-analytics.md`。活动时长参数仍待批准，page_active 尚未启用，不标记为完成。待后端联调、浏览器操作及主页读取摘要验收；未构建、未部署。
+- 协议见 `docs/canvas-analytics.md`。活动时长现已按用户确认参数接入，详见下方补充。待后端联调、浏览器操作及主页读取摘要验收；未构建、未部署。
+
+
+### 海外活动时长分段统计（未部署）
+
+- 每 30 秒及队列达到 20 条时提交；只累计可见且聚焦的 performance 实际经过时间，失焦／隐藏暂停，pagehide、路由离开立即结算并清理监听器。事件失败丢弃，不重试、不阻断业务。
+- 连续 blur、visibilitychange、pagehide、route cleanup 不重复累计；延迟计时器拆成不超过 60000ms 的单事件。项目 ID 每次记录动态映射，尚未保存的本地项目省略 projectId，账号变化丢弃旧队列。
+- 11 项定向测试、177 断言通过，另含隔离 Workbench 21 项／210 断言及三模式统计传输测试；覆盖实际 tracker 事件绑定、时钟、20 条分批、离页清理、账号切换和新项目 ID 就绪。未执行构建、浏览器验收或部署。
