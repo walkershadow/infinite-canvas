@@ -259,3 +259,9 @@ The Chinese version contains the complete item-by-item acceptance checklist.
 - 新整数契约缺项阻止估价，旧海外无该字段保持展示价格兼容；美元最多六位小数，英文确认不展示倍率数字。定向覆盖有无视频、按秒／按次／特殊价格、零值和错误数据，契约见 `docs/workbench-video-pricing-contract.md`。本会话不构建、不部署、不发起收费生成；发布结果见下条；实际上游扣费与退款仍待验收。
 
 - 海外接入会话回报已发布：Canvas `4918ae0`、后端 `432f1cc`，入口 https://ai-creator.xprismai.com/canvas/ ，release.json 及 bootstrap 整数 quota 契约已核实。95 项后端单测、10 项隔离 DB 测试和生产认证 HTTP 报价／权限／分页检查通过，验证账号已清理、业务数据摘要一致。未进行真实收费生成／支付，不标记实际上游扣费验收；国内／new-api／独立画布容器未变。jp1 1024MB heap 明确 OOM，恢复 2048MB 后 48.39 秒构建成功，临时 swap 已移除；详见估价契约文档的发布记录。
+
+### 平台模型推荐与赠送次数资格
+
+- 平台视频选择器读取 recommended／recommendationLabel，显示推荐星标；New／Special price 提供中英文标签。每日免费与赠送抵扣资格独立显示，海外 giftQuota 必须明确为 true；旧国内缺字段仅保留原 Fast 兼容，显式 false 生效。
+- 积分菜单读取赠送总次数、永久／限期次数及最早到期时间，不将总数标为永久。生成确认按资格列出每日免费 → 赠送次数 → 赠送积分 → 付费积分，实际结算交由后端；无支付改动，资产目录与个人数据保留。
+- 定向测试覆盖后台开关、两新模型推荐标签、独立资格、国内兼容、抵扣顺序、双语和到期缺项／非法时间；连同估价、Workbench 集成及三模式回归共 12 项外层测试通过（隔离 Workbench 集成另有 21 项／207 断言）。尚未浏览器验收或真实收费生成，海外发布由根会话协调，国内／独立不部署。

@@ -1,3 +1,5 @@
+import { giftUsesSummary } from "@/services/workbench/video-benefits";
+import { useTranslation } from "react-i18next";
 import { isDomestic } from "@/constant/integration";
 import { useWorkflowLocale } from "@/hooks/use-workflow-locale";
 import { canImportLegacy, workbenchLink } from "@/services/api/workbench";
@@ -19,6 +21,7 @@ import type { CloudProject } from "@/types/workbench";
 
 export function WorkbenchActions() {
     const { text } = useWorkflowLocale();
+    const { i18n } = useTranslation();
     const { ready, saving, error, recovery, balance, libraryReady, libraryError, libraryRecovery, librarySaving } = useWorkbenchStore();
     const aiError = useAiTasksStore((state) => state.error);
     const { token } = theme.useToken();
@@ -53,8 +56,10 @@ export function WorkbenchActions() {
             window.location.assign(`/canvas/canvas/${encodeURIComponent(project.document.id || project.id)}`);
         } catch (error) { setNotice(error instanceof Error ? error.message : String(error)); setImporting(undefined); }
     };
+    const giftSummary = ready ? giftUsesSummary(workbenchSession().quota, i18n.language) : "";
     const details = <div className="w-80 max-w-[calc(100vw-48px)] space-y-3 whitespace-normal text-sm">
         <div className="flex items-center justify-between gap-3"><span className="font-medium">{status}</span><span className="shrink-0 tabular-nums">{balance ?? "…"} {text("points")}</span></div>
+        {giftSummary && <p className="text-xs leading-relaxed" style={{ color: token.colorTextSecondary }}>{giftSummary}</p>}
         <p className="text-xs leading-relaxed" style={{ color: token.colorTextSecondary }}>{text("Local media files are uploaded with your documents. External links and task playback URLs are not guaranteed media backups.")}</p>
         {aiError && <p role="alert" className="break-words text-xs">{aiError}</p>}
         {notice && !importOpen && <div role="alert" className="break-words"><p>{notice}</p><Button type="text" size="small" onClick={() => setNotice("")}>{text("Dismiss")}</Button></div>}

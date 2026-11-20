@@ -1,3 +1,4 @@
+import { videoDeductionText } from "./video-benefits";
 import { inferVideoRatio } from "@/lib/media-size";
 import { modelOptionName, type AiConfig } from "@/stores/use-config-store";
 import { workbenchSession } from "@/services/api/workbench";
@@ -57,7 +58,8 @@ export function workbenchVideoEstimateText(estimate: ReturnType<typeof workbench
     const videoNote = estimate.multiplier > 1
         ? (language.startsWith("zh") ? `含视频参考；图片和音频不加价。` : `Includes video references; image and audio references do not increase the rate. `)
         : "";
+    const deductions = videoDeductionText(estimate.model, workbenchSession(), language);
     return videoNote + (language.startsWith("zh")
-        ? `${estimate.model.name} · ${estimate.duration}秒 · ${estimate.ratio}。预计 ${estimate.points} 点（${amount}）。${estimate.model.freeQuota ? "工作台将按资格使用每日免费额度。" : "此模型不使用每日免费额度。"}停止等待不会取消计费。`
-        : `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points (${amount} ${estimate.currency}). ${estimate.model.freeQuota ? "Eligible daily free quota is applied by Workbench." : "This model does not use daily free quota."} Stopping the wait does not cancel billing.`);
+        ? `${estimate.model.name} · ${estimate.duration}秒 · ${estimate.ratio}。预计 ${estimate.points} 点（${amount}）。${deductions}停止等待不会取消计费。`
+        : `${estimate.model.name} · ${estimate.duration}s · ${estimate.ratio}. Estimated cost: ${estimate.points} points (${amount} ${estimate.currency}). ${deductions} Stopping the wait does not cancel billing.`);
 }

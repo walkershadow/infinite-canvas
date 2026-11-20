@@ -1,3 +1,4 @@
+import { videoDeductionText } from "../src/services/workbench/video-benefits";
 import { expect, test } from "bun:test";
 import ts from "typescript";
 import { readFileSync } from "node:fs";
@@ -6,7 +7,7 @@ const code = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKi
 const model = { id: "seedance2.5-full-720p", name: "720p", price: 4.9, billingUnit: "second", durations: [5], defaultDuration: 5, ratios: [{value: "16:9"}], videoReferenceMultiplier: 3, priceRoundingStep: .5 };
 const session = { models: [model], capabilities: {video:true}, currency:"CNY", pointsPerYuan:10 };
 const loaded = {exports: {} as any};
-new Function("require", "exports", code)((name: string) => name.includes("media-size") ? {inferVideoRatio:()=>"16:9"} : name.includes("use-config-store") ? {modelOptionName:(s:string)=>s} : {workbenchSession:()=>session}, loaded.exports);
+new Function("require", "exports", code)((name: string) => name.includes("video-benefits") ? {videoDeductionText} : name.includes("media-size") ? {inferVideoRatio:()=>"16:9"} : name.includes("use-config-store") ? {modelOptionName:(s:string)=>s} : {workbenchSession:()=>session}, loaded.exports);
 const {workbenchVideoInput, workbenchVideoEstimateText} = loaded.exports;
 const config = {model:model.id, videoSeconds:5, size:"16:9"};
 test("video add/remove changes whole-task fee and keeps half-point rounding", () => {

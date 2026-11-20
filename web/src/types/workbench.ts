@@ -21,12 +21,15 @@ export type WorkbenchModel = {
     maxVideos?: number;
     maxAudios?: number;
     freeQuota: boolean;
+    giftQuota?: boolean;
+    recommended?: boolean;
+    recommendationLabel?: string;
 };
 export type WorkbenchBootstrap = {
     user: { id: string; name?: string; image?: string };
     models: WorkbenchModel[];
     aiModels?: { id: string; name: string; capability: "image" | "text" | "audio"; price: number; constraints?: { textOnly?: boolean; maxImages?: number; maxVideos?: number; referenceAudio?: boolean; maxAudios?: number; referenceKinds?: ("text" | "image" | "video" | "audio")[] } }[];
-    quota: { points: number; daily: { remaining: number } };
+    quota: { points: number; daily: { remaining: number }; gift_uses?: number; gift_uses_permanent?: number; gift_uses_expiring?: number; gift_uses_next_expiry?: string | null };
     capabilities: { video: boolean; image: boolean; text: boolean; audio: boolean; externalPlugins: boolean; publicLibrary?: boolean; publicLibraryAdmin?: boolean; legacyImport?: boolean };
     currency: string;
     pointsPerUsd?: number;

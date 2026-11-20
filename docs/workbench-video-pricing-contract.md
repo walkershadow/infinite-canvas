@@ -36,3 +36,17 @@
 本次 jp1 构建使用 1024MB Node heap 时，在 8635 modules transformed 后明确出现 `Reached heap limit`／`JavaScript heap out of memory`，最后一次 Mark-Compact 为 1009.4 → 1006.3MB，耗时 325 秒，退出 139。因此本次失败已确认为 V8 heap 不足，不能只归为打包缓慢。
 
 代码不变，恢复旧脚本的 2048MB Node heap 后，构建 48.39 秒成功。当次容器物理内存上限 1280MB、soft reservation 1024MB、memory+swap 3072MB，使用临时 swap，完成后已移除。这是该主机本次实测配置，不是所有环境的硬性要求；heap 上限不等于进程总内存。后续在同机重建可参考该成功记录，资源设置变更仍由发布会话确认，不自动修改线上配置。
+
+## 模型推荐、免费与赠送次数
+
+平台视频模型扩展 `recommended?: boolean`、`recommendationLabel?: string`、`giftQuota?: boolean`。推荐星标和标签直接读取后台配置，不按模型 ID 固定；两款新模型 `bt-minimax-h3-768-sp`／`doubao-seedance-2-0-mini-480p` 由后台配置推荐，英文标签分别为 `New`／`Special price`，中文显示“新模型”／“特价”。取消推荐或修改标签后，下一次 bootstrap 加载按新配置展示。
+
+`freeQuota` 仅表示每日免费资格，`giftQuota` 独立表示赠送次数资格。选择器列表分别显示太阳图标及 Daily free eligible／可用每日免费次数、礼物图标及 Gift uses eligible／可抵扣赠送次数，选中项提供对应图标提示。资格不是余额，也不保证本次免费。
+
+海外仅以明确的 giftQuota=true 授予赠送资格，不按 Fast 名称推断；后台默认仅原 Fast 为 true，其余 false，管理员可配置。为兼容未升级的国内宿主，仅国内且缺少 giftQuota 字段时沿用 `wb-seedance-2-fast` 旧资格；显式 false 优先。独立模式及自配模型不读取这些平台标识。
+
+bootstrap.quota 保留 `gift_uses`（当前可用赠送总次数），新增可选字段 `gift_uses_permanent`、`gift_uses_expiring`、`gift_uses_next_expiry`（ISO 时间或 null）。Canvas 积分菜单分别展示永久／限期次数和最早到期时间（按用户语言及浏览器时区格式化）；旧宿主仅有总数时只显示总数，不推定全部永久，也不从总数反算批次。空／无效到期时间不显示错误日期。
+
+生成确认按模型资格列出抵扣顺序：每日免费次数 → 赠送次数 → 赠送积分 → 付费积分；无对应资格的次数项省略，最终按提交时资格和可用余额结算。估价仍是原始模型费率，不在前端提前扣除次数或承诺免费。
+
+新充值赠送批次 30 天有效、旧管理员永久赠送保留，以及批次消费顺序、到期扣减均由海外后端处理。Canvas 只展示 bootstrap 明细和资格，不新增下单／支付／批次写入逻辑。本轮保留整数 quota 估价、资产目录及个人数据。

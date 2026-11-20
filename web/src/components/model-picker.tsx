@@ -1,6 +1,7 @@
+import { videoBenefitLabels } from "@/services/workbench/video-benefits";
 import { workbenchSession } from "@/services/api/workbench";
 import { useEffect, useId, useMemo, useState } from "react";
-import { Cpu } from "lucide-react";
+import { Cpu, Gift, Star, Sun } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import i18n from "@/i18n";
@@ -61,6 +62,7 @@ export function ModelPicker({ config, value, onChange, capability, className, fu
             >
                 <ModelIcon model={current} />
                 <span className="canvas-model-picker-text min-w-0 flex-1 truncate text-left">{current ? modelOptionLabel(config, current) : pickerPlaceholder}</span>
+                <VideoBadges config={config} model={current} compact />
             </SelectTrigger>
             <SelectContent
                 data-canvas-no-zoom
@@ -96,12 +98,22 @@ function emptyModelLabel(config: AiConfig, capability?: ModelCapability) {
 }
 
 function ModelLabel({ config, model }: { config: AiConfig; model: string }) {
-    return (
-        <span className="flex min-w-0 items-center gap-2">
-            <ModelIcon model={model} />
-            <span className="truncate">{modelOptionLabel(config, model)}</span>
-        </span>
-    );
+    return <span className="flex min-w-0 flex-col gap-1 py-1">
+        <span className="flex min-w-0 items-center gap-2"><ModelIcon model={model} /><span className="truncate">{modelOptionLabel(config, model)}</span></span>
+        <VideoBadges config={config} model={model} />
+    </span>;
+}
+
+function VideoBadges({ config, model, compact = false }: { config: AiConfig; model: string; compact?: boolean }) {
+    const { i18n } = useTranslation();
+    if (!isWorkbenchModel(config, model)) return null;
+    const session = workbenchSession();
+    const video = session.models.find(item => item.id === modelOptionName(model));
+    if (!video) return null;
+    const labels = videoBenefitLabels(video, session, i18n.language);
+    return <span className="flex shrink-0 flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+        {([ [Star, labels.recommendation], [Sun, labels.daily], [Gift, labels.gift] ] as const).map(([Icon, label]) => label ? <span key={label} className="inline-flex items-center gap-1" title={label}><Icon aria-label={compact ? label : undefined} aria-hidden={!compact} className="size-3.5" />{!compact && label}</span> : null)}
+    </span>;
 }
 
 function ModelIcon({ model }: { model: string }) {
