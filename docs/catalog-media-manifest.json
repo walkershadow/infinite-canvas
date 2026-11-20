@@ -2955,6 +2955,48 @@
           ]
         }
       ]
+    },
+    {
+      "key": "https://saman.lexianglexun.com/catalog/ai-creator/book-of-light/f85ef93924c7de25f8b98032a66995f5d368d7fa8cb9a658f962900e2881103d.mp4",
+      "kind": "video",
+      "urls": [
+        "https://saman.lexianglexun.com/catalog/ai-creator/book-of-light/f85ef93924c7de25f8b98032a66995f5d368d7fa8cb9a658f962900e2881103d.mp4"
+      ],
+      "uses": [
+        {
+          "caseId": "ai-creator-book-of-light",
+          "role": "outputMedia[0]",
+          "sources": [
+            {
+              "role": "inspiration",
+              "label": "Is YOUR NAME written in the Book of Life???",
+              "url": "https://www.youtube.com/shorts/Ejog3je9Ivo",
+              "author": "Earth To Eternity"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "key": "https://saman.lexianglexun.com/catalog/ai-creator/book-of-light/ff2e8479e7f042de5aa8f95de02cd124c7e06c648a119a1e76e1cba6d91acd43.jpg",
+      "kind": "image",
+      "urls": [
+        "https://saman.lexianglexun.com/catalog/ai-creator/book-of-light/ff2e8479e7f042de5aa8f95de02cd124c7e06c648a119a1e76e1cba6d91acd43.jpg"
+      ],
+      "uses": [
+        {
+          "caseId": "ai-creator-book-of-light",
+          "role": "outputMedia[0].poster",
+          "sources": [
+            {
+              "role": "inspiration",
+              "label": "Is YOUR NAME written in the Book of Life???",
+              "url": "https://www.youtube.com/shorts/Ejog3je9Ivo",
+              "author": "Earth To Eternity"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

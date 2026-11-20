@@ -14,7 +14,7 @@ export function catalogTextAsset(entry: OverseasPromptEntry, stepId: string, lan
     return {
         kind: "text", title: `${entry.title} · ${step.title} · ${languageLabel} · ${variant}`,
         coverUrl: "", tags: [...new Set([...entry.tags, entry.contentKind === "template" ? "Workflow template" : "Case study", languageLabel])],
-        source: original?.author || original?.label || entry.title,
+        source: entry.author || original?.author || original?.label || entry.title,
         note: `${variant}. ${entry.contentKind === "template" ? "Planning template: use with a text assistant to write the image and video prompts first." : "Use this step with your own inputs and model settings."}${step.originalKind === "excerpt" && (language === "original" || step.textKind === "source-excerpt") ? " This is a short excerpt, not a complete generation prompt." : ""}${original ? ` Original source: ${original.url}` : ""}`,
         data: { content },
         metadata: { source: "overseas-prompt-catalog", catalogId: entry.id, stepId: step.id, language, contentKind: entry.contentKind, variant, sourceModel: entry.sourceModel, sources: entry.sources },

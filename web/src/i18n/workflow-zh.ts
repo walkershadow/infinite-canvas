@@ -1,4 +1,6 @@
 export default {
+    "Actual platform generation model. Saved settings remain editable in Canvas.": "平台实际生成模型，保存的参数可在画布中编辑。",
+    "Platform-tested original case. Regeneration may vary in timing and motion.": "平台实测原创案例，再次生成的镜头时点与动作可能不同。",
     "Platform-tested original prompt": "平台实测原创提示词",
     "Translation of platform-tested prompt": "平台实测提示词译文",
     "Inspiration source": "灵感来源",

@@ -9,13 +9,13 @@ import { validateWorkflow } from "./workflow-validation";
 export function catalogWorkflow(entry: OverseasPromptEntry, language: WorkflowDocument["language"] = "en"): WorkflowDocument {
     const text = (value: string) => catalogText(value, language);
     const complete = entry.sourceCompleteness === "complete";
-    const stages: WorkflowDocument["stages"] = entry.steps.map(step => ({ ...(step.settings ? { settings: structuredClone(step.settings) } : {}), id: step.id, title: text(step.title), mode: step.mode || (complete && entry.contentKind === "template" ? "planning" : "manual"), prompt: step.prompts[language] || step.prompts.original || step.prompts.en || step.prompts.zh || "", dependsOn: [...(step.dependsOn || [])], ...(step.image ? { image: structuredClone(step.image) } : {}), ...(step.inputOrder ? { inputOrder: [...step.inputOrder] } : {}) }));
+    const stages: WorkflowDocument["stages"] = entry.steps.map(step => ({ ...(step.settings ? { settings: structuredClone(step.settings) } : {}), id: step.id, title: language === "zh" ? step.titleZh || text(step.title) : step.title, mode: step.mode || (complete && entry.contentKind === "template" ? "planning" : "manual"), prompt: step.prompts[language] || step.prompts.original || step.prompts.en || step.prompts.zh || "", dependsOn: [...(step.dependsOn || [])], ...(step.image ? { image: structuredClone(step.image) } : {}), ...(step.inputOrder ? { inputOrder: [...step.inputOrder] } : {}) }));
     return { schemaVersion: 1, source: structuredClone(entry), language, stages, references: (entry.referenceInputs || []).map(ref => ({ ...structuredClone(ref), title: text(ref.title), role: text(ref.role) })) };
 }
 export function workflowAsset(document: WorkflowDocument): Omit<WorkflowAsset, "id" | "createdAt" | "updatedAt"> {
     validateWorkflow(document);
     const source = document.source.sources.find(item => item.role !== "inspiration");
-    return { kind: "workflow", title: catalogTitle(document.source, document.language), coverUrl: "", tags: [...document.source.tags.map(tag => catalogText(tag, document.language)), catalogText("Workflow", document.language)], source: source?.author || source?.label, note: catalogText("Complete saved collection. Source text and editable stages are stored separately. External samples remain external links.", document.language), data: structuredClone(document) };
+    return { kind: "workflow", title: catalogTitle(document.source, document.language), coverUrl: "", tags: [...document.source.tags.map(tag => catalogText(tag, document.language)), catalogText("Workflow", document.language)], source: document.source.author || source?.author || source?.label, note: catalogText("Complete saved collection. Source text and editable stages are stored separately. External samples remain external links.", document.language), data: structuredClone(document) };
 }
 export function instantiateWorkflow(document: WorkflowDocument, origin = { x: 0, y: 0 }) {
     validateWorkflow(document);

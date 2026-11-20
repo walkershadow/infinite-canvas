@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type Plugin } from "vite";
 
-import { rawOverseasPromptCatalog } from "./src/services/api/overseas-prompt-catalog";
+import { catalogForAppMode } from "./src/services/api/overseas-prompt-catalog";
 import { validateCatalogMediaMap, type CatalogMediaMap } from "./src/lib/catalog-media";
 
 import { overseasPublicAssets } from "./scripts/overseas-public-assets";
@@ -52,7 +52,7 @@ export default defineConfig(({ mode, command }) => {
     if (integrated) {
         if (env.CATALOG_MEDIA_MAP_FILE) {
             catalogMediaMap = JSON.parse(readFileSync(resolve(webDir, env.CATALOG_MEDIA_MAP_FILE), "utf8"));
-            validateCatalogMediaMap(rawOverseasPromptCatalog, catalogMediaMap!);
+            validateCatalogMediaMap(catalogForAppMode(env.VITE_APP_MODE), catalogMediaMap!);
         } else if (command === "build") {
             throw new Error("Workbench builds require CATALOG_MEDIA_MAP_FILE. See docs/catalog-media-storage.md.");
         } else {

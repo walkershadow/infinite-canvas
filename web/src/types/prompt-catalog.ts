@@ -2,6 +2,7 @@ import type { WorkflowImage, WorkflowReference, WorkflowSettings } from "./workf
 export type CatalogMedia = { kind: "image" | "video"; url: string; caption: string; captionZh?: string; localPath?: string; poster?: string; originalUrl?: string; originalPoster?: string; unavailable?: boolean };
 export type OverseasPromptEntry = {
     publicLibrary?: boolean;
+    author?: string;
     id: string;
     contentKind: "template" | "case";
     title: string;

@@ -9,7 +9,7 @@ const mapping: CatalogMediaMap = { version: 1, allowedOrigins: ["https://cdn.exa
 
 test("manifest covers every source media use and deduplicates original local attachments", () => {
     expect(manifest.media).toEqual(dependencies);
-    expect(dependencies).toHaveLength(68);
+    expect(dependencies).toHaveLength(70);
     expect(dependencies.filter(d => d.repositoryPath)).toHaveLength(10);
     expect(new Set(dependencies.map(d => d.key)).size).toBe(dependencies.length);
 });

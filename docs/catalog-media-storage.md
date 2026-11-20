@@ -1,6 +1,6 @@
 # 海外公共案例媒体七牛转存协议
 
-机器清单：`docs/catalog-media-manifest.json`。由 `bun web/scripts/catalog-media-manifest.ts` 从正式目录生成，包含29案例及27模板中所有 referenceMedia、outputMedia、poster、步骤 image、输入 image。无附件的6例不会产生虚构文件。
+机器清单：`docs/catalog-media-manifest.json`。由 `bun web/scripts/catalog-media-manifest.ts` 从正式目录生成，包含30案例及27模板中所有 referenceMedia、outputMedia、poster、步骤 image、输入 image。无附件的6例不会产生虚构文件。
 
 每条 `media` 以 `key` 去重；本地文件优先使用 `repositoryPath`（相对仓库根目录），否则使用 `urls` 中的下载地址。`uses` 列出案例ID、字段用途和完整来源署名。`urls` 是目录记录的下载地址，下载成功与实际内容校验由转存端确认。
 

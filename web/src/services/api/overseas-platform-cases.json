@@ -1,10 +1,5 @@
-{
-  "status": "awaiting-successful-media",
-  "author": "AI Creator (platform test)",
-  "taskId": "cmwom81lo0003nv01jvan6rh9",
-  "publishScope": "overseas-only",
-  "deepLink": "/canvas/prompts?collection=case&id=ai-creator-book-of-light",
-  "entry": {
+[
+  {
     "id": "ai-creator-book-of-light",
     "contentKind": "case",
     "title": "The Book of Light",
@@ -21,12 +16,16 @@
     "notes": [
       "Created by AI Creator (platform test). The English prompt is the exact submitted text; Chinese is a translation.",
       "Inspired by the visual narrative of Earth To Eternity’s video. The original creator’s prompt and production model are unknown. This is an original scene, not a recovered creator prompt.",
-      "One generation stage contains all five shots. No reference images, videos or audio were submitted. Regeneration may vary in shot timing and motion."
+      "One generation stage contains all five shots. No reference images, videos or audio were submitted. Regeneration may vary in shot timing and motion.",
+      "The successful generation cost 5 points. The five shots and broadly consistent character costumes were visually reviewed; cuts do not fall at exact three-second intervals.",
+      "No post-production editing or voice-over was added. The generated audio track was not manually auditioned. This workflow does not promise frame-accurate reproduction."
     ],
     "notesZh": [
       "创作者：AI Creator（平台实测）。英文为实际提交的完整提示词，中文为译文。",
       "视觉叙事灵感来自 Earth To Eternity 的视频。原作者提示词及制作模型未知；本案例为原创场景，不是还原出的作者提示词。",
-      "一次生成包含全部五个镜头，未提交参考图片、视频或音频。再次生成的镜头时点与动作可能不同。"
+      "一次生成包含全部五个镜头，未提交参考图片、视频或音频。再次生成的镜头时点与动作可能不同。",
+      "本次成功生成实际消耗 5 points。已目视抽查五个镜头及基本连贯的角色服装，切换时点并非严格每三秒一次。",
+      "未进行后期剪辑或配音，未人工听审生成音轨。此流程不承诺逐帧复刻。"
     ],
     "sources": [
       {
@@ -61,6 +60,16 @@
     ],
     "referenceInputs": [],
     "referenceMedia": [],
-    "outputMedia": []
+    "outputMedia": [
+      {
+        "kind": "video",
+        "url": "https://saman.lexianglexun.com/catalog/ai-creator/book-of-light/f85ef93924c7de25f8b98032a66995f5d368d7fa8cb9a658f962900e2881103d.mp4",
+        "poster": "https://saman.lexianglexun.com/catalog/ai-creator/book-of-light/ff2e8479e7f042de5aa8f95de02cd124c7e06c648a119a1e76e1cba6d91acd43.jpg",
+        "caption": "Platform-generated result · 15.104 seconds · 720×1280 · H.264 video with AAC audio. Poster extracted at 6.6 seconds.",
+        "captionZh": "平台实际生成成片 · 15.104 秒 · 720×1280 · H.264 视频及 AAC 音轨。封面提取自成片 6.6 秒。"
+      }
+    ],
+    "author": "AI Creator (platform test)",
+    "mediaRights": "licensed"
   }
-}
+]

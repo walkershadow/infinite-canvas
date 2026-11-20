@@ -1,6 +1,7 @@
 import type { WorkflowDocument } from "../../types/workflow";
 import { mapCatalogMedia, mapWorkflowCatalogMedia } from "../../lib/catalog-media";
 import templates from "./overseas-workflow-templates.json";
+import platformCases from "./overseas-platform-cases.json";
 import expandedCases from "./overseas-expanded-cases.json";
 import type { OverseasPromptEntry } from "@/types/prompt-catalog";
 
@@ -491,11 +492,14 @@ const seedCatalog: OverseasPromptEntry[] = [
   }
 ];
 
-export const rawOverseasPromptCatalog: OverseasPromptEntry[] = [...templates as OverseasPromptEntry[], ...seedCatalog.filter(entry => entry.contentKind === "case"), ...expandedCases as OverseasPromptEntry[]];
+export const rawOverseasPromptCatalog: OverseasPromptEntry[] = [...templates as OverseasPromptEntry[], ...seedCatalog.filter(entry => entry.contentKind === "case"), ...expandedCases as OverseasPromptEntry[], ...platformCases as OverseasPromptEntry[]];
+
+export const catalogForAppMode = (mode?: string) => rawOverseasPromptCatalog.filter(entry => mode === "overseas" || !platformCases.some(item => item.id === entry.id));
+const modeCatalog = catalogForAppMode(import.meta.env?.VITE_APP_MODE);
 
 export const overseasPromptCatalog = typeof __CATALOG_MEDIA_MAP__ !== "undefined" && __CATALOG_MEDIA_MAP__
-    ? mapCatalogMedia(rawOverseasPromptCatalog, __CATALOG_MEDIA_MAP__) : rawOverseasPromptCatalog;
+    ? mapCatalogMedia(modeCatalog, __CATALOG_MEDIA_MAP__) : modeCatalog;
 
 export function resolveCatalogWorkflowMedia(document: WorkflowDocument) {
-    return mapWorkflowCatalogMedia(document, rawOverseasPromptCatalog, typeof __CATALOG_MEDIA_MAP__ !== "undefined" ? __CATALOG_MEDIA_MAP__ : null);
+    return mapWorkflowCatalogMedia(document, modeCatalog, typeof __CATALOG_MEDIA_MAP__ !== "undefined" ? __CATALOG_MEDIA_MAP__ : null);
 }
